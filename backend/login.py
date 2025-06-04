@@ -2,15 +2,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.authService import authenticate_user, create_access_token
 
-router = APIRouter()
-
 # Clase para recibir los datos del login
 class LoginData(BaseModel):
     username: str
     password: str
 
-# Ruta para realizar el login
-@router.post("/login")
+
 async def login(data: LoginData):
     user = authenticate_user(data.username, data.password)
     if user:

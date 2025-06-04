@@ -1,19 +1,33 @@
-import frontend
+from nicegui import ui
+#import frontend
+from backend.backend import app as fastapi_app
+
 from fastapi import FastAPI
-from backend.login import router as login_router  # Importa el router de backend
-
-
+from pydantic import BaseModel
+from backend.login import login  
+# NiceGUI routes
+import routes.home
+import routes.login
 
 app = FastAPI()
 
-# Registra el router de login
-app.include_router(login_router, prefix="/auth", tags=["auth"])
+# Clase para recibir los datos del login
+class LoginData(BaseModel):
+    username: str
+    password: str
+
+# Ruta para realizar el login
+@app.post("/auth/login")
+async def login_auth(data: LoginData):
+    return login(app, data)
+
 
 # Inicializa NiceGUI
-frontend.init(app)
+ui.run()
 
-if __name__ == '__main__':
-    print('Ejecuta el servidor con el comando uvicorn main:app')
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# if __name__ == '__main__':
+#     print('Ejecuta el servidor con el comando uvicorn main:app')
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
     
