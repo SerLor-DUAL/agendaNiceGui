@@ -8,7 +8,7 @@ from app.backend.api.routes import users
 from app.frontend.routes import home
 
 # Create FastAPI
-fastapi_app = FastAPI(title="Santipls")
+fastapi_app = FastAPI(title="Agenda Python")
 
 # Include all routes to FastAPI
 fastapi_app.include_router(users.router, prefix="/api")
