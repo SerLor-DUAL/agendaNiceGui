@@ -1,9 +1,7 @@
 from nicegui import ui
-#import frontend
-from backend.backend import app as fastapi_app
-
 from fastapi import FastAPI
 from pydantic import BaseModel
+# Backend imports
 from backend.login import login  
 # NiceGUI routes
 import routes.home
@@ -21,13 +19,7 @@ class LoginData(BaseModel):
 async def login_auth(data: LoginData):
     return login(app, data)
 
-
 # Inicializa NiceGUI
 ui.run()
 
 
-# if __name__ == '__main__':
-#     print('Ejecuta el servidor con el comando uvicorn main:app')
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
-    
