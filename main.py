@@ -1,25 +1,28 @@
-from nicegui import ui
+from nicegui import app, ui
 from fastapi import FastAPI
-from pydantic import BaseModel
-# Backend imports
-from backend.login import login  
-# NiceGUI routes
-import routes.home
-import routes.login
 
-app = FastAPI()
+# Import APIs
+from app.backend.api.routes import users 
 
-# Clase para recibir los datos del login
-class LoginData(BaseModel):
-    username: str
-    password: str
+# Import routes (pages)
+from app.frontend.routes import home
 
-# Ruta para realizar el login
-@app.post("/auth/login")
-async def login_auth(data: LoginData):
-    return login(app, data)
+# Create FastAPI
+fastapi_app = FastAPI(title="Santipls")
 
-# Inicializa NiceGUI
-ui.run()
+# Include all routes to FastAPI
+fastapi_app.include_router(users.router, prefix="/api")
+# fastapi_app.include_router(productos.router, prefix="/api")
+# fastapi_app.include_router(auth.router, prefix="/api")
 
+# Include into NiceGUI FastAPI
+app.mount("/api", fastapi_app)
 
+# Set jome page
+@ui.page('/')
+def pagina_inicio():
+    return home.create_home_page()
+
+# Load app
+if __name__ in {"__main__", "__mp_main__"}:
+    ui.run(port=8080, reload=True, show=True)
