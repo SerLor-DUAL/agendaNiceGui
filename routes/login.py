@@ -1,33 +1,26 @@
-from nicegui import ui
-import requests
+from nicegui import ui, app
 # Componentes
 from components.navbar import navbar  
 # Servicios
-from services.auth_service2 import authenticateUser
+from services.authService import authenticate_user, create_access_token
 
 
-# Función para manejar la página de login
 @ui.page('/login')
 def login():
-    navbar()
     ui.label('Iniciar sesión').classes('text-center text-2xl')
     username_input = ui.input('Nombre de usuario').classes('m-2')
     password_input = ui.input('Contraseña', password=True).classes('m-2')
-    
-    # Botón para iniciar sesión
-    ui.button('Iniciar sesión', on_click=lambda: loginUser(username_input.value, password_input.value))
 
-def loginUser(username, password):
-        # Llamamos al backend FastAPI para verificar las credenciales
-    try:
-        response = requests.post("http://localhost:8000/auth/login", json={"username": username, "password": password})
-        
-        if response.status_code == 200:
-            access_token = response.json().get("access_token")
-            ui.notify(f'Login exitoso! Token: {access_token}')
-            ui.navigate.to('/')  # Redirige a la página principal
+    def loginUser():
+        username = username_input.value.strip()
+        password = password_input.value.strip()
+        user = authenticate_user(username, password)
+        if user:
+            token = create_access_token({"sub": user["username"]})
+            app.storage.user.update({'username': user["username"], 'token':token, 'authenticated': True})
+            ui.notify('¡Inicio de sesión exitoso!')
+            ui.navigate.to('/')
         else:
-            ui.notify('Credenciales incorrectas')
-    except requests.exceptions.RequestException as e:
-        # Manejamos cualquier error de la solicitud
-        ui.notify(f'Error al contactar el servidor: {str(e)}')
+            ui.notify('Credenciales incorrectas', type='negative')
+    
+    ui.button('Iniciar sesión', on_click=loginUser)
