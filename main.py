@@ -1,5 +1,19 @@
-from nicegui import ui
-from routes.home import home  # Importa la página de inicio
-from routes.login import login
+import frontend
+from fastapi import FastAPI
+from backend.login import router as login_router  # Importa el router de backend
 
-ui.run()  # Ejecuta la aplicación
+
+
+app = FastAPI()
+
+# Registra el router de login
+app.include_router(login_router, prefix="/auth", tags=["auth"])
+
+# Inicializa NiceGUI
+frontend.init(app)
+
+if __name__ == '__main__':
+    print('Ejecuta el servidor con el comando uvicorn main:app')
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    

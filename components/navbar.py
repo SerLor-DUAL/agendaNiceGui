@@ -1,5 +1,5 @@
 from nicegui import ui
-
+from services.session import getUser
 # Vincular el archivo CSS
 #ui.link('/static/styles.css')
 
@@ -9,8 +9,9 @@ def navbar():
         # Logo (puedes poner un texto o imagen)
         ui.label('Mi Aplicación').classes('text-white text-xl')
         
-        # Botones de navegación
-        with ui.row().classes('gap-4'):
-            ui.button('Inicio', on_click=lambda: ui.open('/home')).classes('text-white')
-            ui.button('Tareas', on_click=lambda: ui.open('/tareas')).classes('text-white')
-            ui.button('Perfil', on_click=lambda: ui.open('/perfil')).classes('text-white')
+        if getUser() != None:
+            # Botones de navegación
+            with ui.row().classes('gap-4'):
+                ui.button('Inicio', on_click=lambda: ui.open('/home')).classes('text-white')
+                ui.button('Tareas', on_click=lambda: ui.open('/tareas')).classes('text-white')
+                ui.button('Perfil', on_click=lambda: ui.open('/perfil')).classes('text-white')
