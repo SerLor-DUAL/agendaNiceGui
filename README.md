@@ -3,7 +3,7 @@
 Este proyecto está construido con:
 
 - ✅ **FastAPI** como backend (API REST)
-- ✅ **NiceGUI** como interfaz de usuario (frontend)
+- ✅ **NiceGUI** como interfaz de usuario (FRONTEND)
 - ✅ **PostgreSQL** como base de datos relacional
 
 ---
