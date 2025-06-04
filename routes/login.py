@@ -18,12 +18,16 @@ def login():
     ui.button('Iniciar sesión', on_click=lambda: loginUser(username_input.value, password_input.value))
 
 def loginUser(username, password):
-    # Llamamos al backend FastAPI para verificar las credenciales
-    response = requests.post("http://localhost:8000/auth/login", json={"username": username, "password": password})
-    ui.notify(response)
-    if response.status_code == 200:
-        access_token = response.json().get("access_token")
-        ui.notify(f'Login exitoso! Token: {access_token}')
-        ui.navigate.to('/')  # Redirige a la página principal
-    else:
-        ui.notify('Credenciales incorrectas')
+        # Llamamos al backend FastAPI para verificar las credenciales
+    try:
+        response = requests.post("http://localhost:8000/auth/login", json={"username": username, "password": password})
+        
+        if response.status_code == 200:
+            access_token = response.json().get("access_token")
+            ui.notify(f'Login exitoso! Token: {access_token}')
+            ui.navigate.to('/')  # Redirige a la página principal
+        else:
+            ui.notify('Credenciales incorrectas')
+    except requests.exceptions.RequestException as e:
+        # Manejamos cualquier error de la solicitud
+        ui.notify(f'Error al contactar el servidor: {str(e)}')
