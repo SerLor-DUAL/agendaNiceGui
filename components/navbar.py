@@ -1,5 +1,8 @@
 from nicegui import ui
 
+# Vincular el archivo CSS
+#ui.link('/static/styles.css')
+
 def navbar():
     """Crea la barra de navegación."""
     with ui.row().classes('w-full bg-blue-500 p-2 justify-between items-center'):
