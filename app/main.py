@@ -7,6 +7,7 @@ from backend.api.routes import users
 
 # Import routes (pages)
 from frontend.routes import home
+from frontend.routes import login
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -23,15 +24,27 @@ fastapi_app.include_router(users.router)
 app.mount("/api", fastapi_app)
 
 # Set home page
+# Add static folder for frontend.
+app.add_static_files('/static', 'app/frontend/static')
+
+# Set jome page
 @ui.page('/')
 def pagina_inicio():
     return home.create_home_page()
+
+# Execute server and load app
+# Set login page
+@ui.page('/login')
+def pagina_login():
+    return login.create_login_page()
 
 # Incialize database when NiceGUI starts
 @app.on_startup
 async def startup():
     await init_db()
 
-# Execute server and load app
+
+
+# Load app
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run(port=8080, reload=True, show=True)
