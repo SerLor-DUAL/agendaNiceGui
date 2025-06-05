@@ -51,6 +51,8 @@ mi_proyecto/
 │   │   │   ├── navbar.py
 │   │   │   ├── sidebar.py
 │   │   │   └── user_card.py
+│   │   ├── static/
+│   │   │   ├── img/
 
     ├── requirements.in                     # Lista las dependencias directas del proyecto, sin versiones estrictas.
     ├── requirements.txt                    # Versión bloqueada con todas las dependencias y sub-dependencias.
