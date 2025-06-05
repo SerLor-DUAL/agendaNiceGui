@@ -1,0 +1,9 @@
+nicegui
+fastapi
+sqlmodel
+asyncpg
+uvicorn
+python-multipart
+python-dotenv
+pydantic
+email_validator
