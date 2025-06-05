@@ -8,7 +8,7 @@ def create_home_page():
     'flex '                
     'items-center '        
     'justify-between '    
-    'h-screen '        
+    'h-[80%] '        
     'px-8 '           
     'bg-gray-50 '         
     'w-full'                
@@ -16,18 +16,18 @@ def create_home_page():
         with ui.column().classes(
             'flex-1 '          
             'pr-8 '             
-            'text-center '      
-            'md:text-left'       
+            'text-center '
+            'h-full '             
         ):
-            ui.markdown('# AgendaNiceGUI').classes(
-                'text-5xl '
-                'font-extrabold '
+            ui.label('AgendaNiceGUI').classes(
+                'text-4xl md:text-6xl lg:text-8xl '
+                'font-bold '
                 'text-gray-900 '
-                'mb-4'
+                'mb-12 w-full'
             )
-            ui.markdown('Esta agenda es nuestra brújula. 🧭').classes(
-                'text-lg '
-                'text-gray-700'
+            ui.label('Esta agenda es nuestra brújula. 🧭').classes(
+                '!text-3xl '
+                'text-gray-700 w-full'
             )
 
         with ui.column().classes(
@@ -36,11 +36,7 @@ def create_home_page():
             'text-center '      
             'md:text-right'      
         ):
-            ui.image('/static/img/hero.png').classes(
-                'w-[50%]'    
-                'h-[50%] '        
-                'mx-auto '       
-                'md:mx-0'         
+            ui.image('/static/img/hero.png').classes(       
             )
 
     
