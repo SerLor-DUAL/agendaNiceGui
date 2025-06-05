@@ -21,7 +21,6 @@ class DatabaseSettings:
 
 class UsersTableSettings:
     USERS_TABLE = os.getenv("DB_USERS_TABLE")
-    USERS_UUID_COL = os.getenv("DB_USERS_TABLE_UUID")
     USERS_ID_COL = os.getenv("DB_USERS_TABLE_ID")
     USERS_NICKNAME_COL = os.getenv("DB_USERS_TABLE_NICKNAME")
     USERS_HASHEDPASSWORD_COL = os.getenv("DB_USERS_TABLE_HASHEDPASSWORD")
@@ -30,7 +29,6 @@ class UsersTableSettings:
 
 class EventTableSettings:
     EVENTS_TABLE = os.getenv("DB_EVENTS_TABLE")
-    EVENTS_UUID_COL = os.getenv("DB_EVENTS_TABLE_UUID")
     EVENTS_ID_COL = os.getenv("DB_EVENTS_TABLE_ID")
     EVENTS_TITLE_COL = os.getenv("DB_EVENTS_TABLE_TITLE")
     EVENTS_DESCRIPTION_COL = os.getenv("DB_EVENTS_TABLE_DESCRIPTION")
@@ -38,8 +36,8 @@ class EventTableSettings:
     EVENTS_ENDTIME_COL = os.getenv("DB_EVENTS_TABLE_ENDTIME")
     EVENTS_RECORDCREATION_COL = os.getenv("DB_EVENTS_TABLE_RECORDCREATION")
     EVENTS_RECORDMODIFICATION_COL = os.getenv("DB_EVENTS_TABLE_RECORDMODIFICATION")
-    EVENTS_USER_ID_COL = os.getenv("DB_EVENTS_TABLE_USER_ID")                           # Foreign key to users table
-
+    EVENTS_USER_ID_COL = os.getenv("DB_EVENTS_TABLE_USER_ID")
+    
 # Create settings instances  
 db_settings = DatabaseSettings()
 users_table_settings = UsersTableSettings()

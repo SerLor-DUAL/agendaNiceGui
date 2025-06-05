@@ -23,11 +23,10 @@ fastapi_app.include_router(users.router)
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)
 
-# Set home page
 # Add static folder for frontend.
-app.add_static_files('/static', 'app/frontend/static')
+app.add_static_files('/static', 'frontend/static')
 
-# Set jome page
+# Set home page
 @ui.page('/')
 def pagina_inicio():
     return home.create_home_page()
@@ -38,12 +37,10 @@ def pagina_inicio():
 def pagina_login():
     return login.create_login_page()
 
-# Incialize database when NiceGUI starts
+# Inicialize database when NiceGUI starts
 @app.on_startup
 async def startup():
     await init_db()
-
-
 
 # Load app
 if __name__ in {"__main__", "__mp_main__"}:

@@ -11,16 +11,16 @@ from backend.config import db_settings
 # Creates the asynchronous database engine
     # This engine manages the connection pool to your database in an async way.
 engine:AsyncEngine = create_async_engine(
-                                            db_settings.database_url,      # Database connection string from config
-                                            echo= True,                 # Enable SQL query logging for debugging    
+                                            db_settings.database_url,    # Database connection string from config
+                                            echo = True,                 # Enable SQL query logging for debugging    
                                         )
 
 # Creates a session factory bound to the async engine
     # This factory will generate AsyncSession instances when called.
 async_session = sessionmaker(
                                 bind=engine,                # Use the previously created engine       
-                                expire_on_commit=False,     # Prevent objects from expiring after commit (keep them usable)
-                                class_=AsyncSession         # Use async session for async DB operations
+                                expire_on_commit = False,     # Prevent objects from expiring after commit (keep them usable)
+                                class_ = AsyncSession         # Use async session for async DB operations
                             )
 
 # Async function to initialize the database schema
