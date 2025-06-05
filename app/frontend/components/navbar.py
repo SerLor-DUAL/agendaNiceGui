@@ -39,3 +39,4 @@ def navbar():
                 'py-2 '                  # Padding vertical de 0.5rem (8px)
                 'rounded'                # Bordes redondeados
             )
+ 
