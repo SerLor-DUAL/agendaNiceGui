@@ -8,6 +8,7 @@ from backend.api.routes import users
 # Import routes (pages)
 from frontend.routes import home
 from frontend.routes import login
+from frontend.routes import register
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -36,6 +37,9 @@ def pagina_inicio():
 @ui.page('/login')
 def pagina_login():
     return login.create_login_page()
+@ui.page('/register')
+def pagina_register():
+    return register.create_register_page()
 
 # Inicialize database when NiceGUI starts
 @app.on_startup
