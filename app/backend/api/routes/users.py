@@ -1,32 +1,23 @@
-from fastapi import APIRouter
+# app/backend/api/routes/users.py
 
+# Import necessary modules
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import select
+from backend.db.db_handler import get_session
+from backend.models.user import User
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+# Create a new API router for user-related endpoints
 router = APIRouter()
 
-# Fake temporal DB
-usuarios_db = [
-    {"id": 1, "nombre": "Juan", "email": "juan@email.com"},
-    {"id": 2, "nombre": "María", "email": "maria@email.com"}
-]
-
-@router.get("/users")
-def get_users():
-    """Obtener todos los usuarios"""
-    return usuarios_db
-
-@router.post("/users")
-def create_user(name: str, email: str):
-    """Crear un nuevo usuario"""
-    nuevo_usuario = {
-        "id": len(usuarios_db) + 1,
-        "name": name,
-        "email": email
-    }
-    usuarios_db.append(nuevo_usuario)
-    return nuevo_usuario
-
-@router.delete("/users/{user_id}")
-def delete_user(user_id: int):
-    """Eliminar un usuario"""
-    global usuarios_db
-    usuarios_db = [u for u in usuarios_db if u["id"] != user_id]
-    return {"mensaje": "Usuario eliminado"}
+# Endpoint to get all the users, expects a list formed by a User model in the request body
+@router.get("/users", response_model=list[User])
+async def get_users(session: AsyncSession = Depends(get_session)):
+    result = await session.exec(select(User))
+    users = result.all()
+    
+    # If no users are found, raise a 404 HTTP exception
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+    
+    return users
