@@ -27,8 +27,6 @@ mi_proyecto/
 
 │   │   ├── db/                             # Conexión y consultas SQL a la base de datos
 │   │   │   ├── db_handler.py               # Conexión y gestión de PostgreSQL
-│   │   │   ├── user_queries.py             # SQL relacionado con usuarios
-│   │   │   └── data_queries.py             # SQL para otros datos
 
 │   │   ├── models/                         # Modelos SQLModel para BD y validación
 │   │   │   ├── user.py
