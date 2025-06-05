@@ -2,10 +2,10 @@ from nicegui import app, ui
 from fastapi import FastAPI
 
 # Import APIs
-from app.backend.api.routes import users 
+from backend.api.routes import users 
 
 # Import routes (pages)
-from app.frontend.routes import home
+from frontend.routes import home
 
 # Create FastAPI
 fastapi_app = FastAPI(title="Santipls")
