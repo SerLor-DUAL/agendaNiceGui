@@ -2,6 +2,8 @@ from nicegui import ui
 from ..components.navbar import navbar
 
 def create_register_page():
+    # Agrega aquí el CSS personalizado
+    ui.add_head_html('<link rel="stylesheet" href="/static/css/styleColores.css">')
     # Submit function for registration
     def submit_register():
                         usuario = username_input.value
