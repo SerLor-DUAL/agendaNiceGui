@@ -36,7 +36,7 @@ def create_home_page():
             'text-center '      
             'md:text-right'      
         ):
-            ui.image('/static/img/hero.png').classes(       
+            ui.image('/static/img/hero.png').classes(      
             )
 
     
