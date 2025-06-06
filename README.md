@@ -23,7 +23,7 @@ mi_proyecto/
 │   │   │   │   ├── events.py               # Rutas de eventos
 │   │   │   │   └── auth.py                 # Login, registro, autenticación
 │   │   │   └── dependencies/
-│   │   │       └── auth_guard.py           # Verificación JWT (get_current_user)
+│   │   │       └── auth_guard.py           # Verificación JWT (get_current_user) - Actua como Middleware
 
 │   │   ├── db/                             # Conexión y consultas SQL a la base de datos
 │   │   │   ├── db_handler.py               # Conexión y gestión de PostgreSQL
