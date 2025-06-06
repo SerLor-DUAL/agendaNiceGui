@@ -1,0 +1,14 @@
+@keyframes slide-in-left {
+                from {
+                    transform: translateX(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+.slide-in-left {
+    /* Duración total de la animación: 1s, easing ease-out, se queda en la posición final (forwards) */
+    animation: slide-in-left 1s ease-out forwards;
+}
