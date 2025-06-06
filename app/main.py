@@ -49,6 +49,8 @@ app.add_static_files('/static', STATIC_PATH)
 #                                           Pages configuration                                                                 #
 # ============================================================================================================================= #
 
+ui.add_head_html('<link rel="stylesheet" href="/static/styleColores.css">')
+
 # Set home page
 @ui.page('/')
 def pagina_inicio():
