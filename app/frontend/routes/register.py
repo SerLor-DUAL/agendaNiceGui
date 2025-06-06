@@ -58,7 +58,7 @@ def create_register_page():
     
                 ui.button('Registrarse', on_click=submit_register).classes(
                     'w-full '                        
-                    '!bg-[#349CD7] '                   
+                    '!bg-logo '                   
                     '!text-[#FAF9F6] '                 
                     'font-semibold '                  
                     'px-4 py-2 '                      
@@ -69,7 +69,7 @@ def create_register_page():
 
                 # Enlaces secundarios
                 with ui.row().classes('mt-4 justify-between w-full'):
-                    ui.link('Inicia Sesión', '/reset-password').classes(
+                    ui.link('Inicia Sesión', '/login').classes(
                         'text-[#F59E0B] '           # naranja acento
                         'hover:text-[#D97706] '     # naranja acento más oscuro al pasar
                         'text-sm'
