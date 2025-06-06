@@ -25,7 +25,7 @@ fastapi_app.include_router(users.router)
 app.mount("/api", fastapi_app)
 
 # Add static folder for frontend.
-app.add_static_files('/static', 'frontend/static')
+app.add_static_files('/static', 'app/frontend/static')
 
 # Set home page
 @ui.page('/')
