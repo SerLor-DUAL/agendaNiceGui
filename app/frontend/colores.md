@@ -6,7 +6,7 @@ A continuación se presenta una paleta de colores coherente partiendo del azul p
 
 ## 1. Color primario
 
-- **Azul Logo**  
+- **Azul Logo | Logo**  
   - **Hex:** `#349CD7`  
   - **RGB:** `rgb(52, 156, 215)`  
   - **Uso sugerido:** Botones principales, enlaces, iconos destacados, encabezados.
@@ -15,12 +15,12 @@ A continuación se presenta una paleta de colores coherente partiendo del azul p
 
 ## 2. Tonos secundarios de azul
 
-1. **Azul oscuro**  
+1. **Azul oscuro | DarkBlue**  
    - **Hex:** `#2C82C9`  
    - **RGB:** `rgb(44, 130, 201)`  
    - **Uso sugerido:** Hover de botones, fondos de secciones intermedias, bordes de contenedores.
 
-2. **Azul claro**  
+2. **Azul claro | LightBlue**  
    - **Hex:** `#8ED6F8`  
    - **RGB:** `rgb(142, 214, 248)`  
    - **Uso sugerido:** Fondos de tarjetas, gradientes, resaltados suaves detrás de texto.
@@ -29,17 +29,17 @@ A continuación se presenta una paleta de colores coherente partiendo del azul p
 
 ## 3. Neutrales / Grises para fondo y texto
 
-1. **Gris oscuro (navbar, texto principal)**  
+1. **Gris oscuro (navbar, texto principal) | DarkGray**  
    - **Hex:** `#1F2937`  
    - **RGB:** `rgb(31, 41, 55)`  
    - **Uso sugerido:** Fondo de navbar, texto blanco encima para contraste.
 
-2. **Gris medio (fondos de secciones, cards)**  
+2. **Gris medio (fondos de secciones, cards) | MidGray**  
    - **Hex:** `#4B5563`  
    - **RGB:** `rgb(75, 85, 99)`  
    - **Uso sugerido:** Texto secundario, iconos, bordes suaves, fondos de secciones intermedias.
 
-3. **Gris claro (paper / section background)**  
+3. **Gris claro (paper / section background) | LightGray**  
    - **Hex:** `#F3F4F6`  
    - **RGB:** `rgb(243, 244, 246)`  
    - **Uso sugerido:** Fondo de página principal, secciones muy claras, formularios para dar aire.
@@ -55,7 +55,7 @@ A continuación se presenta una paleta de colores coherente partiendo del azul p
 
 Para destacar acciones importantes, se recomienda un color cálido que contraste con los azules y grises:
 
-- **Naranja acento**  
+- **Naranja acento | AccentOrange**  
   - **Hex:** `#F59E0B`  
   - **RGB:** `rgb(245, 158, 11)`  
   - **Uso sugerido:** Botones de llamada a la acción (CTA), enlaces importantes, iconos de alerta o “destacado”.  
@@ -63,7 +63,7 @@ Para destacar acciones importantes, se recomienda un color cálido que contraste
 
 Si prefieres un acento más “frío” dentro de la misma familia de azules/verdosos:
 
-- **Verde menta suave**  
+- **Verde menta suave | AccentGreen**  
   - **Hex:** `#10B981`  
   - **RGB:** `rgb(16, 185, 129)`  
   - **Uso sugerido:** Botones de confirmación (“Aceptar”, “Guardar”), iconos de éxito.

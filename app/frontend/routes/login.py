@@ -1,8 +1,6 @@
 from nicegui import ui
 from ..components.navbar import navbar
 
-def create_login_page():
-    navbar()
 from nicegui import ui
 from frontend.components.navbar import navbar
 
@@ -20,8 +18,7 @@ def create_login_page():
                 )   
                 # User
                 username_input = ui.input(
-                    'Usuario',
-                    placeholder='Ingresa tu usuario'
+                    'Usuario'
                 ).classes(
                     'w-full mb-4 '             
                     'text-[#1F2937] '           
@@ -33,7 +30,6 @@ def create_login_page():
                 # password
                 password_input = ui.input(
                     'Contraseña',
-                    placeholder='Ingresa tu contraseña',
                     password=True
                 ).classes(
                     'w-full mb-6 '
