@@ -20,8 +20,8 @@ mi_proyecto/
 │   │   ├── api/                            # Endpoints y protección con JWT
 │   │   │   ├── routes/
 │   │   │   │   ├── users.py                # Rutas de usuarios (perfil, CRUD)
-│   │   │   │   ├── auth.py                 # Login, registro, autenticación
-│   │   │   │   └── data.py                 # Rutas generales (dashboard, otros datos)
+│   │   │   │   ├── events.py               # Rutas de eventos
+│   │   │   │   └── auth.py                 # Login, registro, autenticación
 │   │   │   └── dependencies/
 │   │   │       └── auth_guard.py           # Verificación JWT (get_current_user)
 
@@ -29,12 +29,15 @@ mi_proyecto/
 │   │   │   ├── db_handler.py               # Conexión y gestión de PostgreSQL
 
 │   │   ├── models/                         # Modelos SQLModel para BD y validación
-│   │   │   ├── user.py
-│   │   │   ├── event.py
+│   │   │   ├── user
+|   |   |   |     ├── user.py               # Modelo de usuario según la BD
+|   |   |   |     └── DTOs                  # Carpeta para los DTOs del usuario
+│   │   │   ├── event
+|   |   |   |     ├── event.py
+|   |   |   |     └── DTOs
 
 │   │   ├── services/                       # Lógica de negocio (sin lógica en rutas)
 │   │   │   ├── user_service.py             # Registro, login, perfil, etc.
-│   │   │   └── data_service.py             # Datos generales, dashboard, etc.
 
 │   │   └── utils/                          # Funciones auxiliares reutilizables
 │   │       ├── jwt.py                      # Crear y verificar tokens JWT
@@ -107,7 +110,7 @@ mi_proyecto/
 - Las rutas **solo deben recibir y responder** datos, sin lógica pesada.  
 - Toda la lógica de negocio debe estar en los servicios.  
 - Las consultas SQL deben estar separadas en archivos específicos.  
-- Las rutas privadas deben usar `Depends(get_current_user)` para protección.  
+- Las rutas privadas deben usar `Depends(get_current_user)` de el auth_guard para protección.  
 - No conectar directamente a la base de datos desde los endpoints.  
 - No incluir lógica de negocio dentro de las rutas.  
 
