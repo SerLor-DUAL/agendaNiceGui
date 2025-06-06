@@ -19,9 +19,9 @@ async def api_get_users(session: AsyncSession = Depends(get_session)):
     users : list[User] | None = await us.get_all_users(session)                 
     
     if not users or users == [] or users == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)                  # Raise an error if no users are found
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")     # Raise an error if the users are not found or None (not found)
     
-    return [UserRead.model_validate(user) for user in users]                        # Convert User models to UserRead DTOs using model_validate for compatibility
+    return [UserRead.model_validate(user) for user in users]                                    # Convert User models to UserRead DTOs using model_validate for compatibility
 
 # Endpoint to create a new user, expects a UserCreate DTO and returns an UserRead model
 @router.post("/users", response_model=UserRead)
@@ -44,9 +44,9 @@ async def api_read_user(user_id: int, session: AsyncSession = Depends(get_sessio
     user: User | None = await us.read_user_by_id(user_id, session) 
 
     if not user or user == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)                  # Raise an error if the user is not found
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")     # Raise an error if the user is not found or None (not found)
     
-    return UserRead.model_validate(user)                                            # Convert User model to UserRead DTO using model_validate for compatibility
+    return UserRead.model_validate(user)                                                        # Convert User model to UserRead DTO using model_validate for compatibility
 
 # Endpoint to update an existing user, expects a UserUpdate DTO and returns an UserRead model
 @router.put("/users/{user_id}", response_model=UserRead)
@@ -54,22 +54,24 @@ async def api_update_user(user_id: int, user_to_update: UserUpdate, session: Asy
     
     # Control the update of an existing user with a transaction
     async with session.begin():
-        user, updated = await us.update_user(user_id, user_to_update, session)      # Call the update_user function from user_service, returning the updated user
-                                                                                    # and a boolean indicating if the user was updated
+        user, updated = await us.update_user(user_id, user_to_update, session)                  # Call the update_user function from user_service, returning the updated user
+                                                                                                # and a boolean indicating if the user was updated
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)                  # Raise an error if the user is not found
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")                         # Raise an error if the user is not found
     
     if not updated:
-        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)                 # Raise an error if the user was not updated
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="No changes were made to the user")        # Raise an error if no changes were made to the user
     
-    return UserRead.model_validate(user)                                            # Convert User model to UserRead DTO using model_validate for compatibility
+    return UserRead.model_validate(user)                                                        # Convert User model to UserRead DTO using model_validate for compatibility
 
-# Endpoint to delete a user by ID, returns a 204 No Content response if successful
-@router.post("/users/{user_id}")
+# # Endpoint to delete a user by ID, returns a 204 No Content response if successful
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def api_delete_user(user_id: int, session: AsyncSession = Depends(get_session)):
     
     async with session.begin():
-            await us.delete_user(user_id, session)                                        # Call the delete_user function from user_service
-                                                                                                    # returning a boolean indicating if the user was deleted
-    # if not deleted:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")         # Raise an error if the user is not found
+        deleted = await us.delete_user(user_id, session)                                        # Call the delete_user function from user_service
+                                                                                                # returning a boolean indicating if the user was deleted
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")     # Raise an error if the user is not found or None (not found)
+    else:
+        return {"detail": "User deleted successfully"}

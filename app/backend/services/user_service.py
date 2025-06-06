@@ -40,7 +40,12 @@ class UserService:
     
     # Reads an user by ID
     async def read_user_by_id(user_id: int, session: AsyncSession) -> User | None:
-        result = await session.exec(select(User).where(User.id == user_id))     # Execute a select query to find the user by ID
+        result = await session.exec(select(User).where(User.id == user_id))         # Execute a select query to find the user by ID
+        return result.first()
+    
+    # Reads an user by nickname
+    async def read_user_by_nickname(nickname: str, session: AsyncSession) -> User | None:
+        result = await session.exec(select(User).where(User.nickname == nickname))   # Execute a select query to find the user by nickname
         return result.first()
     
     # Updates an existing user
@@ -48,7 +53,7 @@ class UserService:
         user = await UserService.read_user_by_id(user_id, session) 
         updated = False
         if not user:
-            return None                                                         # If the user does not exist, return None
+            return None, False   # If the user does not exist, return None and False
         
         # Update the user's nickname if it's provided and different from the current one
         if user_to_update.nickname is not None and user.nickname != user_to_update.nickname:
@@ -61,9 +66,9 @@ class UserService:
                     user.hashed_password = hash_password(user_to_update.password)
                     updated = True
         
-        # If no updates were made, return the user as is
+        # If no updates were made, return the user and false
         if not updated:
-            return user
+            return user, False
         
         # If updates were made, set the modification timestamp and save the user
         else:
@@ -84,6 +89,13 @@ class UserService:
         await session.flush()           # Flush the session to apply the changes
         return True
     
-    
+    # Authenticates a user by nickname and password, it will return the user if authentication is successful
+    async def authenticate_user(nickname: str, password: str, session: AsyncSession) -> User | None:
+        user = await UserService.read_user_by_nickname(nickname, session)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
     
 user_Service = UserService()  # Create an instance of UserService to use its methods
