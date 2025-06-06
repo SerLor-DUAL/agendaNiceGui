@@ -1,14 +1,14 @@
 # app/backend/models/user/model.py
 
 # Import necessary modules
-from sqlmodel import SQLModel, Field, Column, Integer, String, TIMESTAMP
-from datetime import datetime
-from typing import Optional
+from sqlmodel import SQLModel, Field, Column, Integer, String, TIMESTAMP         # Importing SQLModel for database operations
+from datetime import datetime                                                    # Importing for timestamps management
+from typing import Optional                                                      # Importing Optional for type hints
+from backend.config import users_table_settings as ut                            # Importing users table settings
 
-# Configuration with real table and column names from .env
-from backend.config import users_table_settings as ut 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-# Definition of the User model from the DB
+# NOTE: This class model represents an user in the database
 class User(SQLModel, table=True):
     
     # Table name

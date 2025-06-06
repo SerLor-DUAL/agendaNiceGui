@@ -4,7 +4,7 @@ import os
 
 # Import APIs
 from backend.api.routes import users 
-from backend.api.dependencies import auth_guard
+from backend.api.routes import auth 
 
 # Import routes (pages)
 from frontend.routes import home
@@ -22,8 +22,8 @@ from backend.db.db_handler import init_db
 fastapi_app = FastAPI(title="Integra")
 
 # Include all the needed routes to FastAPI
-fastapi_app.include_router(users.router)            # Users API
-fastapi_app.include_router(auth_guard.router)       # Authentication API
+fastapi_app.include_router(users.userRouter)      # Users API
+fastapi_app.include_router(auth.authRouter)       # Authentication API
 
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)

@@ -1,40 +1,70 @@
 # app/backend/utils/jwt.py
 
 # Import necessary modules
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
-from typing import Optional, Dict, Any
-import os
+from datetime import datetime, timedelta            # Importing datetime and timedelta for working with dates
+from jose import jwt, JWTError                      # Importing JWTError for handling JWT decoding errors
+from typing import Optional, Dict, Any              # Importing Optional, Dict, and Any for type hints
+import os                                           # Importing os for accessing environment variables
 
-# Constants for JWT settings
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")                                # Secret key for encoding the JWT from environment variable
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+
+# NOTE: This constants are extracted from environment variables and are used for JWT creation and decoding
+
+# Secret key for encoding the JWT from environment variable
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")                                
 if not SECRET_KEY:
-    raise ValueError("JWT_SECRET_KEY environment variable not set")     # Raise an error if the secret key is not set
+    raise ValueError("JWT_SECRET_KEY environment variable not set")
 
-ALGORITHM = "HS256"                                                     # Algorithm used for encoding the JWT
-ACCESS_TOKEN_EXPIRE_MINUTES = 30                                        # Token expiration time in minutes
+# Algorithm used for encoding the JWT
+ALGORITHM = "HS256" 
+                
+# Token expiration time in minutes                             
+ACCESS_TOKEN_EXPIRE_MINUTES = 30                                        
 
-# Class for handling JWT operations
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+
+# NOTE: This class handles JWT creation and decoding
 class JWTHandler:
     def __init__(self):
         self.secret_key = SECRET_KEY
         self.algorithm = ALGORITHM
         self.access_token_expire_minutes = ACCESS_TOKEN_EXPIRE_MINUTES
+
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+    
+    # Function to create a JWT with the given data and expiration time
+    def create_jwt(self, data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
         
-# Function to create a JWT with the given data and expiration time
-def create_jwt(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = data.copy()                                                                         # Create a copy of the data to encode                                                       
-    expire = datetime.now() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))     # Set the expiration time for the token, defaulting to ACCESS_TOKEN_EXPIRE_MINUTES if not provided
-    to_encode.update({"exp": expire})                                                               # Update the data with the expiration time                                  
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)                            # Encode the data into a JWT using the secret key and algorithm
-    return encoded_jwt
+        # Creates a copy of the data to encode, set the expiration time, and encode the data into a JWT
+        to_encode = data.copy()
+        
+        # Sets the expiration time for the token, defaulting to ACCESS_TOKEN_EXPIRE_MINUTES if not provided
+        expire = datetime.now() + (expires_delta or timedelta(minutes=self.access_token_expire_minutes))
+        
+        # Updates the data with the expiration time
+        to_encode.update({"exp": expire})
+        
+        # Encodes the data into a JWT using the secret key and algorithm                                
+        encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        
+        # Returns the encoded JWT                   
+        return encoded_jwt
 
-# Function to decode a JWT and return the payload
-def decode_jwt(token: str) -> Dict[str, Any]:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])                             # Decode the JWT using the secret key and algorithm
-        return payload
-    except JWTError:
-        return {}                                                                                   # Return an empty dictionary if decoding fails
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-jwt_handler = JWTHandler()  # Instance of the JWTHandler class
+    # Function to decode a JWT and return the payload
+    def decode_jwt(self, token: str) -> Dict[str, Any]:
+        try:
+            
+            # Decodes the JWT using the secret key and algorithm, then returns the payload
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            return payload
+        
+        # Returns an empty dictionary if the token is invalid
+        except JWTError:
+            return {}
+        
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+
+# Create an instance of JWTHandler to use throughout the app
+jwt_handler = JWTHandler() 
