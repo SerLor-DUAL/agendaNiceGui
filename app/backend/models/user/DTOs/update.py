@@ -7,4 +7,4 @@ from backend.models.user.DTOs.base import UserBase
 
 # Definition of the UserUpdate DTO model, which is used by the API endpoint to update user data.
 class UserUpdate(UserBase):
-    password: Optional[str] = Field(None, min_length=6)
+    password: Optional[str] = Field(None, min_length=6) # Optional new password that will be encrypted before storing
