@@ -18,7 +18,7 @@ from backend.db.db_handler import init_db
 # ============================================================================================================================= #
 
 # Create FastAPI instance
-fastapi_app = FastAPI(title="Santipls")
+fastapi_app = FastAPI(title="Integra")
 
 # Include all the needed routes to FastAPI
 fastapi_app.include_router(users.router)
