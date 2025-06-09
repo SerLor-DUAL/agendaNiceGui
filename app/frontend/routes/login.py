@@ -59,9 +59,6 @@ def create_login_page():
                         try:
                             response = await client.post(url, json=json_data, timeout=10)
                             
-                            print(f"STATUS: {response.status_code}")
-                            print(f"RESPONSE: {response.text}")
-
                             # Check if the request was successful
                             if response.status_code == 200:
                                 
@@ -69,12 +66,11 @@ def create_login_page():
                                 data = response.json()
                                 access_token = data.get("access_token")
                                 refresh_token = data.get("refresh_token")
-                                print(f"Response JSON: {data}")
 
                                 if access_token and refresh_token:
                                     feedback_label.text = f'Welcome, {user} 👋'
                                     feedback_label.style('color: green')
-                                    # Save or redirect token here
+                                    # TODO: Save or redirect token here
                                 else:
                                     feedback_label.text = "Error: Token not found"
                                     feedback_label.style('color: red')

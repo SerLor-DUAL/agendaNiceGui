@@ -20,7 +20,7 @@ if not SECRET_KEY:
 ALGORITHM = "HS256" 
                 
 # Token expiration time in minutes                             
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 # Refresh token expiration time in days
 REFRESH_TOKEN_EXPIRE_DAYS = 7                                    
@@ -73,7 +73,7 @@ class JWTHandler:
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
         
-    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #   
 
     # Function to create an access token directly
     def create_access_token(self, data: Dict[str, Any]) -> str:
