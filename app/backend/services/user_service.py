@@ -167,14 +167,22 @@ class UserService:
         if not user_to_login:
             return None
         
-        # Generates a JWT token containing user ID and nickname as claims to be used for authentication by middleware
-        token = jwt.create_jwt({
+        # Prepare data to encode in the token
+        token_data = {
             "sub": str(user_to_login.id),
             "nickname": user_to_login.nickname
-        })
+        }
         
-        # Return the token
-        return token
+        # Creates access and refresh tokens with the token data which contains the user ID and nickname as claims to be used for authentication by middleware
+        access_token = jwt.create_access_token(token_data)
+        refresh_token = jwt.create_refresh_token(token_data)
+
+        # Return both access and refresh tokens in JWT token
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+        }
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 

@@ -1,7 +1,7 @@
 # app/backend/api/routes/auth.py
 
 # Import necessary modules
-from fastapi import APIRouter, HTTPException, status, Depends               # Importing FastAPI components for routing and error handling
+from fastapi import APIRouter, HTTPException, status, Depends, Request      # Importing FastAPI components for routing and error handling
 from backend.db.db_handler import get_session                               # Importing the get_session function to manage database sessions
 from backend.api.dependencies.auth_guard import get_current_user            # Importing the dependency to get the current user from the generatedtoken
 from sqlmodel.ext.asyncio.session import AsyncSession                       # Importing AsyncSession for asynchronous database operations
@@ -9,6 +9,7 @@ from backend.services.user_service import UserService as us                 # Im
 from backend.models.user.DTOs import UserLogin, UserCreate, UserRead        # Importing DTOs for validating input/output of user data
 from backend.models.user.model import User                                  # Importing the DB User model
 from fastapi.security import OAuth2PasswordRequestForm                      # Importing OAuth2PasswordRequestForm for token authentication
+from backend.utils.jwt import jwt_handler as jwt                            # Importing the JWT handler for token operations
 
 # Create a new API router for auth-related endpoints
 authRouter = APIRouter(tags=["auth"])
@@ -74,3 +75,35 @@ async def api_auth_get_me(current_user: User = Depends(get_current_user)):
     
     # Return a simple dictionary with user ID and nickname for client-side use
     return {"id": current_user.id, "nickname": current_user.nickname}
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+
+# Endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token
+@authRouter.post("/refresh")
+async def api_auth_refresh_token(request: Request):
+    body = await request.json()
+    token = body.get("refresh_token")
+
+    if not token:
+        raise HTTPException(status_code=400, detail="Refresh token is required")
+
+    # Decodifies the refresh token
+    payload = jwt.decode_jwt(token)
+
+    # Validates the payload
+    if not payload or "sub" not in payload or "nickname" not in payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+
+    # Uses the decoded token data to create a new access token
+    new_token_data = {
+        "sub": payload["sub"],
+        "nickname": payload["nickname"]
+    }
+
+    # Creates a new access token for the user
+    new_access_token = jwt.create_access_token(new_token_data)
+
+    return {
+        "access_token": new_access_token,
+        "token_type": "bearer"
+    }

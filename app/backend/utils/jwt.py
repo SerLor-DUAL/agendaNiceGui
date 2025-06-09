@@ -1,10 +1,11 @@
 # app/backend/utils/jwt.py
 
 # Import necessary modules
-from datetime import datetime, timedelta            # Importing datetime and timedelta for working with dates
-from jose import jwt, JWTError                      # Importing JWTError for handling JWT decoding errors
-from typing import Optional, Dict, Any              # Importing Optional, Dict, and Any for type hints
-import os                                           # Importing os for accessing environment variables
+from datetime import datetime, timedelta                # Importing datetime and timedelta for working with dates
+from fastapi import HTTPException                       # Importing HTTPException for error handling
+from jose import jwt, JWTError, ExpiredSignatureError   # Importing JWTError for handling JWT decoding errors
+from typing import Optional, Dict, Any                  # Importing Optional, Dict, and Any for type hints
+import os                                               # Importing os for accessing environment variables
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -19,7 +20,10 @@ if not SECRET_KEY:
 ALGORITHM = "HS256" 
                 
 # Token expiration time in minutes                             
-ACCESS_TOKEN_EXPIRE_MINUTES = 30                                        
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Refresh token expiration time in days
+REFRESH_TOKEN_EXPIRE_DAYS = 7                                    
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -29,6 +33,7 @@ class JWTHandler:
         self.secret_key = SECRET_KEY
         self.algorithm = ALGORITHM
         self.access_token_expire_minutes = ACCESS_TOKEN_EXPIRE_MINUTES
+        self.refresh_token_expire_days = REFRESH_TOKEN_EXPIRE_DAYS
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     
@@ -60,10 +65,26 @@ class JWTHandler:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
             return payload
         
+        # Raises an error if the token is expired
+        except ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token expired")
+        
         # Returns an empty dictionary if the token is invalid
         except JWTError:
-            return {}
+            raise HTTPException(status_code=401, detail="Invalid token")
         
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+
+# Function to create an access token directly
+def create_access_token(self, data: Dict[str, Any]) -> str:
+    return self.create_jwt(data)
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+
+# Function to create a refresh token directly
+def create_refresh_token(self, data: Dict[str, Any]) -> str:
+    return self.create_jwt(data, timedelta(days=self.refresh_token_expire_days))
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
 
 # Create an instance of JWTHandler to use throughout the app
