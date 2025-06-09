@@ -1,14 +1,12 @@
 from nicegui import ui
 from ..components.navbar import navbar
+from ..components.headerLinks import header_links
 
 def create_home_page():
-    # Agrega aquí el CSS personalizado
-    ui.add_head_html('<link rel="stylesheet" href="/static/css/styleColores.css">')
+
+    header_links()
     navbar()
-    # Add customs CSS for animation.
-    ui.add_head_html('''
-    <link rel="stylesheet" href="/static/css/animations.css">
-    ''')
+    
     with ui.row().classes(
     'flex '                
     'items-center '        
