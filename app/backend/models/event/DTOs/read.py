@@ -1,4 +1,4 @@
-from .base import EventBase
+from backend.models.event.DTOs.base import EventBase
 from datetime import datetime
 
 class EventRead(EventBase):

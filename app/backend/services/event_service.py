@@ -3,8 +3,10 @@ from backend.models.event.model import Event                            # Import
 from sqlmodel import select                                             # Importing SQLModel for database operations
 from sqlmodel.ext.asyncio.session import AsyncSession                   # Importing AsyncSession for asynchronous database operations
 from datetime import datetime                                           # Importing for timestamps management
-from backend.models.event.DTOs import EventCreate, EventUpdate          # Importing DTOs for event input/output validation and transformation
-from sqlalchemy import ilike                                            # Import ilike for case-insensitive filtering
+# Importing DTOs for event input/output validation and transformation
+from backend.models.event.DTOs.create import EventCreate
+from backend.models.event.DTOs.update import EventUpdate          
+from sqlalchemy.sql.operators import ilike_op                                            # Import ilike for case-insensitive filtering
 
 class EventService:
 
@@ -62,7 +64,7 @@ class EventService:
     
     async def read_event_by_title(title: str, session: AsyncSession) -> list[Event] | None:
         """Retrieves all events with a specific title."""
-        result = await session.exec(select(Event).where(ilike(Event.title, title)))
+        result = await session.exec(select(Event).where(ilike_op(Event.title, f"%{title}%")))
         return result.all()
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     # UPDATE
