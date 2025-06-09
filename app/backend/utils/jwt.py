@@ -73,19 +73,19 @@ class JWTHandler:
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
         
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
 
-# Function to create an access token directly
-def create_access_token(self, data: Dict[str, Any]) -> str:
-    return self.create_jwt(data)
+    # Function to create an access token directly
+    def create_access_token(self, data: Dict[str, Any]) -> str:
+        return self.create_jwt(data)
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
 
-# Function to create a refresh token directly
-def create_refresh_token(self, data: Dict[str, Any]) -> str:
-    return self.create_jwt(data, timedelta(days=self.refresh_token_expire_days))
+    # Function to create a refresh token directly
+    def create_refresh_token(self, data: Dict[str, Any]) -> str:
+        return self.create_jwt(data, timedelta(days=self.refresh_token_expire_days))
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #      
 
 # Create an instance of JWTHandler to use throughout the app
 jwt_handler = JWTHandler() 

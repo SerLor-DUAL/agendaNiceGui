@@ -45,8 +45,11 @@ async def api_auth_login_JSON(data: UserLogin, session: AsyncSession = Depends(g
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     # Returns the access token and token type (bearer)
-    return {"access_token": token, "token_type": "bearer"}
-
+    return {
+                "access_token": token['access_token'],
+                "refresh_token": token['refresh_token'],
+                "token_type": "bearer"
+            }
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
