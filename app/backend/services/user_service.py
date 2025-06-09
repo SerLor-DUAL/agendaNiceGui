@@ -57,6 +57,8 @@ class UserService:
         # Refresh to get updated DB info
         await session.refresh(db_user)
         
+        await session.commit()
+        
         # Return the created user      
         return db_user
     

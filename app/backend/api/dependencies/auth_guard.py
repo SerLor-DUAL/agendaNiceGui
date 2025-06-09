@@ -13,8 +13,8 @@ from backend.models.user.model import User                          # Importing 
 
 # NOTE: OAuth2PasswordBearer is a FastAPI dependency that extracts the authorization token to protect routes requiring authentication.
         # The tokenUrl parameter specifies the URL where clients (e.g., Swagger UI or OAuth2 clients) request the token. 
+        
         # This URL is relative to the server root, not the internal app prefix.
-
         # So, even if your FastAPI app is mounted under the "/api" prefix, you must include "/api" in the tokenUrl path to point to the correct token endpoint.
         # For example, the full URL will be: http://<host>:<port>/api/login
         # FastAPI uses this relative path for docs generation and OAuth2 workflows.
