@@ -117,6 +117,7 @@ class UserService:
         session.add(user)
         await session.flush()
         await session.refresh(user)
+        # TODO COMMIT HERE?????
         return user, updated
     
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -134,6 +135,7 @@ class UserService:
         # Deletes the user from the database and flush to assign DB state
         await session.delete(user_to_delete)   
         await session.flush()
+        # TODO COMMIT HERE?????
         return True
     
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
