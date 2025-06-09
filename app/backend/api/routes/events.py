@@ -4,8 +4,10 @@ from backend.db.db_handler import get_session                               # Im
 from sqlmodel.ext.asyncio.session import AsyncSession                       # Importing AsyncSession for asynchronous database operations
 from backend.services.event_service import EventService as es               # Importing the event service for event-related operations                     
 from backend.models.event.model import Event                                # Importing the DB Event model
-from backend.models.event.DTOs import EventCreate, EventUpdate, EventRead   # Importing DTOs for user input/output validation and transformation
-
+# Importing DTOs for user input/output validation and transformation
+from backend.models.event.DTOs.create import EventCreate                    
+from backend.models.event.DTOs.read import EventRead
+from backend.models.event.DTOs.update import EventUpdate
 
 # Create a new API router for user-related endpoints
 event_router = APIRouter(tags=["events"])
