@@ -23,6 +23,11 @@ class EventService:
         # Get the next Event ID
         new_id = await EventService.get_next_event_id(session)
         
+        # Validate datetime fields
+        new_start_date = event_to_create.start_date.replace(tzinfo=None)
+        new_end_date = event_to_create.end_date.replace(tzinfo=None)
+
+
         # Create a new Event model instance.
         db_event = Event(
             # Assign new ID
@@ -30,8 +35,8 @@ class EventService:
             # Set event with provided data
             title=event_to_create.title,
             description=event_to_create.description,
-            start_date=event_to_create.start_date,
-            end_date=event_to_create.end_date,
+            start_date=new_start_date,
+            end_date=new_end_date,
             user_id=event_to_create.user_id,
             # Set creation and modification timestamps to now
             record_creation=datetime.now(),
@@ -73,6 +78,9 @@ class EventService:
         db_event = await EventService.read_event_by_id(event_id, session)
         if not db_event:
             return None
+        
+        event_to_update.start_date = event_to_update.start_date.replace(tzinfo=None)
+        event_to_update.end_date = event_to_update.end_date.replace(tzinfo=None)
         
         wasUpdated = False
         # Update the event with provided data

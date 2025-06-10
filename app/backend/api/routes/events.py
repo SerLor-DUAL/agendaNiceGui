@@ -18,6 +18,13 @@ event_router = APIRouter(tags=["events"])
 @event_router.post("/events", response_model=EventRead)
 async def api_create_event(event_to_create: EventCreate, session: AsyncSession = Depends(get_session)):
 
+    # Validate datetime fields
+    if not event_to_create.start_date or not event_to_create.end_date:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start date and end date are required.")
+
+    if event_to_create.start_date >= event_to_create.end_date:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start date cannot be after end date.")
+
     # Start Transaction.
     async with session.begin():
         event = await es.create_event(event_to_create, session)
@@ -59,7 +66,7 @@ async def api_read_event_by_id(event_id: int, session: AsyncSession = Depends(ge
 @event_router.get("/events/user/{user_id}", response_model=list[EventRead])
 async def api_read_event_by_user(user_id: int, session: AsyncSession = Depends(get_session)):
     # Calls the EventSerice to get all events by user ID
-    events: list[Event] | None = await es.react_event_by_user_id(user_id, session)
+    events: list[Event] | None = await es.read_event_by_user_id(user_id, session)
     # If no events found, raise an error
     if not events or events == [] or events is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found for this user")

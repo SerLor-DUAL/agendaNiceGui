@@ -31,7 +31,7 @@ class Event(SQLModel, table=True):
     end_date: Optional[datetime] = Field(default_factory=datetime.now,sa_column = Column(et.EVENTS_ENDTIME_COL, TIMESTAMP, nullable = False))
     
     # User ID column - foreign key referencing the user table
-    user_id: Optional[int] = Field(default = None, sa_column = Column(et.EVENTS_USER_ID_COL, Integer, ForeignKey(ut.USERS_ID_COL)))
+    user_id: Optional[int] = Field(default = None, sa_column = Column(et.EVENTS_USER_ID_COL, Integer, ForeignKey(f"{ut.USERS_TABLE}.{ut.USERS_ID_COL}")))
     
     # Record creation timestamp - when the user was created
     record_creation: Optional[datetime] = Field(default_factory=datetime.now, sa_column = Column(et.EVENTS_RECORDCREATION_COL, TIMESTAMP, nullable = False))

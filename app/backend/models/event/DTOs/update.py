@@ -4,4 +4,3 @@ from .base import EventBase
 
 class EventUpdate(EventBase):
     pass
-    

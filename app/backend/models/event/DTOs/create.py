@@ -1,4 +1,10 @@
 from backend.models.event.DTOs.base import EventBase
+from typing import Optional
+from datetime import datetime
+from pydantic import field_validator
+
 
 class EventCreate(EventBase):
-    pass  # Inherits all fields from EventBase, no additional fields needed for creation
+    # We add start_date and end_date as required fields
+    start_date: datetime  
+    end_date: datetime    
