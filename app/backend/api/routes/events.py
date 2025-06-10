@@ -37,7 +37,7 @@ async def api_create_event(
     try:
         # Use a transaction block
         async with session.begin():
-            event = await es.create_event(event_to_create, session)
+            event = await es.create_event(event_to_create,current_user, session)
     except IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -6,7 +6,7 @@ from datetime import datetime                                           # Import
 # Importing DTOs for event input/output validation and transformation
 from backend.models.event.DTOs.create import EventCreate
 from backend.models.event.DTOs.update import EventUpdate  
-from backend.models.user.DTOs.read import UserRead                        # Importing the DB User model        
+from backend.models.user.model import User                        # Importing the DB User model        
 from sqlalchemy.sql.operators import ilike_op                                            # Import ilike for case-insensitive filtering
 
 class EventService:
@@ -19,7 +19,7 @@ class EventService:
         last_id = result.first()
         return (last_id or 0) + 1
     
-    async def create_event(event_to_create: EventCreate, session: AsyncSession) -> Event:
+    async def create_event(event_to_create: EventCreate, current_user: User, session: AsyncSession) -> Event:
         """Creates a new event in the database."""
 
 
