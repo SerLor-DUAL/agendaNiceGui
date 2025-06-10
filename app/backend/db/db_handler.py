@@ -43,8 +43,7 @@ async def init_db():
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     
     # Opens a session context with the session factory
-    async with async_session() as session:
-        
+    async with async_session() as session:   
         # NOTE: "Yield" means the function gives back the session object temporarily, allowing the caller to use it and then resume the function after.
         yield session  
 

@@ -5,50 +5,78 @@ from sqlmodel.ext.asyncio.session import AsyncSession                       # Im
 from backend.services.event_service import EventService as es               # Importing the event service for event-related operations                     
 from backend.models.event.model import Event                                # Importing the DB Event model
 # Importing DTOs for user input/output validation and transformation
+  
+from backend.models.user.model import User                                  # Importing the DB User model
 from backend.models.event.DTOs.create import EventCreate                    
 from backend.models.event.DTOs.read import EventRead
 from backend.models.event.DTOs.update import EventUpdate
+from typing import Optional
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from backend.api.routes.auth import api_auth_get_me_cookie  # Importing the dependency to get the current user from the generated token
 
 # Create a new API router for user-related endpoints
 event_router = APIRouter(tags=["events"])
-
 # CREATE
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # Create a new user, expect a UserCreate DTO and return an EventRead DTO
 @event_router.post("/events", response_model=EventRead)
-async def api_create_event(event_to_create: EventCreate, session: AsyncSession = Depends(get_session)):
+async def api_create_event(
+    event_to_create: EventCreate, 
+    current_user: User = Depends(api_auth_get_me_cookie),
+    session: AsyncSession = Depends(get_session)):
 
     # Validate datetime fields
     if not event_to_create.start_date or not event_to_create.end_date:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start date and end date are required.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                            detail="Start date and end date are required.")
 
     if event_to_create.start_date >= event_to_create.end_date:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start date cannot be after end date.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, 
+                            detail="Start date cannot be after end date.")
 
-    # Start Transaction.
-    async with session.begin():
-        event = await es.create_event(event_to_create, session)
-    # If event creation failed, raise an error
-    if not event:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event creation failed")
-    
+    try:
+        # Use a transaction block
+        async with session.begin():
+            event = await es.create_event(event_to_create, session)
+    except IntegrityError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Data integrity error (e.g., invalid user ID)"
+        )
+    # Modificar por SQLModel error
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=e._message() if hasattr(e, '_message') else "An error occurred while creating the event."
+        )
+
     return EventRead.model_validate(event)
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # READ
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # Endpoint to get all events, returns a list of EventRead DTOs
-@event_router.get("/events", response_model=list[EventRead])
-async def api_get_events(session: AsyncSession = Depends(get_session)):
+# @event_router.get("/events", response_model=list[EventRead])
+# async def api_get_events(session: AsyncSession = Depends(get_session)):
 
+#     # Retrieves all events from the database.
+#     events: list[Event] | None = await es.read_all_events(session)
+
+#     # If no events found, raise an error
+#     if not events or events == [] or events is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found")
+    
+#     # Convert each Event model instance to EventRead DTO for serialization
+#     return [EventRead.model_validate(event) for event in events]
+@event_router.get("/events/", response_model=list[EventRead])
+async def api_get_events(amount: Optional[int] = None, session: AsyncSession = Depends(get_session)):
     # Retrieves all events from the database.
-    events: list[Event] | None = await es.read_all_events(session)
-
+    events: list[Event] | None = await es.read_all_events(session, maxAmount=amount)
     # If no events found, raise an error
     if not events or events == [] or events is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found")
     
     # Convert each Event model instance to EventRead DTO for serialization
-    return [EventRead.model_validate(event) for event in events]
+    return [EventRead.model_validate(event) for event in events[:amount]]
 
 # Endpoint to read an event by ID. Returns EventRead DTO
 @event_router.get("/events/{event_id}", response_model=EventRead)

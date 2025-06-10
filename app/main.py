@@ -76,4 +76,4 @@ async def startup():
 
 # Load app
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(port=8080, reload=True, show=True)
+    ui.run(port=8081, reload=True, show=True)

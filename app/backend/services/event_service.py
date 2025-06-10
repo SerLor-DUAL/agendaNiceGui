@@ -5,7 +5,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession                   # Import
 from datetime import datetime                                           # Importing for timestamps management
 # Importing DTOs for event input/output validation and transformation
 from backend.models.event.DTOs.create import EventCreate
-from backend.models.event.DTOs.update import EventUpdate          
+from backend.models.event.DTOs.update import EventUpdate  
+from backend.models.user.DTOs.read import UserRead                        # Importing the DB User model        
 from sqlalchemy.sql.operators import ilike_op                                            # Import ilike for case-insensitive filtering
 
 class EventService:
@@ -20,13 +21,14 @@ class EventService:
     
     async def create_event(event_to_create: EventCreate, session: AsyncSession) -> Event:
         """Creates a new event in the database."""
+
+
         # Get the next Event ID
         new_id = await EventService.get_next_event_id(session)
         
         # Validate datetime fields
         new_start_date = event_to_create.start_date.replace(tzinfo=None)
         new_end_date = event_to_create.end_date.replace(tzinfo=None)
-
 
         # Create a new Event model instance.
         db_event = Event(
@@ -37,7 +39,7 @@ class EventService:
             description=event_to_create.description,
             start_date=new_start_date,
             end_date=new_end_date,
-            user_id=event_to_create.user_id,
+            user_id=2,  # Use the current user's ID
             # Set creation and modification timestamps to now
             record_creation=datetime.now(),
             record_modification=datetime.now()
@@ -47,13 +49,16 @@ class EventService:
         await session.flush()
         await session.refresh(db_event)
         await session.commit()
-        
+    
         return db_event
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     # READ
-    async def read_all_events(session: AsyncSession) -> list[Event] | None:
+    async def read_all_events(session: AsyncSession, maxAmount: int) -> list[Event] | None:
         """Retrieves all events from the database."""
-        result = await session.exec(select(Event))
+        if maxAmount is not None and maxAmount > 0:
+            result = await session.exec(select(Event).limit(maxAmount))
+        else:
+            result = await session.exec(select(Event))
         return result.all()
     
     # Basic Filters for reading events.
@@ -81,7 +86,7 @@ class EventService:
         
         event_to_update.start_date = event_to_update.start_date.replace(tzinfo=None)
         event_to_update.end_date = event_to_update.end_date.replace(tzinfo=None)
-        
+
         wasUpdated = False
         # Update the event with provided data
         if event_to_update.title is not None:
