@@ -27,7 +27,7 @@ class AuthService:
         
         # Constructs the URL and JSON data
         url = f"{BASE_URL}/api/loginJSON"
-        print(url)
+        
         json_data = {"nickname": nickname, "password": password}
         
         # Sends the POST request
@@ -92,6 +92,17 @@ class AuthService:
                 return {"success": False, "message": f"Connection error: {e}"}
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+    async def get_access_token(self) -> Optional[str]:
+        """ Method to get the current access token. """
+        if self.access_token is None:
+
+            url = f"{BASE_URL}/refresh"
+    
+    async def get_refresh_token(self) -> Optional[str]:
+        """ Method to get the current refresh token. """
+        return self.refresh_token
+    # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
+    
     
     #TODO: ADD MORE METHODS IF NEEDED
 
