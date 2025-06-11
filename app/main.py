@@ -11,6 +11,7 @@ from backend.api.routes import events
 from frontend.routes import home
 from frontend.routes import login
 from frontend.routes import register
+from frontend.routes import calendar
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -64,6 +65,11 @@ def pagina_login():
 @ui.page('/register')
 def pagina_register():
     return register.create_register_page()
+
+# Set calendar page
+@ui.page('/calendar')  
+async def pagina_calendar():
+    await calendar.create_calendar_page()
 
 # ============================================================================================================================= #
 #                                           Database and app initialization                                                     #
