@@ -29,7 +29,7 @@ async def api_auth_login_OAuth(form_data: OAuth2PasswordRequestForm = Depends(),
     # If token is None, raise an error
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    
+
     # Returns the access token and the refresh token and token type (bearer)
     return {
                 "access_token": token['access_token'],
@@ -118,7 +118,8 @@ async def api_auth_get_me(current_user: User = Depends(get_current_user)):
 @authRouter.get("/me-cookie")
 async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_user_from_cookie)):
     """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated using cookies """
-    return {"id": current_user.id, "nickname": current_user.nickname}
+    # return {"id": current_user.id, "nickname": current_user.nickname}
+    return current_user
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # REGISTRATION ENDPOINT #
@@ -136,7 +137,11 @@ async def api_auth_register(data: UserCreate, session: AsyncSession = Depends(ge
     
     # Calls the UserService create_user method to create a new user
     user_created = await us.create_user(data, session)
-
+    
+    # Commits the changes to the database
+    await session.commit()
+    await session.refresh(user_created)     
+    
     # Returns the created user (UserCreate DTO)
     return UserRead.model_validate(user_created) 
 

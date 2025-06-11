@@ -2,6 +2,7 @@
 
 # Import necessary modules
 from fastapi import Cookie, HTTPException, status, Response, Depends        # Importing FastAPI components for routing and error handling
+from sqlmodel.ext.asyncio.session import AsyncSession                       # Importing AsyncSession for asynchronous database operations
 from jose import JWTError                                                   # Importing JWTError for handling JWT decoding errors
 from backend.db.db_handler import get_session                               # Importing the database session dependency
 from typing import Optional                                                 # Importing Optional for type hints
@@ -15,7 +16,7 @@ class AuthCookiesHandler:
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     
     # Function to get the current user from the access token cookie
-    async def get_current_user_from_cookie(self, access_token: Optional[str] = Cookie(None), session=Depends(get_session)) -> User:
+    async def get_current_user_from_cookie(self, access_token: Optional[str] = Cookie(None), session : AsyncSession = Depends(get_session)) -> User:
         # If no access token cookie is found, raise an error that no token cookie was found
         if not access_token:
             raise HTTPException(
@@ -38,6 +39,9 @@ class AuthCookiesHandler:
             
             # Fetch the user from the database using the extracted user ID
             user = await us.read_user_by_id(user_id, session)
+            await session.commit()
+            await session.flush()
+            await session.refresh(user)   
             
             # If user is not found, raise an error
             if user is None:

@@ -31,9 +31,13 @@ async def api_create_event(event_to_create: EventCreate, session: AsyncSession =
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Start date cannot be after end date.")
 
     # Calls the EventService function to create the event
-    try:
-        event = await es.create_event(event_to_create, current_user, session)
+    event = await es.create_event(event_to_create, current_user, session)
     
+    try:
+        # Commits the changes to the database and refresh the event
+        await session.commit()
+        await session.refresh(event)    
+        
     # If event creation failed, raise an error
     except IntegrityError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data integrity error (e.g., invalid user ID)")
@@ -42,7 +46,7 @@ async def api_create_event(event_to_create: EventCreate, session: AsyncSession =
     # Internal server error
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e._message() if hasattr(e, '_message') else "An error occurred while creating the event.")
-
+    
     return EventRead.model_validate(event)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -58,7 +62,7 @@ async def api_get_events(amount: Optional[int] = None, session: AsyncSession = D
     # If no events found, raise an error
     if not events or events == [] or events is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found")
-    
+        
     # Convert each Event model instance to EventRead DTO for serialization
     return [EventRead.model_validate(event) for event in events[:amount]]
 
@@ -86,7 +90,7 @@ async def api_read_events_by_user_id(user_id: int, session: AsyncSession = Depen
     
     # If no events found, raise an error
     if not events or events == [] or events is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found for this user")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Events not found for this user") 
     
     return [EventRead.model_validate(event) for event in events]
 
@@ -117,6 +121,11 @@ async def api_update_event_by_id(event_id: int, event_to_update: EventUpdate, se
     # If event update failed, raise an error
     if not event:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event update failed")
+        
+    # Commits the changes to the database and refresh the event
+    await session.commit()
+    await session.refresh(event)     
+    
     return EventRead.model_validate(event)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -132,5 +141,8 @@ async def api_delete_event_by_id(event_id: int, session: AsyncSession = Depends(
     # If event deletion failed, raise an error
     if not was_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found or deletion failed")
+    
+    # Commits the changes to the database
+    await session.commit()
     
     return {"detail": "Event deleted successfully"}

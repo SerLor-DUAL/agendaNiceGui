@@ -19,11 +19,15 @@ async def api_create_user(user_to_create: UserCreate, session: AsyncSession = De
     """ API endpoint to create a new user in the database and returns a UserRead DTO """
     
     # Calls the UserService function to create the user
-    user = await us.create_user(user_to_create, session)                    
+    user = await us.create_user(user_to_create, session)
     
     # If user creation failed, raise an error
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
+    # Commits the changes to the database and refreshes the user
+    await session.commit()
+    await session.refresh(user)     
     
     # Returns the created user converted to UserRead DTO
     return UserRead.model_validate(user)
@@ -55,7 +59,7 @@ async def api_get_all_users(session: AsyncSession = Depends(get_session)):
     
     # If no users found, raise an error
     if not users or users == [] or users is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") 
     
     # Convert each User model instance to UserRead DTO for serialization
     return [UserRead.model_validate(user) for user in users]
@@ -77,6 +81,10 @@ async def api_update_user_by_id(user_id: int, user_to_update: UserUpdate, sessio
     # If no changes were made to the user data, raise an error
     if not updated:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="No changes were made to the user")
+        
+    # Commits the changes to the database and refreshes the user
+    await session.commit()
+    await session.refresh(user)      
     
     # Returns the updated user converted to UserRead DTO
     return UserRead.model_validate(user)
@@ -90,10 +98,13 @@ async def api_delete_user_by_id(user_id: int, session: AsyncSession = Depends(ge
     
     # Calls the UserService function to delete the user
     deleted = await us.delete_user(user_id, session)
-    
+
     # If user was not found, raise an error
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    else:
-        # Return a success message (optional, since status code 204 normally has no content)
-        return {"detail": "User deleted successfully"}
+    
+    # Commits the changes to the database
+    await session.commit()
+
+    # Return a success message (optional, since status code 204 normally has no content)
+    return {"detail": "User deleted successfully"}
