@@ -95,7 +95,7 @@ class AuthCookiesHandler:
                                 key="access_token",
                                 value=token,
                                 httponly=True,
-                                secure=True,
+                                secure=True,        # In localhost, secure=False
                                 samesite="lax",
                                 max_age=900         # 15 minutes for security
                             )
@@ -108,7 +108,7 @@ class AuthCookiesHandler:
                                 key="refresh_token",
                                 value=token,
                                 httponly=True,
-                                secure=True,
+                                secure=True,        # In localhost, secure=False
                                 samesite="lax",
                                 max_age=604800      # 7 days
                             )
