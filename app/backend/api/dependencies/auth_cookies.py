@@ -5,8 +5,8 @@ from fastapi import Cookie, HTTPException, status, Response, Depends        # Im
 from jose import JWTError                                                   # Importing JWTError for handling JWT decoding errors
 from backend.db.db_handler import get_session                               # Importing the database session dependency
 from typing import Optional                                                 # Importing Optional for type hints
-from backend.utils.jwt import jwt_handler as jwt                        # Importing the JWT handler for token operations
-from backend.models.user.model import User                              # Importing the DB User model
+from backend.utils.jwt import jwt_handler as jwt                            # Importing the JWT handler for token operations
+from backend.models.user.model import User                                  # Importing the DB User model
 from backend.services.user_service import UserService as us                 # Importing the UserService for user operations
 
 # NOTE: This class handles cookie authentication
@@ -16,7 +16,6 @@ class AuthCookiesHandler:
     
     # Function to get the current user from the access token cookie
     async def get_current_user_from_cookie(self, access_token: Optional[str] = Cookie(None), session=Depends(get_session)) -> User:
-
         # If no access token cookie is found, raise an error that no token cookie was found
         if not access_token:
             raise HTTPException(

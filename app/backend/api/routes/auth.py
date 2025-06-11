@@ -17,6 +17,7 @@ authRouter = APIRouter(tags=["auth"])
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
+# TODO: VER SI BORRAMOS ESTE MÉTODO DE LOGIN Y MANTENEMOS EL OTRO
 # NOTE: For now, OAuth2PasswordRequestForm is used for quick testing and compatibility with OAuth2 standard form data.
 # Endpoint to authenticate a user using OAuth2 form data, expects username and password, returns a JWT token if credentials are valid
 @authRouter.post("/loginOAuth")
@@ -36,12 +37,12 @@ async def api_auth_login_OAuth(form_data: OAuth2PasswordRequestForm = Depends(),
                 "token_type": "bearer"
             }
 
-
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+# AUTHENTICATION ENDPOINTS (JWT + COOKIES) #
 
-# Endpoint to authenticate a user using JSON payload, expects username and password, returns a JWT token if credentials are valid
 @authRouter.post("/loginJSON")
 async def api_auth_login_JSON(data: UserLogin, response: Response, session: AsyncSession = Depends(get_session)):
+    """ API endpoint to authenticate an user using JSON payload, expects username and password, returns a JWT token if credentials are valid """
     
     # Calls the UserService login method with username and password to validate and generate token
     token = await us.login_user(data.nickname, data.password, session)
@@ -61,47 +62,20 @@ async def api_auth_login_JSON(data: UserLogin, response: Response, session: Asyn
                 "token_type": "bearer"
             }
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-# Endpoint to create/register a new user in the database, accepts user data validated with UserCreate DTO, returns the UserRead DTO
-@authRouter.post("/register")
-async def api_auth_register(data: UserCreate, session: AsyncSession = Depends(get_session)):
-
-    # Checks if a user with the same nickname already exists to avoid duplicates
-    existing_user = await us.read_user_by_nickname(data.nickname, session)
+@authRouter.post("/logout")
+async def logout(response: Response):
+    """ API endpoint to log out the user, clears the cookies """
     
-    # If user exists, raise an error
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+    ach.clear_auth_cookies(response)
+    return {"message": "Logged out"}  
     
-    # Calls the UserService create_user method to create a new user
-    user_created = await us.create_user(data, session)
-
-    # Returns the created user (UserCreate DTO)
-    return UserRead.model_validate(user_created) 
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
-
-# Endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated
-@authRouter.get("/me")
-async def api_auth_get_me(current_user: User = Depends(get_current_user)):
     
-    # Return a simple dictionary with user ID and nickname for client-side use
-    return {"id": current_user.id, "nickname": current_user.nickname}
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
-
-# Endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated using cookies
-@authRouter.get("/me-cookie")
-async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_user_from_cookie)):
-    #return {"id": current_user.id, "nickname": current_user.nickname}
-    return current_user
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
-
-# Endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token
 @authRouter.post("/refresh")
 async def api_auth_refresh_tokens(request: Request, response: Response):
+    """ API endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token """
+    
+    # Gets the refresh token from the cookies
     refresh_token = request.cookies.get("refresh_token")
 
     if not refresh_token:
@@ -132,8 +106,37 @@ async def api_auth_refresh_tokens(request: Request, response: Response):
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-# Endpoint to log out the user, clears the cookies
-@authRouter.post("/logout")
-async def logout(response: Response):
-    ach.clear_auth_cookies(response)
-    return {"message": "Logged out"}
+# TODO: REVISAR SI BORRAMOS ESTE MÉTODO PUES NECESITA EL OAUTH2 FORM DATA QUE NO ESTA SIENDO USADO
+@authRouter.get("/me")
+async def api_auth_get_me(current_user: User = Depends(get_current_user)):
+    """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated """
+    
+    # Return a simple dictionary with user ID and nickname for client-side use
+    return {"id": current_user.id, "nickname": current_user.nickname}
+
+
+@authRouter.get("/me-cookie")
+async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_user_from_cookie)):
+    """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated using cookies """
+    return {"id": current_user.id, "nickname": current_user.nickname}
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+# REGISTRATION ENDPOINT #
+
+@authRouter.post("/register")
+async def api_auth_register(data: UserCreate, session: AsyncSession = Depends(get_session)):
+    """ API endpoint to create/register a new user in the database, accepts user data validated with UserCreate DTO, returns the UserRead DTO """
+
+    # Checks if a user with the same nickname already exists to avoid duplicates
+    existing_user = await us.read_user_by_nickname(data.nickname, session)
+    
+    # If user exists, raise an error
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+    
+    # Calls the UserService create_user method to create a new user
+    user_created = await us.create_user(data, session)
+
+    # Returns the created user (UserCreate DTO)
+    return UserRead.model_validate(user_created) 
+
