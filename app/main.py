@@ -1,6 +1,5 @@
 from nicegui import app, ui
 from fastapi import FastAPI
-import os
 
 # Import APIs
 from backend.api.routes import users 
@@ -15,6 +14,13 @@ from frontend.routes import calendar
 
 # Import database initializer
 from backend.db.db_handler import init_db
+
+# Import modules to load and access environment variables
+from dotenv import load_dotenv                                
+import os                                                     
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ============================================================================================================================= #
 #                                           FastAPI and NiceGUI initial integration                                             #
@@ -82,4 +88,8 @@ async def startup():
 
 # Load app
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(port=8080, reload=True, show=True)
+    
+    selected_port = int(os.getenv("LOCALHOST_PORT", 8000))  # Get port from environment variable, if not set, default to 8000
+    
+    # Runs app
+    ui.run(port=selected_port, reload=True, show=True)

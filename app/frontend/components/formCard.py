@@ -1,5 +1,6 @@
 from nicegui import ui
-import httpx
+from frontend.services.auth_services import front_auth_service as auth    # Import the AuthService instance
+
 
 # Function to create the registration Card
 def register_card():
@@ -104,40 +105,54 @@ def login_card():
                         feedback_label.text = "Fill both fields"
                         feedback_label.style('color: red')
                         return
+                    
+                    login_result = await auth.login(user, password)
+                    feedback_label.text = str(login_result)  # For debugging
+                    
+                    if login_result.get("success") == True:
+                        feedback_label.text = f'Welcome, {user} 👋'
+                        feedback_label.style('color: green')
+                        # TODO: Save or redirect token here
+                        
+                        # Prueba de redirección a la página del calendario
+                        ui.navigate.to('/calendar')
+                    else:
+                        feedback_label.text = login_result
+                        feedback_label.style('color: red')
+                    
+                    # # Url and json data to send to the API
+                    # url = "http://127.0.0.1:8080/api/loginJSON"
+                    # json_data = {"nickname": user, "password": password}
 
-                    # Url and json data to send to the API
-                    url = "http://127.0.0.1:8080/api/loginJSON"
-                    json_data = {"nickname": user, "password": password}
-
-                    async with httpx.AsyncClient() as client:
-                        try:
-                            response = await client.post(url, json=json_data, timeout=10)
+                    # async with httpx.AsyncClient() as client:
+                    #     try:
+                    #         response = await client.post(url, json=json_data, timeout=10)
                             
-                            # Check if the request was successful
-                            if response.status_code == 200:
+                    #         # Check if the request was successful
+                    #         if response.status_code == 200:
                                 
-                                # Access token and refresh token
-                                data = response.json()
-                                access_token = data.get("access_token")
-                                refresh_token = data.get("refresh_token")
+                    #             # Access token and refresh token
+                    #             data = response.json()
+                    #             access_token = data.get("access_token")
+                    #             refresh_token = data.get("refresh_token")
 
-                                if access_token and refresh_token:
-                                    feedback_label.text = f'Welcome, {user} 👋'
-                                    feedback_label.style('color: green')
-                                    # TODO: Save or redirect token here
-                                    # Prueba de redirección a la página del calendario
-                                    ui.navigate.to('/calendar')
-                                else:
-                                    feedback_label.text = "Error: Token not found"
-                                    feedback_label.style('color: red')
+                    #             if access_token and refresh_token:
+                    #                 feedback_label.text = f'Welcome, {user} 👋'
+                    #                 feedback_label.style('color: green')
+                    #                 # TODO: Save or redirect token here
+                    #                 # Prueba de redirección a la página del calendario
+                    #                 ui.navigate.to('/calendar')
+                    #             else:
+                    #                 feedback_label.text = "Error: Token not found"
+                    #                 feedback_label.style('color: red')
 
-                            else:
-                                feedback_label.text = "Error: Incorrect credencials"
-                                feedback_label.style('color: red')
+                    #         else:
+                    #             feedback_label.text = "Error: Incorrect credencials"
+                    #             feedback_label.style('color: red')
 
-                        except Exception as e:
-                            feedback_label.text = f"Connection error: {e}"
-                            feedback_label.style('color: red')
+                    # except Exception as e:
+                    #     feedback_label.text = f"Connection error: {e}"
+                    #     feedback_label.style('color: red')
 
                 # Login button
                 ui.button('Enter', on_click=submit_login).classes(

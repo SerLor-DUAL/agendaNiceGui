@@ -40,7 +40,6 @@ class AuthCookiesHandler:
             # Fetch the user from the database using the extracted user ID
             user = await us.read_user_by_id(user_id, session)
             await session.commit()
-            await session.flush()
             await session.refresh(user)   
             
             # If user is not found, raise an error
