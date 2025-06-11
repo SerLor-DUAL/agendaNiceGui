@@ -125,6 +125,8 @@ def login_card():
                                     feedback_label.text = f'Welcome, {user} 👋'
                                     feedback_label.style('color: green')
                                     # TODO: Save or redirect token here
+                                    # Prueba de redirección a la página del calendario
+                                    ui.navigate.to('/calendar')
                                 else:
                                     feedback_label.text = "Error: Token not found"
                                     feedback_label.style('color: red')
