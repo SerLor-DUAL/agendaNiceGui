@@ -5,7 +5,7 @@ import calendar
 
 from ..components.navbar import navbar
 from ..components.headerLinks import header_links
-
+from frontend.components.calendar_day_card import CalendarDayCard
 
 def create_calendar_page():
     """ Create the calendar page """
@@ -53,15 +53,11 @@ def update_calendar(container):
     days_of_week = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
     with container:
-        # Grid con 7 columnas
         with ui.grid().style('grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: #ccc').classes('w-full h-full'):
             for day in days_of_week:
                 ui.label(day).classes('text-center font-semibold bg-white p-2')
 
             for week in month_days:
                 for day in week:
-                    content = str(day) if day != 0 else ""
-                    with ui.card().style('min-height: 80px; border: 1px solid #eee; background-color: #fff;'):
-                        ui.label(content).classes('text-sm')
-
+                    CalendarDayCard(day, year, month)
 
