@@ -116,7 +116,10 @@ async def api_auth_get_me(current_user: User = Depends(get_current_user)):
 
 
 @authRouter.get("/me-cookie")
-async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_user_from_cookie)):
+async def api_auth_get_me_cookie(
+        response: Response, 
+        current_user: User = Depends(ach.get_current_user_from_cookie)
+    ):
     """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated using cookies """
     # return {"id": current_user.id, "nickname": current_user.nickname}
     return current_user

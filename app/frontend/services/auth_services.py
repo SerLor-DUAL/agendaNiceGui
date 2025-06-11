@@ -5,8 +5,6 @@ import httpx                        # Importing for making HTTP requests
 from typing import Optional         # Importing Optional for type hints
 from dotenv import load_dotenv      # Importing load_dotenv for loading environment variables                              
 import os                           # Importing os for accessing environment variables  
-
-import aiohttp  # Usa una sesión real del navegador                                
 from nicegui import ui
 
 # Load environment variables from .env file
@@ -48,6 +46,7 @@ class AuthService:
 
         ui.run_javascript(js_code)
         
+
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
     async def register(self, nickname: str, password: str) -> dict:
@@ -87,8 +86,18 @@ class AuthService:
             except Exception as e:
                 return {"success": False, "message": f"Connection error: {e}"}
 
-    # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+   # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+    async def get_access_token(self) -> Optional[str]:
+        """ Method to get the current access token. """
+        if self.access_token is None:
+
+            url = f"{BASE_URL}/refresh"
     
+    async def get_refresh_token(self) -> Optional[str]:
+        """ Method to get the current refresh token. """
+        return self.refresh_token
+    # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
+        
     #TODO: ADD MORE METHODS IF NEEDED
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #

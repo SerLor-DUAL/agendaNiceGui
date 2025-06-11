@@ -16,42 +16,73 @@ class AuthCookiesHandler:
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     
     # Function to get the current user from the access token cookie
-    async def get_current_user_from_cookie(self, access_token: Optional[str] = Cookie(None), session : AsyncSession = Depends(get_session)) -> User:
+    async def get_current_user_from_cookie(
+            self, 
+            response: Response,
+            access_token: Optional[str] = Cookie(None),
+            refresh_token: Optional[str] = Cookie(None),
+            session : AsyncSession = Depends(get_session)) -> User:
         # If no access token cookie is found, raise an error that no token cookie was found
-        if not access_token:
-            raise HTTPException(
-                                    status_code=status.HTTP_401_UNAUTHORIZED,
-                                    detail="No access token cookie found",
-                                    headers={"WWW-Authenticate": "Bearer"},
-                                )
+        if access_token:
+            try:
+                # Decodes the access token using the JWT handler
+                payload = jwt.decode_jwt(access_token)
+                user_id = int(payload.get("sub"))
 
-        try:
-            
-            # Decodifies the access token
-            payload = jwt.decode_jwt(access_token)
-            
-            # Extracts the user ID ("sub" claim) from the token payload
-            user_id = int(payload.get("sub"))
-            
-            # If user ID is not found in the token, raise an error
-            if user_id is None:
-                raise HTTPException(status_code=401, detail="Invalid token")
-            
-            # Fetch the user from the database using the extracted user ID
+                if not user_id:
+                    raise HTTPException(status_code=401, detail="Invalid token")
+
+                user = await us.read_user_by_id(user_id, session)
+                await session.commit()
+                await session.refresh(user)
+                return user
+
+            except JWTError:
+                pass
+
+        # If no access token cookie is found, check the refresh token cookie
+        if refresh_token:
+            user_id = await self.refresh_tokens(refresh_token, response)
+            # get the user from the database using the user_id
             user = await us.read_user_by_id(user_id, session)
             await session.commit()
-            await session.refresh(user)   
-            
-            # If user is not found, raise an error
-            if user is None:
-                raise HTTPException(status_code=404, detail="User not found")
-            
-            # Return the current user
+            await session.refresh(user)
             return user
         
-        # Raise an error if the token is invalid or expired
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No valid access or refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    async def refresh_tokens(
+        self,  
+        refresh_token: str,
+        response: Response
+    ) -> int:
+        """ Refresh access and refresh tokens, and return user_id """
+        try:
+            payload = jwt.decode_jwt(refresh_token)
+            user_id = int(payload.get("sub"))
+
+            if not user_id:
+                raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+            new_token_data = {
+                "sub": payload["sub"],
+                "nickname": payload["nickname"],
+            }
+
+            new_access_token = jwt.create_access_token(new_token_data)
+            new_refresh_token = jwt.create_refresh_token(new_token_data)
+
+            self.set_access_token_cookie(response, new_access_token)
+            self.set_refresh_token_cookie(response, new_refresh_token)
+
+            return user_id
+
         except JWTError:
-            raise HTTPException(status_code=401, detail="Invalid or expired token")
+            raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -90,6 +121,5 @@ class AuthCookiesHandler:
         response.delete_cookie("refresh_token")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
-
 # Create an instance of the AuthCookiesHandler class
 auth_cookies_handler = AuthCookiesHandler()
