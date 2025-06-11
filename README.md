@@ -17,31 +17,35 @@ mi_proyecto/
 │   ├── main.py                             # Punto de entrada que monta FastAPI + NiceGUI
 
 │   ├── backend/                            # Toda la lógica del servidor
-│   │   ├── api/                            # Endpoints y protección con JWT
+│   │   ├── api/                            # Endpoints
 │   │   │   ├── routes/
-│   │   │   │   ├── users.py                # Rutas de usuarios (perfil, CRUD)
+│   │   │   │   ├── users.py                # Rutas de usuarios
 │   │   │   │   ├── events.py               # Rutas de eventos
 │   │   │   │   └── auth.py                 # Login, registro, autenticación
 │   │   │   └── dependencies/
-│   │   │       └── auth_guard.py           # Verificación JWT (get_current_user) - Actua como Middleware
+│   │   │       ├── auth_guard.py           # TODO: REVISAR SI SE BORRA POR NO USARLO
+│   │   │       └── auth_cookies.py         # Verificación JWT + COOKIES - Actua como Middleware
 
 │   │   ├── db/                             # Conexión y consultas SQL a la base de datos
-│   │   │   ├── db_handler.py               # Conexión y gestión de PostgreSQL
+│   │   │   └── db_handler.py               # Conexión y gestión de PostgreSQL
 
 │   │   ├── models/                         # Modelos SQLModel para BD y validación
 │   │   │   ├── user
-|   |   |   |     ├── user.py               # Modelo de usuario según la BD
+|   |   |   |     ├── model.py              # Modelo de usuario según la BD
 |   |   |   |     └── DTOs                  # Carpeta para los DTOs del usuario
-│   │   │   ├── event
-|   |   |   |     ├── event.py
-|   |   |   |     └── DTOs
+│   │   │   └── event
+|   |   |         ├── model.py              # Modelo de evento según la BD
+|   |   |         └── DTOs                  # Carpeta para los DTOs del evento
 
-│   │   ├── services/                       # Lógica de negocio (sin lógica en rutas)
-│   │   │   ├── user_service.py             # Registro, login, perfil, etc.
+│   │   ├── services/                       # Lógica de negocio (Es decir "controladores")
+│   │   │   ├── user_service.py             # CRUD y otros de usuarios
+│   │   │   └── event_Service.py            # CRUD y otros de eventos
 
-│   │   └── utils/                          # Funciones auxiliares reutilizables
-│   │       ├── jwt.py                      # Crear y verificar tokens JWT
-│   │       └── hashing.py                  # Hashing de contraseñas (bcrypt)
+│   │   ├── utils/                          # Funciones auxiliares reutilizables
+│   │   │   ├── jwt.py                      # Crear y verificar tokens JWT
+│   │   │   └── hashing.py                  # Hashing de contraseñas (bcrypt)
+
+│   │   └── config.py                       # Configuración de clases que usan información de .env
 
 │   ├── frontend/                           # Interfaz de usuario con NiceGUI
 │   │   ├── routes/                         # Páginas visibles

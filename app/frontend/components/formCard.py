@@ -106,7 +106,7 @@ def login_card():
                         return
 
                     # Url and json data to send to the API
-                    url = "http://127.0.0.1:8081/api/loginJSON"
+                    url = "http://127.0.0.1:8080/api/loginJSON"
                     json_data = {"nickname": user, "password": password}
 
                     async with httpx.AsyncClient() as client:
