@@ -9,19 +9,20 @@ from typing import Optional                                                 # Im
 from backend.utils.jwt import jwt_handler as jwt                            # Importing the JWT handler for token operations
 from backend.models.user.model import User                                  # Importing the DB User model
 from backend.services.user_service import UserService as us                 # Importing the UserService for user operations
+import os                                                                   # Importing os for accessing environment variables
+
+# Get the SECURE_COOKIES environment variable and convert it to a boolean
+SECURE_COOKIES = os.getenv("SECURE_COOKIES", "false").lower() == "true"
 
 # NOTE: This class handles cookie authentication
 class AuthCookiesHandler:
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     
-    # Function to get the current user from the access token cookie
-    async def get_current_user_from_cookie(
-            self, 
-            response: Response,
-            access_token: Optional[str] = Cookie(None),
-            refresh_token: Optional[str] = Cookie(None),
-            session : AsyncSession = Depends(get_session)) -> User:
+    async def get_current_user_from_cookie( self, response: Response, access_token: Optional[str] = Cookie(None), 
+                                            refresh_token: Optional[str] = Cookie(None), session : AsyncSession = Depends(get_session)) -> User:
+        """ Get the current user from the access token cookie """
+        
         # If no access token cookie is found, raise an error that no token cookie was found
         if access_token:
             try:
@@ -43,24 +44,18 @@ class AuthCookiesHandler:
         # If no access token cookie is found, check the refresh token cookie
         if refresh_token:
             user_id = await self.refresh_tokens(refresh_token, response)
-            # get the user from the database using the user_id
+            
+            # Gets the user from the database using the user_id
             user = await us.read_user_by_id(user_id, session)
             await session.commit()
             await session.refresh(user)
             return user
         
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No valid access or refresh token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No valid access or refresh token", headers={"WWW-Authenticate": "Bearer"},)
     
-    async def refresh_tokens(
-        self,  
-        refresh_token: str,
-        response: Response
-    ) -> int:
+    async def refresh_tokens(self, refresh_token: str, response: Response) -> int:
         """ Refresh access and refresh tokens, and return user_id """
+        
         try:
             payload = jwt.decode_jwt(refresh_token)
             user_id = int(payload.get("sub"))
@@ -69,9 +64,9 @@ class AuthCookiesHandler:
                 raise HTTPException(status_code=401, detail="Invalid refresh token")
 
             new_token_data = {
-                "sub": payload["sub"],
-                "nickname": payload["nickname"],
-            }
+                                "sub": payload["sub"],
+                                "nickname": payload["nickname"],
+                            }
 
             new_access_token = jwt.create_access_token(new_token_data)
             new_refresh_token = jwt.create_refresh_token(new_token_data)
@@ -87,36 +82,38 @@ class AuthCookiesHandler:
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-    # Function to set the access token cookie
     def set_access_token_cookie(self, response: Response, token: str) -> None:
+        """ Sets the access token cookie """
 
         # Set the access token cookie values
         response.set_cookie(
                                 key="access_token",
                                 value=token,
                                 httponly=True,
-                                secure=True,        # In localhost, secure=False
+                                secure=SECURE_COOKIES,  # In localhost, secure=False
                                 samesite="lax",
-                                max_age=900         # 15 minutes for security
+                                max_age=900             # 15 minutes for security
                             )
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-    # Function to set the refresh token cookie
     def set_refresh_token_cookie(self, response: Response, token: str):
+        """ Sets the refresh token cookie """
+        
         response.set_cookie(
                                 key="refresh_token",
                                 value=token,
                                 httponly=True,
-                                secure=True,        # In localhost, secure=False
+                                secure=SECURE_COOKIES,  # In localhost, secure=False
                                 samesite="lax",
-                                max_age=604800      # 7 days
+                                max_age=604800          # 7 days
                             )
         
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-    # Function to clear the access and refresh token cookies
     def clear_auth_cookies (self, response: Response) -> None:
+        """ Clears the access and refresh token cookies """
+        
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
 

@@ -1,4 +1,4 @@
-# app/backend/api/routes/users.py
+# app/backend/api/routes/users_admin.py
 
 # Import necessary modules
 from fastapi import APIRouter, HTTPException, status, Depends               # Importing FastAPI components for routing and error handling
@@ -9,12 +9,12 @@ from backend.models.user.model import User                                  # Im
 from backend.models.user.DTOs import UserCreate, UserRead, UserUpdate       # Importing DTOs for user input/output validation and transformation
 
 # Creates a new API router for user-related endpoints
-userRouter = APIRouter(tags=["users"])
+user_admin_router = APIRouter(tags=["admin_users"])
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # CREATE ENDPOINTS #
 
-@userRouter.post("/users", response_model=UserRead)
+@user_admin_router.post("/admin/users", response_model=UserRead)
 async def api_create_user(user_to_create: UserCreate, session: AsyncSession = Depends(get_session)):
     """ API endpoint to create a new user in the database and returns a UserRead DTO """
     
@@ -35,7 +35,7 @@ async def api_create_user(user_to_create: UserCreate, session: AsyncSession = De
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # READ ENDPOINTS #
 
-@userRouter.get("/users/{user_id}", response_model=UserRead)
+@user_admin_router.get("/admin/users/{user_id}", response_model=UserRead)
 async def api_read_user_by_id(user_id: int, session: AsyncSession = Depends(get_session)):
     """ API endpoint to read a user by ID from the database and returns a UserRead DTO """
     
@@ -50,7 +50,7 @@ async def api_read_user_by_id(user_id: int, session: AsyncSession = Depends(get_
     return UserRead.model_validate(user)
 
 
-@userRouter.get("/users", response_model=list[UserRead])
+@user_admin_router.get("/admin/users", response_model=list[UserRead])
 async def api_get_all_users(session: AsyncSession = Depends(get_session)):
     """ API endpoint to get all users from the database and returns a list of UserRead DTOs """
     
@@ -67,7 +67,7 @@ async def api_get_all_users(session: AsyncSession = Depends(get_session)):
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # UPDATE ENDPOINTS #
 
-@userRouter.put("/users/{user_id}", response_model=UserRead)
+@user_admin_router.put("/admin/users/{user_id}", response_model=UserRead)
 async def api_update_user_by_id(user_id: int, user_to_update: UserUpdate, session: AsyncSession = Depends(get_session)):
     """ API endpoint to update an existing user by ID in the database and returns a UserRead DTO """
     
@@ -92,7 +92,7 @@ async def api_update_user_by_id(user_id: int, user_to_update: UserUpdate, sessio
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # DELETE ENDPOINTS #
 
-@userRouter.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@user_admin_router.delete("/admin/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def api_delete_user_by_id(user_id: int, session: AsyncSession = Depends(get_session)):
     """ API endpoint to delete an user by ID from the database and returns a success message """
     

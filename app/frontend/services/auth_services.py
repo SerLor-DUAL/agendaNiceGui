@@ -2,10 +2,10 @@
 
 # Import necessary modules
 import httpx                        # Importing for making HTTP requests
-from typing import Optional         # Importing Optional for type hints
 from dotenv import load_dotenv      # Importing load_dotenv for loading environment variables                              
 import os                           # Importing os for accessing environment variables  
-from nicegui import ui
+from nicegui import ui              # Importing ui from nicegui
+from functools import wraps         # Importing wraps for decorator usage      
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,6 +16,7 @@ BASE_URL = os.getenv(f"BASE_URL{LOCALHOST_PORT}", f"http://localhost:{LOCALHOST_
 
 # NOTE: This class handles HTTP requests for authentication with the backend
         # To obtain the cookies in the client, a JavaScript fetching method is used, this is used in the login and refresh token methods
+        # To check the cookies in the client, a JavaScript fetching method is used, this is used in the get_me method
 class AuthService:
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -109,7 +110,7 @@ class AuthService:
         """ Register method that sends a POST request to the backend to register a new user. """
         
         # Constructs the URL and JSON data
-        url = f"{BASE_URL}/register"
+        url = f"{BASE_URL}/api/register"
         json_data = {"nickname": nickname, "password": password}
         
         # Sends the POST request
@@ -132,7 +133,7 @@ class AuthService:
         """ Logout method that sends a POST request to the backend to logout the user. """
         
         # Constructs the URL
-        url = f"{BASE_URL}/logout"
+        url = f"{BASE_URL}/api/logout"
         
         # Sends the POST request
         async with httpx.AsyncClient() as client:
@@ -146,10 +147,60 @@ class AuthService:
                 return {"success": False, "message": f"Connection error: {e}"}
 
     # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
+    
+    # NOTE: This method will be used as a decorator to check if the user is logged in or not in the pages
+    def auth_required(self, page_function):
+        """ Decorator that checks if the user is logged in or not in the pages """
         
-    #TODO: ADD MORE METHODS IF NEEDED
+        # Wraps the original page_function into a new function
+        @wraps(page_function)
+        
+        # The new function checks if the user is logged in with the get_me method
+        async def wrapper(*args, **kwargs):
+            
+            # Makes the instance to use its async method 
+            result = await self.get_me()
+            
+            # If the user is not logged in, redirects to the login page
+            if not result.get('success', False):
+                ui.notify('You are not logged in. Redirecting to login...', color='negative')
+                ui.navigate.to('/login')
+                
+                # Does not call the original page_function
+                return  
+            
+            # IF the user is logged in, calls the original page_function
+            return await page_function(*args, **kwargs)
+        
+        # Returns the new function
+        return wrapper
+    
+    
+    async def get_me(self) -> dict:
+        """ Get me method that sends a GET request to the backend to get the user's profile from the cookies. """
+        
+        js_code = f"""
+                        return fetch('{BASE_URL}/api/me-cookie', {{
+                            method: 'GET',
+                            credentials: 'include'
+                        }})
+                        .then(response => {{
+                            if (!response.ok) throw new Error('Unauthorized or error');
+                            return response.json();
+                        }})
+                        .then(data => {{
+                            return {{ success: true, data: data }};
+                        }})
+                        .catch(error => {{
+                            return {{ success: false, message: error.message }};
+                        }});
+                    """
+        result = await ui.run_javascript(js_code, timeout=5)
+        return result
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
+
+#TODO: ADD MORE METHODS IF NEEDED
 
 # Create an instance of the AuthService to be used in other parts of the application
 front_auth_service = AuthService()

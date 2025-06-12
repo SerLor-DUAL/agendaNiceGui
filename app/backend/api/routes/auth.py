@@ -13,14 +13,14 @@ from backend.db.db_handler import get_session                                   
 from backend.api.dependencies.auth_guard import get_current_user                                   # Importing the dependency to get the current user from the generated token    
 
 # Create a new API router for auth-related endpoints
-authRouter = APIRouter(tags=["auth"])
+auth_router = APIRouter(tags=["auth"])
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
 # TODO: VER SI BORRAMOS ESTE MÉTODO DE LOGIN Y MANTENEMOS EL OTRO
 # NOTE: For now, OAuth2PasswordRequestForm is used for quick testing and compatibility with OAuth2 standard form data.
 # Endpoint to authenticate a user using OAuth2 form data, expects username and password, returns a JWT token if credentials are valid
-@authRouter.post("/loginOAuth")
+@auth_router.post("/loginOAuth")
 async def api_auth_login_OAuth(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_session)):
     
     #  Calls the UserService login method with username and password to validate and generate token
@@ -40,7 +40,7 @@ async def api_auth_login_OAuth(form_data: OAuth2PasswordRequestForm = Depends(),
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # AUTHENTICATION ENDPOINTS (JWT + COOKIES) #
 
-@authRouter.post("/loginJSON")
+@auth_router.post("/loginJSON")
 async def api_auth_login_JSON(data: UserLogin, response: Response, session: AsyncSession = Depends(get_session)):
     """ API endpoint to authenticate an user using JSON payload, expects username and password, returns a JWT token if credentials are valid """
     
@@ -50,6 +50,9 @@ async def api_auth_login_JSON(data: UserLogin, response: Response, session: Asyn
     # If token is None, raise an error
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    
+    # Clear cookies to avoid security issues
+    ach.clear_auth_cookies(response)
     
     # Creates cookies with the access and refresh tokens
     ach.set_access_token_cookie(response, token['access_token'])
@@ -63,7 +66,7 @@ async def api_auth_login_JSON(data: UserLogin, response: Response, session: Asyn
             }
 
 
-@authRouter.post("/logout")
+@auth_router.post("/logout")
 async def logout(response: Response):
     """ API endpoint to log out the user, clears the cookies """
     
@@ -71,7 +74,7 @@ async def logout(response: Response):
     return {"message": "Logged out"}  
     
     
-@authRouter.post("/refresh")
+@auth_router.post("/refresh-token")
 async def api_auth_refresh_tokens(request: Request, response: Response):
     """ API endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token """
     
@@ -107,7 +110,7 @@ async def api_auth_refresh_tokens(request: Request, response: Response):
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
 # TODO: REVISAR SI BORRAMOS ESTE MÉTODO PUES NECESITA EL OAUTH2 FORM DATA QUE NO ESTA SIENDO USADO
-@authRouter.get("/me")
+@auth_router.get("/me")
 async def api_auth_get_me(current_user: User = Depends(get_current_user)):
     """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated """
     
@@ -115,7 +118,7 @@ async def api_auth_get_me(current_user: User = Depends(get_current_user)):
     return {"id": current_user.id, "nickname": current_user.nickname}
 
 
-@authRouter.get("/me-cookie")
+@auth_router.get("/me-cookie")
 async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_user_from_cookie)):
     """ API endpoint to retrieve the currently authenticated user's information, requires the user to be authenticated with the token validated using cookies """
 
@@ -124,7 +127,7 @@ async def api_auth_get_me_cookie(current_user: User = Depends(ach.get_current_us
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # REGISTRATION ENDPOINT #
 
-@authRouter.post("/register")
+@auth_router.post("/register")
 async def api_auth_register(data: UserCreate, session: AsyncSession = Depends(get_session)):
     """ API endpoint to create/register a new user in the database, accepts user data validated with UserCreate DTO, returns the UserRead DTO """
 

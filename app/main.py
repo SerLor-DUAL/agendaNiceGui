@@ -1,16 +1,14 @@
 from nicegui import app, ui
 from fastapi import FastAPI
 
-# Import APIs
-from backend.api.routes import users 
-from backend.api.routes import auth 
-from backend.api.routes import events, events_admin
+# Import CORS middleware to handle cross-origin requests
+from backend.utils.cors import setup_cors
+
+# Import APIs endopints
+from backend.api.routes import events, events_admin, users_admin, auth
 
 # Import routes (pages)
-from frontend.routes import home
-from frontend.routes import login
-from frontend.routes import register
-from frontend.routes import calendar
+from frontend.routes import home, login, register, calendar
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -29,11 +27,14 @@ load_dotenv()
 # Create FastAPI instance
 fastapi_app = FastAPI(title="Integra")
 
+# Injects CORS middleware into the FastApi instance
+setup_cors(fastapi_app)
+
 # Include all the needed routes to FastAPI
-fastapi_app.include_router(users.userRouter)                # Users API
-fastapi_app.include_router(auth.authRouter)                 # Authentication API
-fastapi_app.include_router(events.event_router)             # Events API
-fastapi_app.include_router(events_admin.event_admin_router) # Admin events API
+fastapi_app.include_router(users_admin.user_admin_router)       # Administration of users API
+fastapi_app.include_router(auth.auth_router)                    # Authentication API
+fastapi_app.include_router(events.event_router)                 # Events API
+fastapi_app.include_router(events_admin.event_admin_router)     # Administration of events API
 
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)
@@ -91,7 +92,8 @@ async def startup():
 # Load app
 if __name__ in {"__main__", "__mp_main__"}:
     
-    selected_port = int(os.getenv("LOCALHOST_PORT", 8000))  # Get port from environment variable, if not set, default to 8000
+    # Get port from environment variable, if not set, default to 8000
+    selected_port = int(os.getenv("LOCALHOST_PORT", 8000))  
     
     # Runs app
     ui.run(port=selected_port, reload=True, show=True)
