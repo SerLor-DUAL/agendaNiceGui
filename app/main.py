@@ -77,8 +77,8 @@ def pagina_register():
 
 # Set calendar page
 @ui.page('/calendar')  
-def pagina_calendar():
-    return calendar.create_calendar_page()
+async def pagina_calendar():
+    return await calendar.create_calendar_page()
 
 # ============================================================================================================================= #
 #                                           Database and app initialization                                                     #
