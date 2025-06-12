@@ -9,15 +9,15 @@ from frontend.services.auth_services import front_auth_service as auth  # Import
 import httpx                                                            # Importing httpx for making HTTP requests
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
-
+@auth.auth_required()
 async def create_calendar_page():
     
-    result = await auth.get_me()
+    # result = await auth.get_me()
 
-    if not result.get('success', False):
-        ui.notify('You are not logged in. Redirecting to login...', color='negative')
-        ui.navigate.to('/login')
-        return
+    # if not result.get('success', False):
+    #     ui.notify('You are not logged in. Redirecting to login...', color='negative')
+    #     ui.navigate.to('/login')
+    #     return
 
     # Construye UI
     header_links()

@@ -149,32 +149,51 @@ class AuthService:
     # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
     
     # NOTE: This method will be used as a decorator to check if the user is logged in or not in the pages
-    def auth_required(self, page_function):
-        """ Decorator that checks if the user is logged in or not in the pages """
+    # def auth_required(self, page_function):
+    #     """ Decorator that checks if the user is logged in or not in the pages """
         
-        # Wraps the original page_function into a new function
-        @wraps(page_function)
+    #     # Wraps the original page_function into a new function
+    #     @wraps(page_function)
         
-        # The new function checks if the user is logged in with the get_me method
-        async def wrapper(*args, **kwargs):
+    #     # The new function checks if the user is logged in with the get_me method
+    #     async def wrapper(*args, **kwargs):
             
-            # Makes the instance to use its async method 
-            result = await self.get_me()
+    #         # Makes the instance to use its async method 
+    #         result = await self.get_me()
             
-            # If the user is not logged in, redirects to the login page
-            if not result.get('success', False):
-                ui.notify('You are not logged in. Redirecting to login...', color='negative')
-                ui.navigate.to('/login')
+    #         # If the user is not logged in, redirects to the login page
+    #         if not result.get('success', False):
+    #             ui.notify('You are not logged in. Redirecting to login...', color='negative')
+    #             ui.navigate.to('/login')
                 
-                # Does not call the original page_function
-                return  
+    #             # Does not call the original page_function
+    #             return  
             
-            # IF the user is logged in, calls the original page_function
-            return await page_function(*args, **kwargs)
+    #         # IF the user is logged in, calls the original page_function
+    #         return await page_function(*args, **kwargs)
         
-        # Returns the new function
-        return wrapper
-    
+    #     # Returns the new function
+    #     return wrapper
+    def auth_required(self):
+        def decorator(function):
+            """ Decorator that checks if the user is logged in or not in the pages. """
+            @wraps(function)
+            async def wrapper(*args, **kwargs):
+                # Mostrar un loader antes de la espera
+                with ui.dialog() as dialog, ui.card():
+                    ui.label('Comprobando sesión...')
+                    ui.spinner()
+                dialog.open()
+
+                result = await self.get_me()
+                if not result.get('success', False):
+                    ui.notify('You are not logged in. Redirecting to login...', color='negative')
+                    ui.navigate.to('/login')
+                else:
+                    return await function(*args, **kwargs)
+                        
+            return wrapper
+        return decorator
     
     async def get_me(self) -> dict:
         """ Get me method that sends a GET request to the backend to get the user's profile from the cookies. """
@@ -195,7 +214,7 @@ class AuthService:
                             return {{ success: false, message: error.message }};
                         }});
                     """
-        result = await ui.run_javascript(js_code, timeout=5)
+        result = await ui.run_javascript(js_code, timeout=10)
         return result
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
