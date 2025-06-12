@@ -4,7 +4,7 @@ from fastapi import FastAPI
 # Import APIs
 from backend.api.routes import users 
 from backend.api.routes import auth 
-from backend.api.routes import events
+from backend.api.routes import events, events_admin
 
 # Import routes (pages)
 from frontend.routes import home
@@ -30,9 +30,11 @@ load_dotenv()
 fastapi_app = FastAPI(title="Integra")
 
 # Include all the needed routes to FastAPI
-fastapi_app.include_router(users.userRouter)      # Users API
-fastapi_app.include_router(auth.authRouter)       # Authentication API
-fastapi_app.include_router(events.event_router)  # Events API
+fastapi_app.include_router(users.userRouter)                # Users API
+fastapi_app.include_router(auth.authRouter)                 # Authentication API
+fastapi_app.include_router(events.event_router)             # Events API
+fastapi_app.include_router(events_admin.event_admin_router) # Admin events API
+
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)
 
