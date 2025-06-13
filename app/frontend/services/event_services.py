@@ -18,21 +18,45 @@ class EventService:
     def __init__(self):
         self.client = httpx.AsyncClient(base_url=BASE_URL)  # Initialize the HTTP client with the base URL
 
-    async def get_events(self, *args, **kwargs):
+    async def get_events(self):
         """ Get all events """
-        
-        url = f"{BASE_URL}/api/events"
-        print("Fetching events from:", url)
+        js_code = f'''
+        fetch('{BASE_URL}/api/events', {{
+            method: 'GET',
+            credentials: 'include'
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+    '''
+        # Ejecutar fetch desde el navegador
         try:
-            response = await self.client.get(url)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                ui.notify(f"Error al obtener los eventos: {response.status_code} - {response.text}", color='negative')
+            # Ejecutamos el JS, esperamos la respuesta y parseamos el JSON
+            events = await ui.run_javascript(js_code, timeout=5)
+
+            if isinstance(events, dict) and events.get('error'):
+                ui.notify(f"Error al obtener eventos: {events['error']}", color='negative')
                 return None
+
+            return events  # Lista de eventos JSON
+
         except Exception as e:
-            ui.notify(f"Error al obtener los eventos: {str(e)}", color='negative')
+            ui.notify(f"Error al ejecutar fetch: {str(e)}", color='negative')
             return None
+
+        # url = f"{BASE_URL}/api/events"
+        # print("Fetching events from:", url)
+        # try:
+        #     response = await self.client.get(url)
+        #     if response.status_code == 200:
+        #         return response.json()
+        #     else:
+        #         ui.notify(f"Error al obtener los eventos: {response.status_code} - {response.text}", color='negative')
+        #         return None
+        # except Exception as e:
+        #     ui.notify(f"Error al obtener los eventos: {str(e)}", color='negative')
+        #     return None
 
     async def create_event(self, event_data):
         """ Create a new event """

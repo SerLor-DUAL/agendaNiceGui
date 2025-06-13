@@ -21,7 +21,7 @@ mock_events = [
 async def create_events_page():
     """ Creates the events page """
     userEvents = await event_service.get_events() 
-
+    print("User Events:", userEvents)
     # Build UI
     header_links()
     await navbar()
@@ -31,6 +31,7 @@ async def create_events_page():
         if not userEvents:
             ui.label("No tienes eventos por el momento.").classes("text-gray-500")
         else:
-            print("User Events:", userEvents)
+            for event in userEvents:
+                await create_events_card(event)
             # for event in userEvents:
             #     create_events_card(event)
