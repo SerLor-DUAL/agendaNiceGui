@@ -2,7 +2,7 @@
 
 # Import necessary modules
 from nicegui import ui
-
+from fastapi.responses import RedirectResponse #SECOND ROUNTING OPTION
 # NOTE: Class to handle routing in the frontend elements
         # This is due to the fact that the components have a problem with the lambda redirecting
         # TODO: Check why and make some explanation here to clarify
@@ -31,6 +31,30 @@ class RouteHandler:
     @staticmethod
     def go_events():
         ui.navigate.to('/events')
+
+    @staticmethod
+    def go_home2():
+        return RedirectResponse(url='/')
+        
+    @staticmethod    
+    def go_login2():
+        return RedirectResponse(url='/login')
+
+    @staticmethod
+    def go_register2():
+        return RedirectResponse(url='/register')
+
+    @staticmethod
+    def go_logout2():
+        return RedirectResponse(url='/logout')
+    
+    @staticmethod    
+    def go_calendar2():
+        return RedirectResponse(url='/calendar')
+    
+    @staticmethod
+    def go_events2():
+        return RedirectResponse(url='/events')
 
     # -------------------------------------------------------------------------------------------- #
 
