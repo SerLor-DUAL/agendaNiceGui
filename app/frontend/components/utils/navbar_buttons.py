@@ -14,7 +14,6 @@ async def navbar_buttons():
     
     # If the user is not logged in, add the logout button
     if logged:
-    
         # Logout button
         ui.button( 'Logout', on_click=lambda: ui.navigate.to('/logout'),).classes( 
                                                                                     '!bg-[#349CD7] '

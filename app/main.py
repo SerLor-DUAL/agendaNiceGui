@@ -66,17 +66,17 @@ app.add_static_files('/static', STATIC_PATH)
 
 # Set home page
 @ui.page('/')
-async def pagina_inicio():
+async def page_init():
     return await home.create_home_page()
 
 # Set login page
 @ui.page('/login')
-async def pagina_login():
+async def page_login():
     return await login.create_login_page()
 
 # Set register page
 @ui.page('/register')
-async def pagina_register():
+async def page_register():
     return await register.create_register_page()
 
 # Set logout page
@@ -90,12 +90,12 @@ async def page_logout():
 
 # Set calendar page
 @ui.page('/calendar')  
-async def pagina_calendar():
+async def page_calendar():
     return await calendar.create_calendar_page()
 
 # Set events page
 @ui.page('/events')
-async def pagina_events():
+async def page_events():
     return await event_page.create_events_page()
 
 # ============================================================================================================================= #
