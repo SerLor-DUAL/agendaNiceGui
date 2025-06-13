@@ -8,7 +8,7 @@ from backend.utils.cors import setup_cors
 from backend.api.routes import events, events_admin, users_admin, auth
 
 # Import routes (pages)
-from frontend.routes import home, login, register, calendar, events
+from frontend.routes import home, login, register, calendar, event_page
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -91,7 +91,7 @@ async def pagina_calendar():
 # Set events page
 @ui.page('/events')
 async def pagina_events():
-    return await events.create_events_page()
+    return await event_page.create_events_page()
 
 # ============================================================================================================================= #
 #                                           Database and app initialization                                                     #
