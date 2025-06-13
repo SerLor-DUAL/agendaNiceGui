@@ -55,7 +55,7 @@ def register_card():
         with ui.card().classes('bg-white p-8 rounded-lg shadow-lg max-w-md w-5/6 sm:w-full '):
             
             # Register title
-            ui.markdown('# Register').classes(
+            ui.markdown('# Registrarse').classes(
                                                 'text-xs '
                                                 'sm:text-2xl '
                                                 'font-bold '
@@ -64,7 +64,7 @@ def register_card():
                                             )   
             
             # Username input
-            username_input = ui.input('Username',).classes(
+            username_input = ui.input('Usuario',).classes(
                                                                 'w-full mb-4 '              
                                                                 'text-[#1F2937] '           
                                                                 'border border-gray-300 '   
@@ -74,7 +74,7 @@ def register_card():
                                                             )
             
             # Password input
-            password_input = ui.input('Password', password=True).classes(
+            password_input = ui.input('Contraseña', password=True).classes(
                                                                             'w-full mb-4 '
                                                                             'text-[#1F2937] '
                                                                             'border border-gray-300 '
@@ -83,7 +83,7 @@ def register_card():
                                                                             'focus:ring-2 focus:ring-[#349CD7]'
                                                                         )
             # Confirm password input
-            confirm_password_input = ui.input('Confirm Password', password=True).classes(
+            confirm_password_input = ui.input('Confirmar Contraseña', password=True).classes(
                                                                                             'w-full mb-6 '
                                                                                             'text-[#1F2937] '
                                                                                             'border border-gray-300 '
@@ -95,7 +95,7 @@ def register_card():
             
 
             # Register button
-            ui.button('Register', on_click=submit_register).classes(
+            ui.button('Registrarse', on_click=submit_register).classes(
                                                                         'w-full '                        
                                                                         '!bg-logo '                   
                                                                         '!text-[#FAF9F6] '                 
