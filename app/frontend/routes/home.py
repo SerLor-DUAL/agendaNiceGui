@@ -1,9 +1,8 @@
 # frontend/routes/home.py
 
 # Import necessary modules
-from nicegui import ui                                                      # Import the ui module
-from frontend.components.navbar import navbar                               # Importing the navbar component
-from frontend.components.header_links import header_links                   # Importing the header_links component
+from nicegui import ui                                                  # Import the ui module
+from frontend.components.utils import navbar, header_links              # Importing the utils components
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 

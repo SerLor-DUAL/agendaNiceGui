@@ -149,54 +149,48 @@ class AuthService:
     # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
     
     # NOTE: This method will be used as a decorator to check if the user is logged in or not in the pages
-    # def auth_required(self, page_function):
-    #     """ Decorator that checks if the user is logged in or not in the pages """
-        
-    #     # Wraps the original page_function into a new function
-    #     @wraps(page_function)
-        
-    #     # The new function checks if the user is logged in with the get_me method
-    #     async def wrapper(*args, **kwargs):
-            
-    #         # Makes the instance to use its async method 
-    #         result = await self.get_me()
-            
-    #         # If the user is not logged in, redirects to the login page
-    #         if not result.get('success', False):
-    #             ui.notify('You are not logged in. Redirecting to login...', color='negative')
-    #             ui.navigate.to('/login')
-                
-    #             # Does not call the original page_function
-    #             return  
-            
-    #         # IF the user is logged in, calls the original page_function
-    #         return await page_function(*args, **kwargs)
-        
-    #     # Returns the new function
-    #     return wrapper
     def auth_required(self):
+        """ Decorator that checks if the user is logged in or not in the pages. """
+
+        # Decorator function
         def decorator(function):
-            """ Decorator that checks if the user is logged in or not in the pages. """
+            
+            # Wrapper function
             @wraps(function)
             async def wrapper(*args, **kwargs):
-                # Mostrar un loader antes de la espera
+
+                # Show loading dialog
                 with ui.dialog() as dialog, ui.card():
-                    ui.label('Comprobando sesión...')
+                    ui.label('Checking session...')
                     ui.spinner()
+                    
+                # Check if the user is logged in
                 dialog.open()
 
+                # Check if the user is logged in
                 result = await self.get_me()
+                
+                # If the user is not logged in, redirects to the login page
                 if not result.get('success', False):
                     ui.notify('You are not logged in. Redirecting to login...', color='negative')
                     ui.navigate.to('/login')
                 else:
+                    # If the user is logged in, executes the original function
+                    dialog.close()
                     return await function(*args, **kwargs)
-                        
+            
+            # Returns the wrapper function            
             return wrapper
+        
+        # Returns the decorator
         return decorator
     
     async def get_me(self) -> dict:
-        """ Get me method that sends a GET request to the backend to get the user's profile from the cookies. """
+        """ Validates user authentication and retrieves profile data using HttpOnly cookies.
+            
+            Uses JavaScript fetch to securely send browser cookies to the backend's '/api/me-cookie'
+            endpoint. This is the recommended method for HttpOnly cookie authentication as it prevents
+            client-side token exposure while maintaining session security. """
         
         js_code = f"""
                         return fetch('{BASE_URL}/api/me-cookie', {{

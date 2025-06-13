@@ -60,6 +60,10 @@ app.add_static_files('/static', STATIC_PATH)
 #                                           Pages configuration                                                                 #
 # ============================================================================================================================= #
 
+# =====================#
+#     Global pages     #
+# =====================#
+
 # Set home page
 @ui.page('/')
 def pagina_inicio():
@@ -74,6 +78,10 @@ def pagina_login():
 @ui.page('/register')
 def pagina_register():
     return register.create_register_page()
+
+# =====================#
+#  Authorizated pages  #
+# =====================#
 
 # Set calendar page
 @ui.page('/calendar')  
