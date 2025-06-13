@@ -29,7 +29,21 @@ def register_card():
             feedback_label.style('color: red')
             return
         
-        await auth.register(username_value, password_value)
+        result = await auth.register(username_value, password_value)
+
+        # Updates the feedback label based on the result
+        if result.get('status') == 'success':
+            feedback_label.text = result.get('message', 'Login successful')
+            feedback_label.style('color: green')
+            username_input.value = ''
+            password_input.value = ''
+            
+            # Redirects the user to the calendar page
+            ui.navigate.to('/calendar')
+            
+        else:
+            feedback_label.text = result.get('message', 'Error logging in')
+            feedback_label.style('color: red')
 
     # ----------------------------------------------------------------------------------------------------------------------------------------- #
     # UI #
@@ -41,7 +55,7 @@ def register_card():
         with ui.card().classes('bg-white p-8 rounded-lg shadow-lg max-w-md w-5/6 sm:w-full '):
             
             # Register title
-            ui.markdown('# Register').classes(
+            ui.markdown('# Registrarse').classes(
                                                 'text-xs '
                                                 'sm:text-2xl '
                                                 'font-bold '
@@ -50,7 +64,7 @@ def register_card():
                                             )   
             
             # Username input
-            username_input = ui.input('Username',).classes(
+            username_input = ui.input('Usuario',).classes(
                                                                 'w-full mb-4 '              
                                                                 'text-[#1F2937] '           
                                                                 'border border-gray-300 '   
@@ -60,7 +74,7 @@ def register_card():
                                                             )
             
             # Password input
-            password_input = ui.input('Password', password=True).classes(
+            password_input = ui.input('Contraseña', password=True).classes(
                                                                             'w-full mb-4 '
                                                                             'text-[#1F2937] '
                                                                             'border border-gray-300 '
@@ -69,7 +83,7 @@ def register_card():
                                                                             'focus:ring-2 focus:ring-[#349CD7]'
                                                                         )
             # Confirm password input
-            confirm_password_input = ui.input('Confirm Password', password=True).classes(
+            confirm_password_input = ui.input('Confirmar Contraseña', password=True).classes(
                                                                                             'w-full mb-6 '
                                                                                             'text-[#1F2937] '
                                                                                             'border border-gray-300 '
@@ -78,11 +92,10 @@ def register_card():
                                                                                             'focus:ring-2 focus:ring-[#349CD7]'
                                                                                         )
 
-            # Feedback label
-            feedback_label = ui.label().classes('text-sm mb-4')
+            
 
             # Register button
-            ui.button('Register', on_click=submit_register).classes(
+            ui.button('Registrarse', on_click=submit_register).classes(
                                                                         'w-full '                        
                                                                         '!bg-logo '                   
                                                                         '!text-[#FAF9F6] '                 
@@ -92,19 +105,14 @@ def register_card():
                                                                         'focus:outline-none '             
                                                                         'focus:ring-2 focus:ring-[#2C82C9]'  
                                                                     )
+            # Feedback label
+            feedback_label = ui.label().classes('text-sm mb-4')
 
             # Secondary links row
             with ui.row().classes('mt-4 justify-between w-full'):
                 
-                # Register link
-                ui.link('Register', '/register').classes(
-                                                            'text-[#F59E0B] '           
-                                                            'hover:text-[#D97706] '    
-                                                            'text-sm'
-                                                        )
-
                 # Login link
-                ui.link('Login', '/login').classes(
+                ui.link('Iniciar Sesión', '/login').classes(
                                                         'text-[#F59E0B] '           
                                                         'hover:text-[#D97706] '    
                                                         'text-sm'
