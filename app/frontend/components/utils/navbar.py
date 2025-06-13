@@ -3,11 +3,9 @@
 # Import necesary modules
 from nicegui import ui                                                  # Import the ui module
 from frontend.components.utils.navbar_buttons import navbar_buttons     # Importing the navbar_buttons component
+from frontend.utils.routing import front_router_handler as frh          # Importing the RouteHandler
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
-
-def go_to(route):
-    ui.navigate.to(route)
 
 # NOTE: Function to add the navbar component
 async def navbar():
@@ -24,7 +22,7 @@ async def navbar():
                                                         )
         
         # Logo click event
-        img.on('click', go_to('/'))
+        img.on('click', lambda: frh.go_to('/'))
         
         # Second row
         with ui.row().classes('space-x-4'):
