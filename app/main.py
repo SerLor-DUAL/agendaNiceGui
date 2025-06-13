@@ -8,7 +8,7 @@ from backend.utils.cors import setup_cors
 from backend.api.routes import events, events_admin, users_admin, auth
 
 # Import routes (pages)
-from frontend.routes import home, login, register, calendar, event_page
+from frontend.routes import home, login, register, calendar, event_page, logout
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -78,6 +78,11 @@ async def pagina_login():
 @ui.page('/register')
 async def pagina_register():
     return await register.create_register_page()
+
+# Set logout page
+@ui.page('/logout')
+async def page_logout():
+    return await logout.create_logout_page()
 
 # =====================#
 #  Authorizated pages  #
