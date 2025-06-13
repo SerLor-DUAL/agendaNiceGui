@@ -66,18 +66,18 @@ app.add_static_files('/static', STATIC_PATH)
 
 # Set home page
 @ui.page('/')
-def pagina_inicio():
-    return home.create_home_page()
+async def pagina_inicio():
+    return await home.create_home_page()
 
 # Set login page
 @ui.page('/login')
-def pagina_login():
-    return login.create_login_page()
+async def pagina_login():
+    return await login.create_login_page()
 
 # Set register page
 @ui.page('/register')
-def pagina_register():
-    return register.create_register_page()
+async def pagina_register():
+    return await register.create_register_page()
 
 # =====================#
 #  Authorizated pages  #

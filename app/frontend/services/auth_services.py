@@ -148,11 +148,20 @@ class AuthService:
 
     # -------------------------------------------------------------------------------------------------------------------------------------------------------- #
     
-    # NOTE: This method will be used as a decorator to check if the user is logged in or not in the pages
-    def auth_required(self):
-        """ Decorator that checks if the user is logged in or not in the pages. """
+    # NOTE: This method will be used as a decorator or as a boolean checker to check if the user is logged in
+    def auth_required(self, check_only: bool = False):
+        """ Function to be used as a decorator or as a boolean checker to check if the user is logged in """
 
-        # Decorator function
+        async def check_auth():
+            """ Function to check if the user is logged in """
+            result = await self.get_me()
+            return result.get('success', False)
+
+        # Boolean mode
+        if check_only:
+            return check_auth()
+
+        # Decorator mode
         def decorator(function):
             
             # Wrapper function
@@ -164,14 +173,13 @@ class AuthService:
                     ui.label('Checking session...')
                     ui.spinner()
                     
-                # Check if the user is logged in
                 dialog.open()
 
-                # Check if the user is logged in
-                result = await self.get_me()
+                # Checks the authentication
+                is_authenticated = await check_auth()
                 
                 # If the user is not logged in, redirects to the login page
-                if not result.get('success', False):
+                if not is_authenticated:
                     ui.notify('You are not logged in. Redirecting to login...', color='negative')
                     ui.navigate.to('/login')
                 else:
@@ -184,6 +192,7 @@ class AuthService:
         
         # Returns the decorator
         return decorator
+    
     
     async def get_me(self) -> dict:
         """ Validates user authentication and retrieves profile data using HttpOnly cookies.

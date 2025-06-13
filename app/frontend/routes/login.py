@@ -8,7 +8,7 @@ from frontend.components.forms import login_card                                
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
 @ui.page('/login')
-def create_login_page():
+async def create_login_page():
     """ Creates the login page """
     
     # Header links
@@ -18,7 +18,7 @@ def create_login_page():
     with ui.column().classes('w-full h-screen bg-gray-100'):
         
         # Navbar
-        navbar()
+        await navbar()
         
         # Centered row
         with ui.row().classes('items-center justify-center w-full h-[80vh] bg-gray-100'):

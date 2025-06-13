@@ -7,17 +7,13 @@ from frontend.components.diary import diary_card                        # Import
 from frontend.services.auth_services import front_auth_service as auth  # Importing the AuthService instance
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
+
+# Decorator that checks authorization
 @auth.auth_required()
 async def create_calendar_page():
-    
-    # result = await auth.get_me()
-
-    # if not result.get('success', False):
-    #     ui.notify('You are not logged in. Redirecting to login...', color='negative')
-    #     ui.navigate.to('/login')
-    #     return
+    """ Function to create the calendar page """
 
     # Construye UI
     header_links()
-    navbar()
+    await navbar()
     diary_card()

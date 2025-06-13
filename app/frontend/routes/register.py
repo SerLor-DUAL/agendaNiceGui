@@ -8,7 +8,7 @@ from frontend.components.forms import register_card                     # Import
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
 @ui.page('/register')
-def create_register_page():
+async def create_register_page():
     """ Creates the register page """
     
     # Header links
@@ -18,7 +18,7 @@ def create_register_page():
     with ui.column().classes('w-full h-screen bg-gray-100'):
         
         # Navbar
-        navbar()
+        await navbar()
         
         # Register card
         register_card()
