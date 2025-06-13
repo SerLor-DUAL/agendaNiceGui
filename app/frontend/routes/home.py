@@ -7,14 +7,14 @@ from frontend.components.utils import navbar, header_links              # Import
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
 @ui.page('/home')
-def create_home_page():
+async def create_home_page():
     """ Creates the home page """
     
     # Header links
     header_links()
     
     # Navbar
-    navbar()
+    await navbar()
     
     # Principal row
     with ui.row().classes('flex items-center justify-between h-[80%] px-8 bg-gray-50 w-full'):
