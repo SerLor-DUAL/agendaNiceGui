@@ -6,6 +6,9 @@ from frontend.services.auth_services import front_auth_service as auth      # Im
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
+def go_to(route):
+    ui.navigate.to(route)
+
 # NOTE: Function to add the navbar buttons component
 async def navbar_buttons():
     
@@ -15,7 +18,7 @@ async def navbar_buttons():
     # If the user is not logged in, add the logout button
     if logged:
         # Logout button
-        ui.button( 'Logout', on_click=lambda: ui.navigate.to('/logout'),).classes( 
+        ui.button( 'Logout', on_click=go_to('/logout'),).classes( 
                                                                                     '!bg-[#349CD7] '
                                                                                     'text-[#FAF9F6] '
                                                                                     'px-4 '            
@@ -27,7 +30,7 @@ async def navbar_buttons():
     else:
         
         # Login button
-        ui.button( 'Login', on_click=lambda: ui.navigate.to('/login'),).classes( 
+        ui.button( 'Login', on_click=go_to('/login'),).classes( 
                                                                                     '!bg-[#349CD7] '
                                                                                     'text-[#FAF9F6] '
                                                                                     'px-4 '            
@@ -36,7 +39,7 @@ async def navbar_buttons():
                                                                                 )
 
         # Register button
-        ui.button('Register', on_click=lambda: ui.navigate.to('/register')).classes(
+        ui.button('Register', on_click=go_to('/register')).classes(
                                                                                         '!bg-[#349CD7] '
                                                                                         'text-[#FAF9F6] '            
                                                                                         'px-4 '                  

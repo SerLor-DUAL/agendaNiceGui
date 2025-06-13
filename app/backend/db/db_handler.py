@@ -29,13 +29,17 @@ async_session = sessionmaker(
 # Async function to initialize the database schema
 async def init_db():
     # Start a connection context with the engine
-    async with engine.begin() as conn:
-        print("Database connection initialized successfully.")
-        
-        # NOTE: Uncomment this line only if you want to create the tables automatically.
-                # It's unsafe to run if your database already has data because it can overwrite or cause errors.
-                
-        # await conn.run_sync(SQLModel.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            print("Database connection initialized successfully.")
+            
+            # NOTE: Uncomment this line only if you want to create the tables automatically.
+                    # It's unsafe to run if your database already has data because it can overwrite or cause errors.
+                    
+            # await conn.run_sync(SQLModel.metadata.create_all)
+            
+    except Exception as e:
+        print(f"Database initialization failed: {e}")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 

@@ -1,7 +1,8 @@
 # app/backend/api/routes/auth.py
 
 # Import necessary modules
-from fastapi import APIRouter, HTTPException, status, Depends, Request, Response                   # Importing FastAPI components for routing and error handling
+from typing import Optional
+from fastapi import APIRouter, Cookie, HTTPException, status, Depends, Request, Response                   # Importing FastAPI components for routing and error handling
 from sqlmodel.ext.asyncio.session import AsyncSession                                              # Importing AsyncSession for asynchronous database operations
 from backend.models.user.model import User                                                         # Importing the DB User model
 from backend.models.user.DTOs import UserLogin, UserCreate, UserRead                               # Importing DTOs for validating input/output of user data
@@ -74,38 +75,47 @@ async def logout(response: Response):
     return {"message": "Logged out"}  
     
     
-@auth_router.post("/refresh-token")
-async def api_auth_refresh_tokens(request: Request, response: Response):
-    """ API endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token """
+# @auth_router.post("/refresh-token")
+# async def api_auth_refresh_tokens(request: Request, response: Response):
+#     """ API endpoint to refresh an access token using a refresh token, expects a refresh token, returns a new access token """
     
-    # Gets the refresh token from the cookies
-    refresh_token = request.cookies.get("refresh_token")
+#     # Gets the refresh token from the cookies
+#     refresh_token = request.cookies.get("refresh_token")
 
+#     if not refresh_token:
+#         raise HTTPException(status_code=401, detail="Refresh token missing")
+
+#     # Decodifies the refresh token
+#     payload = jwt.decode_jwt(refresh_token)
+
+#     # Validates the payload
+#     if not payload or "sub" not in payload or "nickname" not in payload:
+#         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+
+#     # Uses the decoded token data to create a new access token
+#     new_token_data = {
+#                         "sub": payload["sub"],
+#                         "nickname": payload["nickname"]
+#                     }
+
+#     # Creates a new access and refresh tokens for the user
+#     new_access_token = jwt.create_access_token(new_token_data)
+#     new_refresh_token = jwt.create_refresh_token(new_token_data)
+    
+#     # Saves cookies with the new refreshed okens
+#     ach.set_access_token_cookie(response, new_access_token)
+#     ach.set_refresh_token_cookie(response, new_refresh_token)
+
+#     return {"message": "Tokens refreshed"}
+
+@auth_router.post("/refresh-token")
+async def api_auth_refresh_tokens(response: Response, refresh_token: Optional[str] = Cookie(None)):
+    
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token missing")
 
-    # Decodifies the refresh token
-    payload = jwt.decode_jwt(refresh_token)
-
-    # Validates the payload
-    if not payload or "sub" not in payload or "nickname" not in payload:
-        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
-
-    # Uses the decoded token data to create a new access token
-    new_token_data = {
-                        "sub": payload["sub"],
-                        "nickname": payload["nickname"]
-                    }
-
-    # Creates a new access and refresh tokens for the user
-    new_access_token = jwt.create_access_token(new_token_data)
-    new_refresh_token = jwt.create_refresh_token(new_token_data)
-    
-    # Saves cookies with the new refreshed okens
-    ach.set_access_token_cookie(response, new_access_token)
-    ach.set_refresh_token_cookie(response, new_refresh_token)
-
-    return {"message": "Tokens refreshed"}
+    user_id = await ach.refresh_tokens(refresh_token, response)
+    return {"message": "Tokens refreshed", "user_id": user_id}
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 

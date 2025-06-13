@@ -30,11 +30,11 @@ class AuthCookiesHandler:
                 payload = jwt.decode_jwt(access_token)
                 user_id = int(payload.get("sub"))
 
-                if not user_id:
+                if not user_id or not isinstance(user_id, int):
                     raise HTTPException(status_code=401, detail="Invalid token")
 
                 user = await us.read_user_by_id(user_id, session)
-                await session.commit()
+                # await session.commit() // NO ES NECESARIO?
                 await session.refresh(user)
                 return user
 
@@ -47,7 +47,7 @@ class AuthCookiesHandler:
             
             # Gets the user from the database using the user_id
             user = await us.read_user_by_id(user_id, session)
-            await session.commit()
+            # await session.commit() // NO ES NECESARIO?
             await session.refresh(user)
             return user
         
@@ -71,6 +71,9 @@ class AuthCookiesHandler:
             new_access_token = jwt.create_access_token(new_token_data)
             new_refresh_token = jwt.create_refresh_token(new_token_data)
 
+            # Clears the cookies
+            self.clear_auth_cookies(response)
+            
             self.set_access_token_cookie(response, new_access_token)
             self.set_refresh_token_cookie(response, new_refresh_token)
 

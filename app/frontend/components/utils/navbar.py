@@ -6,6 +6,9 @@ from frontend.components.utils.navbar_buttons import navbar_buttons     # Import
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
+def go_to(route):
+    ui.navigate.to(route)
+
 # NOTE: Function to add the navbar component
 async def navbar():
     
@@ -21,14 +24,12 @@ async def navbar():
                                                         )
         
         # Logo click event
-        img.on('click', lambda: ui.navigate.to('/'))
+        img.on('click', go_to('/'))
         
         # Second row
         with ui.row().classes('space-x-4'):
             
             # Add the buttons depending on the logged state
             await navbar_buttons()
-
-            
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #

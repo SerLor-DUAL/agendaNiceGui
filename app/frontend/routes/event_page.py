@@ -16,7 +16,6 @@ mock_events = [
     {"title": "Entrega de proyecto", "description": "Subida final al repositorio", "date": "2025-06-30"},
 ]
 
-
 @auth.auth_required()
 async def create_events_page():
     """ Creates the events page """

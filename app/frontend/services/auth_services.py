@@ -4,8 +4,8 @@
 import httpx                        # Importing for making HTTP requests
 from dotenv import load_dotenv      # Importing load_dotenv for loading environment variables                              
 import os                           # Importing os for accessing environment variables  
-from nicegui import ui              # Importing ui from nicegui
-from functools import wraps         # Importing wraps for decorator usage      
+from nicegui import ui, app         # Importing ui and app from nicegui
+from functools import wraps         # Importing wraps for decorator usage   
 
 # Load environment variables from .env file
 load_dotenv()
@@ -139,6 +139,10 @@ class AuthService:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(url)
+                
+                # Clears the local cache
+                app.storage.user.clear()
+                
                 if response.status_code == 200:
                     return {"success": True, "message": "Succesful logout"}
                 else:
@@ -153,9 +157,13 @@ class AuthService:
         """ Function to be used as a decorator or as a boolean checker to check if the user is logged in """
 
         async def check_auth():
-            """ Function to check if the user is logged in """
-            result = await self.get_me()
-            return result.get('success', False)
+            
+            #  First check local cache
+            if 'user_id' in app.storage.user:
+                return True
+            
+            # If there is no user data in the local cache, load the user session
+            return await self.load_user_session()
 
         # Boolean mode
         if check_only:
@@ -192,6 +200,25 @@ class AuthService:
         
         # Returns the decorator
         return decorator
+    
+    
+    async def load_user_session(self) -> bool:
+        """ Loads the user session from the backend cookies and stores the user data in app.storage.user, 
+            returns True if the session is valid, False if not. """
+
+        # Checks if the user is logged in
+        result = await self.get_me()
+        
+        if result.get('success'):
+            user_data = result.get('data', {})
+            
+            # Save the user data in app.storage.user
+            app.storage.user['user_id'] = user_data.get('id')
+            app.storage.user['nickname'] = user_data.get('nickname')
+            return True
+        else:
+            app.storage.user.clear()
+            return False
     
     
     async def get_me(self) -> dict:

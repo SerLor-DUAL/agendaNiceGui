@@ -113,5 +113,8 @@ if __name__ in {"__main__", "__mp_main__"}:
     # Get port from environment variable, if not set, default to 8000
     selected_port = int(os.getenv("LOCALHOST_PORT", 8000))  
     
+    # Get JWT secret key from environment variable
+    secret_key = os.getenv("SECRET_STORAGE")
+    
     # Runs app
-    ui.run(port=selected_port, reload=True, show=True)
+    ui.run(port=selected_port, reload=True, show=True, storage_secret=secret_key)
