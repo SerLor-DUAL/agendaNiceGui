@@ -52,7 +52,7 @@ async def api_create_event(event_to_create: EventCreate, session: AsyncSession =
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # READ ENDPOINTS #
 
-@event_router.get("/events/", response_model=list[EventRead])
+@event_router.get("/events", response_model=list[EventRead])
 async def api_get_events(amount: Optional[int] = None, session: AsyncSession = Depends(get_session), current_user: User = Depends(api_auth_get_me_cookie)):
     """ API endpoint to get all events from the database for the current user and returns a list of EventRead DTOs.
         This endpoint requires an user session and cookies with a validated token."""
