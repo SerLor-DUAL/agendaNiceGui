@@ -6,7 +6,8 @@ from frontend.components.utils import navbar, header_links              # Import
 from frontend.components.diary import diary_card                        # Importing the calendar_card component
 from frontend.services.auth_services import front_auth_service as auth  # Importing the AuthService instance
 from frontend.services.event_services import front_event_service as event_service  # Importing the EventService instance
-from datetime import datetime  # Importing datetime for date formatting
+from datetime import datetime                                           # Importing datetime for date formatting
+from frontend.components.events.event_card import create_events_card    # Importing the event card component
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 # Simulación de eventos (esto luego vendría de una base de datos o API)
 mock_events = [
@@ -19,18 +20,17 @@ mock_events = [
 @auth.auth_required()
 async def create_events_page():
     """ Creates the events page """
+    userEvents = await event_service.get_events() 
+
     # Build UI
     header_links()
-    navbar()
+    await navbar()
     ui.label('Mis eventos').classes('text-3xl font-bold my-4')
     with ui.column().classes('w-full gap-4'):
 
-        if not mock_events:
+        if not userEvents:
             ui.label("No tienes eventos por el momento.").classes("text-gray-500")
         else:
-            for event in mock_events:
-                with ui.card().classes("w-full p-4 bg-white shadow rounded"):
-                    ui.label(event['title']).classes('text-xl font-semibold')
-                    ui.label(event['description']).classes('text-gray-700')
-                    ui.label(f"📅 {datetime.strptime(event['date'], '%Y-%m-%d').strftime('%d %b %Y')}").classes('text-sm text-gray-500')
-    # userEvents = event_service.get_events() 
+            print("User Events:", userEvents)
+            # for event in userEvents:
+            #     create_events_card(event)

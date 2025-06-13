@@ -20,7 +20,9 @@ class EventService:
 
     async def get_events(self, *args, **kwargs):
         """ Get all events """
+        
         url = f"{BASE_URL}/api/events"
+        print("Fetching events from:", url)
         try:
             response = await self.client.get(url)
             if response.status_code == 200:
