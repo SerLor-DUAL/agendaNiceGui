@@ -111,13 +111,6 @@ def register_card():
             # Secondary links row
             with ui.row().classes('mt-4 justify-between w-full'):
                 
-                # # Register link
-                # ui.link('Register', '/register').classes(
-                #                                             'text-[#F59E0B] '           
-                #                                             'hover:text-[#D97706] '    
-                #                                             'text-sm'
-                #                                         )
-
                 # Login link
                 ui.link('Iniciar Sesión', '/login').classes(
                                                         'text-[#F59E0B] '           

@@ -16,8 +16,9 @@ def create_diary_day_card(day: int):
             # Create a label with the day number
             ui.label(str(day)).classes('text-sm font-medium')
             
-            # NOTE here you can add more details about the day, like events or tasks
-            # For example a icon or label for events
+            with ui.menu().classes("relative"):
+                ui.menu_item('Añadir evento', on_click=lambda: ui.notify(f'Añadir evento al día {day}'))
+                ui.menu_item('Ver tareas', on_click=lambda: ui.notify(f'Tareas para el día {day}'))
             
         else:
             
