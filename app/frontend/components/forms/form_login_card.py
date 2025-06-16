@@ -3,6 +3,7 @@
 # Import necesary modules
 from nicegui import ui                                                    # Import the ui module
 from frontend.services.auth_services import front_auth_service as auth    # Import the AuthService instance
+from frontend.utils.routing import front_router_handler as frh            # Importing the RouteHandler   
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -36,7 +37,7 @@ def login_card():
             password_input.value = ''
             
             # Redirects the user to the calendar page
-            ui.navigate.to('/calendar')
+            frh.go_to('/calendar')
             
         else:
             feedback_label.text = result.get('message', 'Error logging in')

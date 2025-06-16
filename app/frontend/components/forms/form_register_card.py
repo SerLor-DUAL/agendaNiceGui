@@ -3,6 +3,7 @@
 # Import necesary modules
 from nicegui import ui                                                    # Import the ui module
 from frontend.services.auth_services import front_auth_service as auth    # Import the AuthService instance
+from frontend.utils.routing import front_router_handler as frh            # Importing the RouteHandler   
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -37,6 +38,8 @@ def register_card():
             feedback_label.style('color: green')
             username_input.value = ''
             password_input.value = ''
+            
+            frh.go_to('/calendar')
             
         else:
             feedback_label.text = result.get('message', 'Error logging in')
