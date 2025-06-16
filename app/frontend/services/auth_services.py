@@ -270,10 +270,31 @@ class AuthService:
         else:
             app.storage.user.clear()
             return False
+# ----------------------------------------------------------------------------------------------------------------------------------------------------    
+    # FIRST INIT. It will be used as a decorator.
+    async def first_init(self) -> None:
+        """During the first INIT we will try to set up the user."""
+        print(app.storage.user.get('session_initialized', True))
+        if not app.storage.user.get('session_initialized', False):
+            await self.load_user_session()
+        app.storage.user['session_initialized'] = True
 
+
+      
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 
 #TODO: ADD MORE METHODS IF NEEDED
 
 # Create an instance of the AuthService to be used in other parts of the application
 front_auth_service = AuthService()
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
+# FIRST INIT DECORATOR.
+def with_first_init(auth_service_instance):
+    def decorator(view_function):
+        @wraps(view_function)
+        async def wrapper(*args, **kwargs):
+            await auth_service_instance.first_init()
+            return await view_function(*args, **kwargs)
+        return wrapper
+    return decorator

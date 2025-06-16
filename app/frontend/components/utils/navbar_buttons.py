@@ -25,23 +25,25 @@ mobile_button_classes = (
                         )
             
 # NOTE: Function to add the navbar buttons component for desktop
-async def navbar_buttons():
-    logged = await auth.auth_required(check_only=True)
+async def navbar_buttons(current_user):
+    # logged = await auth.auth_required(check_only=True)
 
     # If user is logged in show logout button, if not show login and register buttons
-    if logged:
+    # if logged:
+    if current_user:
         ui.button('Cerrar Sesión', on_click=lambda: auth.logout()).classes(desktop_button_classes)
     else:
         ui.button('Iniciar Sesión', on_click=lambda: frh.go_to('/login')).classes(desktop_button_classes)
         ui.button('Registro', on_click=lambda: frh.go_to('/register')).classes(desktop_button_classes)
 
 # NOTE: Function to add the navbar buttons component for mobile
-async def mobile_nav_buttons():
-    logged = await auth.auth_required(check_only=True)
+async def mobile_nav_buttons(current_user):
+    # logged = await auth.auth_required(check_only=True)
 
     # If user is logged in show logout button, if not show login and register buttons
     with ui.column().classes('space-y-2 w-full'):
-        if logged:
+        # if logged:
+        if current_user:
             ui.button('Cerrar Sesión', on_click=lambda: auth.logout()).classes(mobile_button_classes)
         else:
             ui.button('Iniciar Sesión', on_click=lambda: frh.go_to('/login')).classes(mobile_button_classes)
