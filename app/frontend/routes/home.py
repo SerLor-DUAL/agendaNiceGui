@@ -14,7 +14,7 @@ async def create_home_page():
         'flex flex-col-reverse lg:flex-row items-start justify-end lg:justify-start w-full bg-gray-50 px-4 lg:px-8 py-8 ' +
         'min-h-screen lg:min-h-0 lg:h-[80%]'
     ):
-        # Left column (texto) - centrado vertical solo en escritorio
+        # Left column
         with ui.column().classes(
             'w-full lg:flex-1 lg:h-full lg:pl-4 text-center lg:text-left lg:self-center'
         ):
@@ -26,7 +26,7 @@ async def create_home_page():
                 '!text-2xl lg:!text-3xl text-gray-700 w-full slide-in-left'
             ).style('animation-delay: 0.1s;')
 
-        # Right column (imagen)
+        # Right column
         with ui.column().classes(
             'w-full lg:flex-1 pl-0 lg:pr-4 text-center lg:text-right'
         ):
