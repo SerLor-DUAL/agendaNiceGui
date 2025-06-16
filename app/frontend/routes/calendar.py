@@ -13,7 +13,4 @@ from frontend.services.auth_services import front_auth_service as auth  # Import
 async def create_calendar_page():
     """ Function to create the calendar page """
 
-    # Construye UI
-    header_links()
-    await navbar()
     diary_card()

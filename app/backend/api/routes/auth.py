@@ -2,7 +2,7 @@
 
 # Import necessary modules
 from typing import Optional
-from fastapi import APIRouter, Cookie, HTTPException, status, Depends, Request, Response                   # Importing FastAPI components for routing and error handling
+from fastapi import APIRouter, Cookie, HTTPException, status, Depends, Request, Response           # Importing FastAPI components for routing and error handling
 from sqlmodel.ext.asyncio.session import AsyncSession                                              # Importing AsyncSession for asynchronous database operations
 from backend.models.user.model import User                                                         # Importing the DB User model
 from backend.models.user.DTOs import UserLogin, UserCreate, UserRead                               # Importing DTOs for validating input/output of user data
@@ -71,6 +71,7 @@ async def api_auth_login_JSON(data: UserLogin, response: Response, session: Asyn
 async def logout(response: Response):
     """ API endpoint to log out the user, clears the cookies """
     
+    # Clear authorization cookies
     ach.clear_auth_cookies(response)
     return {"message": "Logged out"}  
     

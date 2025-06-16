@@ -2,20 +2,13 @@
 
 # Import necessary modules
 from nicegui import ui                                                  # Import the ui module
-from frontend.components.utils import navbar, header_links              # Importing the utils components
+from frontend.components.utils import navbar                            # Importing the utils components
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
-@ui.page('/home')
 async def create_home_page():
     """ Creates the home page """
-    
-    # Header links
-    header_links()
-    
-    # Navbar
-    await navbar()
-    
+
     # Principal row
     with ui.row().classes('flex items-center justify-between h-[80%] px-8 bg-gray-50 w-full'):
 

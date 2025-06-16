@@ -20,6 +20,12 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
+# Import added custom links to head in the HTML
+from frontend.components.utils.header_links import header_links
+
+# Import principal page components
+from frontend.components.utils import navbar
+
 # ============================================================================================================================= #
 #                                           FastAPI and NiceGUI initial integration                                             #
 # ============================================================================================================================= #
@@ -56,6 +62,9 @@ if not os.path.isdir(STATIC_PATH):
 # Add static folder for frontend.
 app.add_static_files('/static', STATIC_PATH)
 
+# Add customs CSS to the head
+header_links()
+
 # ============================================================================================================================= #
 #                                           Pages configuration                                                                 #
 # ============================================================================================================================= #
@@ -67,22 +76,20 @@ app.add_static_files('/static', STATIC_PATH)
 # Set home page
 @ui.page('/')
 async def page_init():
-    return await home.create_home_page()
+    await navbar()
+    await home.create_home_page()
 
 # Set login page
 @ui.page('/login')
 async def page_login():
-    return await login.create_login_page()
+    await navbar()
+    await login.create_login_page()
 
 # Set register page
 @ui.page('/register')
 async def page_register():
-    return await register.create_register_page()
-
-# Set logout page
-@ui.page('/logout')
-async def page_logout():
-    return await logout.create_logout_page()
+    await navbar()
+    await register.create_register_page()
 
 # =====================#
 #  Authorizated pages  #
@@ -91,12 +98,14 @@ async def page_logout():
 # Set calendar page
 @ui.page('/calendar')  
 async def page_calendar():
-    return await calendar.create_calendar_page()
+    await navbar()
+    await calendar.create_calendar_page()
 
 # Set events page
 @ui.page('/events')
 async def page_events():
-    return await event_page.create_events_page()
+    await navbar()
+    await event_page.create_events_page()
 
 # ============================================================================================================================= #
 #                                           Database and app initialization                                                     #
@@ -117,4 +126,4 @@ if __name__ in {"__main__", "__mp_main__"}:
     secret_key = os.getenv("SECRET_STORAGE")
     
     # Runs app
-    ui.run(port=selected_port, reload=True, show=True, storage_secret=secret_key)
+    ui.run(port=selected_port, reload=True, show=True, storage_secret=secret_key, tailwind=True)

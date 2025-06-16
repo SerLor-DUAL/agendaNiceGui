@@ -1,0 +1,48 @@
+# frontend/components/navbar_links.py
+
+# Import necesary modules
+from nicegui import ui                                                      # Import the ui module
+from frontend.services.auth_services import front_auth_service as auth      # Importing the AuthService instance
+from frontend.utils.routing import front_router_handler as frh              # Importing the RouteHandler
+
+# ----------------------------------------------------------------------------------------------------------------------------------------- #
+
+# Styles for the desktop links
+desktop_link_classes = (
+                            'text-white no-underline '
+                            'hover:text-blue-300 hover:underline '
+                            'transition-colors duration-200 '
+                            'text-base font-medium px-3 py-2 rounded-md '
+                            'whitespace-nowrap'
+                        )
+
+# Styles for mobile links (botones que parecen links)
+mobile_link_classes = (
+                            'text-white hover:text-blue-300 hover:bg-gray-800 '
+                            'text-lg px-4 py-4 rounded-lg '
+                            'w-full text-left transition-all duration-200 '
+                            'bg-transparent border-none font-medium '
+                            'flex items-center justify-start'
+                        )
+            
+# NOTE: Function to add the navbar links component for desktop
+async def navbar_links():
+    logged = await auth.auth_required(check_only=True)
+
+    ui.link('Inicio', '/').classes(desktop_link_classes)
+
+    #If user is logged in show calendar and events links
+    if logged:
+        ui.link('Calendario', '/calendar').classes(desktop_link_classes)
+        ui.link('Eventos', '/events').classes(desktop_link_classes)
+
+# NOTE: Function to add the navbar links component for mobile
+async def mobile_nav_links():
+    logged = await auth.auth_required(check_only=True)
+
+    ui.button('Inicio', on_click=lambda: frh.go_to('/')).classes(mobile_link_classes)
+
+    #If user is logged in show calendar and events links
+    if logged:
+        ui.button('Calendario', on_click=lambda: frh.go_to('/calendar')).classes(mobile_link_classes)
+        ui.button('Eventos', on_click=lambda: frh.go_to('/events')).classes(mobile_link_classes)

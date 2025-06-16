@@ -7,42 +7,42 @@ from frontend.utils.routing import front_router_handler as frh              # Im
 
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
+# Styles for the desktop buttons
+desktop_button_classes = (
+                            'flex items-center gap-2 '
+                            'bg-blue-600 hover:bg-blue-500 active:bg-blue-700 '
+                            'text-white font-semibold '
+                            'px-4 py-2 rounded-lg '
+                            'transition-colors duration-200 '
+                            'whitespace-nowrap'
+                        )
 
-
-# NOTE: Function to add the navbar buttons component
+# Styles for mobile buttons  
+mobile_button_classes = (
+                            'bg-blue-600 hover:bg-blue-500 '
+                            'text-white px-4 py-3 rounded-lg '
+                            'w-full text-left transition-colors duration-200'
+                        )
+            
+# NOTE: Function to add the navbar buttons component for desktop
 async def navbar_buttons():
-    
-    # Check if the user is logged
     logged = await auth.auth_required(check_only=True)
-    
-    # If the user is not logged in, add the logout button
+
+    # If user is logged in show logout button, if not show login and register buttons
     if logged:
-        # Logout button
-        ui.button( 'Logout', on_click=lambda: frh.go_to('/logout')).classes( 
-                                                                                    '!bg-[#349CD7] '
-                                                                                    'text-[#FAF9F6] '
-                                                                                    'px-4 '            
-                                                                                    'py-2 '            
-                                                                                    'rounded '         
-                                                                                )
-
-    # If the user is logged in, add the login and register buttons
+        ui.button('Cerrar Sesión', on_click=lambda: auth.logout()).classes(desktop_button_classes)
     else:
-        
-        # Login button
-        ui.button( 'Login', on_click=lambda: frh.go_to('/login')).classes( 
-                                                                                    '!bg-[#349CD7] '
-                                                                                    'text-[#FAF9F6] '
-                                                                                    'px-4 '            
-                                                                                    'py-2 '            
-                                                                                    'rounded '         
-                                                                                )
+        ui.button('Iniciar Sesión', on_click=lambda: frh.go_to('/login')).classes(desktop_button_classes)
+        ui.button('Registro', on_click=lambda: frh.go_to('/register')).classes(desktop_button_classes)
 
-        # Register button
-        ui.button('Register', on_click=lambda: frh.go_to('/register')).classes(
-                                                                                        '!bg-[#349CD7] '
-                                                                                        'text-[#FAF9F6] '            
-                                                                                        'px-4 '                  
-                                                                                        'py-2 '                  
-                                                                                        'rounded'                
-                                                                                    )
+# NOTE: Function to add the navbar buttons component for mobile
+async def mobile_nav_buttons():
+    logged = await auth.auth_required(check_only=True)
+
+    # If user is logged in show logout button, if not show login and register buttons
+    with ui.column().classes('space-y-2 w-full'):
+        if logged:
+            ui.button('Cerrar Sesión', on_click=lambda: auth.logout()).classes(mobile_button_classes)
+        else:
+            ui.button('Iniciar Sesión', on_click=lambda: frh.go_to('/login')).classes(mobile_button_classes)
+            ui.button('Registro', on_click=lambda: frh.go_to('/register')).classes(mobile_button_classes)
