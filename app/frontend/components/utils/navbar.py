@@ -23,18 +23,18 @@ async def navbar():
                     img.on('click', lambda: frh.go_to('/'))
 
                 # Links (CENTER)
-                with ui.row().classes('items-center justify-center space-x-8 flex-1 max-md:hidden'):
+                with ui.row().classes('items-center justify-center space-x-8 flex-1 max-lg:hidden'):
                     with ui.row().classes('space-x-6 text-lg font-medium'):
                         await navbar_links(current_user)
 
                 # Botones (RIGHT)
-                with ui.row().classes('items-center justify-end space-x-4 flex-1 max-md:hidden'):
+                with ui.row().classes('items-center justify-end space-x-4 flex-1 max-lg:hidden'):
                     await navbar_buttons(current_user)
                 
                 # ----------------------------------------------------------------------------------------------------------------------------------------- #
                 # Mobile
                 
-                with ui.element('div').classes('md:hidden relative'):
+                with ui.element('div').classes('lg:hidden relative'):
                     
                     # Menu button
                     menu_button = ui.button().classes('text-white bg-transparent hover:bg-gray-700 p-2 rounded-md transition-colors duration-200')
@@ -44,7 +44,7 @@ async def navbar():
                         ui.label('☰').classes('text-white text-3xl leading-none select-none')
 
                     # Overlay of menu
-                    mobile_overlay = ui.element('div').classes('fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden')
+                    mobile_overlay = ui.element('div').classes('fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden')
 
                     # Sliding mobile menu
                     mobile_menu = ui.element('div').classes(
