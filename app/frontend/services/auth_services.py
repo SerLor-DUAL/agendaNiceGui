@@ -90,7 +90,11 @@ class AuthService:
         result = await ui.run_javascript(js_code, timeout=5.0)
         
         # Returns a response from the fetched JavaScript code
-        return result
+        if result and result.get('status') == 'success':
+            frh.go_to2('/calendar')
+            return {"success": True, "message": result.get('message')}
+        else:
+            return {"success": False, "message": result.get('message')}
 
 
     async def logout(self) -> dict:
@@ -133,7 +137,7 @@ class AuthService:
         if result and result.get('status') == 'success':
             # Clears the local cache
             app.storage.user.clear()
-            frh.go_to('/')
+            frh.go_to2('/')
             return {"success": True, "message": result.get('message')}
         else:
             return {"success": False, "message": result.get('message')}
@@ -240,7 +244,7 @@ class AuthService:
                 # If the user is not logged in, redirects to the login page
                 if not is_authenticated:
                     ui.notify('You are not logged in. Redirecting to login...', color='negative')
-                    ui.navigate.to('/login')
+                    frh.go_to2('/login')
                 else:
                     # If the user is logged in, executes the original function
                     dialog.close()

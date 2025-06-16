@@ -38,9 +38,6 @@ def register_card():
             username_input.value = ''
             password_input.value = ''
             
-            # Redirects the user to the calendar page
-            ui.navigate.to('/calendar')
-            
         else:
             feedback_label.text = result.get('message', 'Error logging in')
             feedback_label.style('color: red')

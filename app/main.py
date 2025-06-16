@@ -8,7 +8,7 @@ from backend.utils.cors import setup_cors
 from backend.api.routes import events, events_admin, users_admin, auth
 
 # Import routes (pages)
-from frontend.routes import home, login, register, calendar, event_page, logout
+from frontend.routes import home, login, register, calendar, event_page
 
 # Import database initializer
 from backend.db.db_handler import init_db

@@ -2,7 +2,9 @@
 
 # Import necessary modules
 from nicegui import ui
-from fastapi.responses import RedirectResponse #SECOND ROUNTING OPTION
+from fastapi.responses import RedirectResponse
+
+
 # NOTE: Class to handle routing in the frontend elements
         # This is due to the fact that the components have a problem with the lambda redirecting
         # TODO: Check why and make some explanation here to clarify
@@ -78,6 +80,25 @@ class RouteHandler:
         else:
             ui.notify(f"Route not found: {route}", color='negative')
 
+    def go_to2(self, route: str):
+        """ Function to go to a specific route using redirect response"""
+        
+        # Routes map -> funtion
+        routes_map = {
+            '/': RouteHandler.go_home2,
+            '/login': RouteHandler.go_login2,
+            '/register': RouteHandler.go_register2,
+            '/logout': RouteHandler.go_logout2,
+            '/calendar': RouteHandler.go_calendar2,
+            '/events': RouteHandler.go_events2,
+        }
+        
+        func = routes_map.get(route)
+        
+        if func:
+            func()
+        else:
+            ui.notify(f"Route not found: {route}", color='negative')
 
 # -------------------------------------------------------------------------------------------- #
 
