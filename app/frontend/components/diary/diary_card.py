@@ -84,7 +84,7 @@ def diary_card():
     # UI #
 
     # Calendar card
-    with ui.row().classes('w-full p-8 h-100 bg-gray-100 rounded shadow'):
+    with ui.row().classes('w-full md:p-8 py-8 px-0 h-100 bg-gray-100 rounded shadow'):
         
         # Calendar header
         with ui.row().classes('items-center justify-between w-full'):
