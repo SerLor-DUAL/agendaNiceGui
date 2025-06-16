@@ -26,6 +26,9 @@ from frontend.components.utils.header_links import header_links
 # Import principal page components
 from frontend.components.utils import navbar
 
+from frontend.services.auth_services import front_auth_service, with_first_init
+
+   
 # ============================================================================================================================= #
 #                                           FastAPI and NiceGUI initial integration                                             #
 # ============================================================================================================================= #
@@ -75,18 +78,21 @@ header_links()
 
 # Set home page
 @ui.page('/')
+@with_first_init(front_auth_service)
 async def page_init():
     await navbar()
     await home.create_home_page()
 
 # Set login page
 @ui.page('/login')
+@with_first_init(front_auth_service)
 async def page_login():
     await navbar()
     await login.create_login_page()
 
 # Set register page
 @ui.page('/register')
+@with_first_init(front_auth_service)
 async def page_register():
     await navbar()
     await register.create_register_page()

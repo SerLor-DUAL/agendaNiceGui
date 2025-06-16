@@ -1,7 +1,7 @@
 # frontend/components/navbar.py
 
 # Import necesary modules
-from nicegui import ui                                                                      # Import the ui module
+from nicegui import ui, app                                                                     # Import the ui module
 from frontend.components.utils.navbar_buttons import navbar_buttons, mobile_nav_buttons     # Importing the navbar_buttons component
 from frontend.components.utils.navbar_links import navbar_links, mobile_nav_links           # Importing the navbar_links component
 from frontend.utils.routing import front_router_handler as frh                              # Importing the RouteHandler
@@ -10,7 +10,7 @@ from frontend.utils.routing import front_router_handler as frh                  
 
 # NOTE: Function to add the navbar component
 async def navbar():
-    
+    current_user =  app.storage.user.get('user_id', None)
     # Header
     with ui.header().classes('bg-gray-900 text-white shadow-md'):
         
@@ -25,11 +25,11 @@ async def navbar():
                 # Links (CENTER)
                 with ui.row().classes('items-center justify-center space-x-8 flex-1 max-md:hidden'):
                     with ui.row().classes('space-x-6 text-lg font-medium'):
-                        await navbar_links()
+                        await navbar_links(current_user)
 
                 # Botones (RIGHT)
                 with ui.row().classes('items-center justify-end space-x-4 flex-1 max-md:hidden'):
-                    await navbar_buttons()
+                    await navbar_buttons(current_user)
                 
                 # ----------------------------------------------------------------------------------------------------------------------------------------- #
                 # Mobile
@@ -68,13 +68,13 @@ async def navbar():
                             
                             # Links
                             with ui.column().classes('space-y-1'):
-                                await mobile_nav_links()
+                                await mobile_nav_links(current_user)
                                 
                             ui.separator().classes('my-2 border-gray-700')
                             
                             # Buttons
                             with ui.column().classes('space-y-2'):
-                                await mobile_nav_buttons()
+                                await mobile_nav_buttons(current_user)
 
                     # State to open/close menu
                     is_menu_open = False

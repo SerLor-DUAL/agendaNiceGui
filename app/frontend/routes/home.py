@@ -3,12 +3,12 @@
 # Import necessary modules
 from nicegui import ui                                                  # Import the ui module
 from frontend.components.utils import navbar                            # Importing the utils components
-
+# Importing the AuthService instance
+from frontend.services.auth_services import front_auth_service as auth   
 # ----------------------------------------------------------------------------------------------------------------------------------------- #
 
 async def create_home_page():
     """ Creates the home page """
-
     # Principal row
     with ui.row().classes('flex items-center justify-between h-[80%] px-8 bg-gray-50 w-full'):
 
