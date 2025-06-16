@@ -64,16 +64,16 @@ async def navbar():
                             close_btn = ui.button('✕').classes('text-white bg-transparent hover:bg-gray-700 p-2 rounded-full text-xl')
 
                         # Mobile elements
-                        with ui.column().classes('p-4 space-y-4 flex-1 items-center'):
+                        with ui.column().classes('p-4 space-y-4 flex-1'):
                             
                             # Links
-                            with ui.column().classes('space-y-1'):
+                            with ui.column().classes('space-y-1 ml-4'):
                                 await mobile_nav_links(current_user)
                                 
-                            ui.separator().classes('my-2 border-gray-700')
+                            # ui.separator().classes('border-gray-700')
                             
                             # Buttons
-                            with ui.column().classes('space-y-2'):
+                            with ui.column().classes('space-y-2 flex-1 items-center self-center'):
                                 await mobile_nav_buttons(current_user)
 
                     # State to open/close menu
