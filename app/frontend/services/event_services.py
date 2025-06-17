@@ -49,8 +49,37 @@ class EventService:
                 return None
 
 
-    async def create_event(self, event_data):
-        """ Create a new event """
+    async def create_event(self, event_data: dict):
+        """ Create a new event by sending a POST request via browser fetch """
+        js_code = f'''
+        fetch('{BASE_URL}/api/events', {{
+            method: 'POST',
+            headers: {{
+                'Content-Type': 'application/json'
+            }},
+            credentials: 'include',
+            body: JSON.stringify({{
+                "title": "{event_data['title']}",
+                "description": "{event_data['description']}",
+                "start_date": "{event_data['start_date']}",
+                "end_date": "{event_data['end_date']}"
+            }})
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+        '''
+
+        try:
+            result = await ui.run_javascript(js_code, timeout=5)
+            print('Evento creado:', result)
+            ui.notify('Evento creado con éxito', color='positive')
+            return result
+        except Exception as e:
+            print('Error al crear evento:', e)
+            ui.notify(f'Error creando evento: {str(e)}', color='negative')
+            return None
         
 
     async def delete_event(self, event_id):

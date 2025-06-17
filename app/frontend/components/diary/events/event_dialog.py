@@ -7,10 +7,12 @@ from nicegui import ui      # Import the ui module from nicegui
 
 from nicegui import ui
 from datetime import datetime
+from frontend.services.event_services import EventService
 
 
 def show_event_dialog(action, event_data, on_save, on_delete=None):
     
+
     title = {
         'create': 'Agregar evento',
         'edit': 'Editar evento',
@@ -78,15 +80,18 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
 
             if action == 'delete':
                 ui.button(button_text, on_click=lambda: on_delete(event_data)).classes('bg-red-500 text-white hover:bg-red-600 px-6')
+                print("ACA")
             else:
-                def handle_action():
+                async def handle_action():
                     new_event = {
                         'title': title_input.value,
                         'description': description_input.value,
-                        'start_date': f'{start_date_input.value} {start_time_input.value}',
-                        'end_date': f'{end_date_input.value} {end_time_input.value}',
+                        'start_date': datetime.strptime(f'{start_date_input.value} {start_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
+                        'end_date': datetime.strptime(f'{end_date_input.value} {end_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
                     }
                     on_save(new_event)
+                    event_service = EventService()
+                    await event_service.create_event(new_event)
                     dialog.close()
 
                 ui.button(button_text, on_click=handle_action).classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')

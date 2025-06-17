@@ -245,6 +245,7 @@ class DiaryCard:
 
 
         # Hanlding the save event
+        # TODO this could be modularized into the dialog function.
         def handle_save(new_event):
             """Manages the save event"""
 
