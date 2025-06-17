@@ -10,9 +10,8 @@ from datetime import datetime
 from frontend.services.event_services import EventService
 
 
-def show_event_dialog(action, event_data, on_save, on_delete=None):
-    
 
+def show_event_dialog(action, event_data, on_save, on_delete=None):
     title = {
         'create': 'Agregar evento',
         'edit': 'Editar evento',
@@ -79,7 +78,7 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
             ui.button('Cancelar', on_click=dialog.close).props('flat').classes('text-gray-600 px-4')
 
             if action == 'delete':
-                ui.button(button_text, on_click=lambda: on_delete(event_data)).classes('bg-red-500 text-white hover:bg-red-600 px-6')
+                ui.button(button_text, on_click=lambda: handle_delete(on_delete,event_data)).classes('bg-red-500 text-white hover:bg-red-600 px-6')
                 print("ACA")
             else:
                 async def handle_action():
@@ -98,6 +97,11 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
 
     return dialog
 
+# TODO this will need refactor, but it's just a test by now.
+async def handle_delete(function, event_data):
+    function(event_data)
+    event_service = EventService()
+    await event_service.delete_event(event_data["id"])
 
 def format_time_range(start_date, end_date):
     """Formats time range for display"""
@@ -108,3 +112,5 @@ def format_time_range(start_date, end_date):
         return f"{start_time} - {end_time}"
     except Exception:
         return "Todo el día"
+    
+

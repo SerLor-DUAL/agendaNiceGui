@@ -82,8 +82,27 @@ class EventService:
             return None
         
 
-    async def delete_event(self, event_id):
-        """ Delete an event by ID """
+    async def delete_event(self, event_id: int):
+        """ Delete an event by ID using a browser-side fetch call """
+        js_code = f'''
+        fetch('{BASE_URL}/api/events/{event_id}', {{
+            method: 'DELETE',
+            credentials: 'include'
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+        '''
+
+        try:
+            result = await ui.run_javascript(js_code, timeout=5)
+            print('Evento eliminado:', result)
+            return True
+        except Exception as e:
+            print('Error al eliminar evento:', e)
+            return False
+
     
     @staticmethod
     def group_events_by_date(events: list) -> dict:
