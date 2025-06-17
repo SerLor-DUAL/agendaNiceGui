@@ -114,7 +114,7 @@ class DiaryCard:
         """ Creates the events section """
         
         with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
-            self.events_container = ui.column().classes('w-full h-full')
+            self.events_container = ui.column().classes('w-full h-full gap-0')
 
 
     # -------------------------------------------------------------------------------------------------------------------------- #
@@ -122,6 +122,7 @@ class DiaryCard:
 
     def get_events_for_day(self, day):
         return self.events_data.get(day, [])
+
 
     def get_all_events_for_month(self):
         month_events = []
@@ -132,8 +133,10 @@ class DiaryCard:
                 month_events.append(event_with_day)
         return sorted(month_events, key=lambda x: (x['day'], x['start_date']))
 
+
     def format_date_title(self, day, month, year):
         return f"{day:02d}-{month:02d}-{year}"
+
 
     def update_events_panel(self):
         """ Updates the events panel """
@@ -211,6 +214,7 @@ class DiaryCard:
         if event:
             self.show_event_dialog('edit', day, event)
 
+
     def show_event_dialog(self, action, day, event=None):
         """ Shows the event dialog """
         
@@ -228,6 +232,7 @@ class DiaryCard:
         else:
             event_data = event.copy()
             event_data['day'] = day
+
 
         # Hanlding the save event
         def handle_save(new_event):
@@ -252,6 +257,7 @@ class DiaryCard:
             # Updates UI
             self.update_diary()
             self.update_events_panel()
+
 
         # Handling the delete event
         def handle_delete(event_to_delete):
@@ -309,7 +315,6 @@ class DiaryCard:
         self.date_label.set_text(f"{month_name} {year}")
 
 
-
     def on_day_select(self, day):
         """ Handles the day select event """
         
@@ -321,6 +326,7 @@ class DiaryCard:
         self.update_diary()
         self.update_events_panel()
         self.update_view_button()
+
 
     def change_month(self, offset):
         
@@ -343,6 +349,7 @@ class DiaryCard:
         self.update_diary()
         self.update_events_panel()
 
+
     def go_to_today(self):
         """ Handles the go to today event """
         
@@ -358,6 +365,7 @@ class DiaryCard:
         self.update_events_panel()
         self.update_view_button()
 
+
     def toggle_view_mode(self):
         """ Handles the toggle view mode event """
         
@@ -370,6 +378,7 @@ class DiaryCard:
         self.update_diary()
         self.update_events_panel()
         self.update_view_button()
+
 
     def update_view_button(self):
         """ Updates the view button """

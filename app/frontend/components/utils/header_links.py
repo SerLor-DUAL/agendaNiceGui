@@ -48,9 +48,12 @@ def header_links():
                                 .hide-scroll .q-scrollarea__thumb {
                                     display: none !important;
                                     opacity: 0 !important;
-                                    width: 0px !important;
-                                    height: 0px !important;
+                                    width: 0 !important;
+                                    height: 0 !important;
+                                    pointer-events: none !important;
+                                    transition: none !important;
                                 }
+
                         </style>
                         """)
 
