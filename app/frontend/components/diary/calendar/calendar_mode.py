@@ -26,19 +26,20 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
         for day in days_of_week:
             ui.label(day).classes('text-center font-medium text-gray-500 text-lg')
 
-    # Display the calendar days in a grid
+   # Display the calendar days in a grid
     with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
         for i in range(6):
             week = month_days[i] if i < len(month_days) else [0]*7
             for day in week:
-                
+
                 # Create a placeholder for empty days
                 if day == 0:
                     ui.element('div').classes('bg-gray-100 shadow-lg rounded-lg')
-                
+
                 # Create a day card
                 else:
-                    event_count = len(events_data.get(day, []))
+                    date_key = f'{day:02d}/{month:02d}/{year}'
+                    event_count = len(events_data.get(date_key, []))
                     is_today = (day == today.day and month == today.month and year == today.year)
                     is_selected = (day == selected_day)
                     create_diary_day_card(day, event_count, is_today, is_selected, lambda d=day: on_select(d))

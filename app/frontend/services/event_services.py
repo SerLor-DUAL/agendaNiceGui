@@ -65,7 +65,6 @@ class EventService:
                 event_group[date].append(event)
             except Exception as e:
                 print(f"Error procesando evento: {event}, {e}")
-        print(event_group)
         return dict(event_group)
         
 

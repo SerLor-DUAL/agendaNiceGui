@@ -163,7 +163,7 @@ class UserService:
         
         # Authenticate user
         user_to_login = await UserService.authenticate_user(nickname, password, session)
-        print(user_to_login)
+
         
         # If user is not authenticated or does not exist, return None
         if not user_to_login:
