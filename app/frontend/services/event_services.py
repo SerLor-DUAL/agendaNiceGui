@@ -30,33 +30,21 @@ class EventService:
             return response.json();
         }})
     '''
-        # Ejecutar fetch desde el navegador
+        # Execute fetch from the browser
         try:
-            # Ejecutamos el JS, esperamos la respuesta y parseamos el JSON
+            # Execute the JS, wait for the response, and parse the JSON
             events = await ui.run_javascript(js_code, timeout=5)
 
             if isinstance(events, dict) and events.get('error'):
-                ui.notify(f"Error al obtener eventos: {events['error']}", color='negative')
+                ui.notify(f"Error obteniendo los eventos: {events['error']}", color='negative')
                 return None
 
-            return events  # Lista de eventos JSON
+            return events  # List of event JSON
 
         except Exception as e:
-            ui.notify(f"Error al ejecutar fetch: {str(e)}", color='negative')
-            return None
+                ui.notify(f"Error ejecutando el fetch: {str(e)}", color='negative')
+                return None
 
-        # url = f"{BASE_URL}/api/events"
-        # print("Fetching events from:", url)
-        # try:
-        #     response = await self.client.get(url)
-        #     if response.status_code == 200:
-        #         return response.json()
-        #     else:
-        #         ui.notify(f"Error al obtener los eventos: {response.status_code} - {response.text}", color='negative')
-        #         return None
-        # except Exception as e:
-        #     ui.notify(f"Error al obtener los eventos: {str(e)}", color='negative')
-        #     return None
 
     async def create_event(self, event_data):
         """ Create a new event """
