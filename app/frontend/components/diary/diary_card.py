@@ -16,7 +16,7 @@ locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
 class DiaryCard:
     
-    def __init__(self):
+    def  __init__(self, event_data: dict):
         
         # Calendar state
         self.calendar_state = {
@@ -32,22 +32,23 @@ class DiaryCard:
         self.events_container = None
         self.view_button = None
         
-        # Events data
-        self.events_data = {
-            1: [
-                {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
-                {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
-            ],
-            5: [
-                {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
-            ],
-            17: [
-                {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
-                {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
-                {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
-                {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
-            ]
-        }
+        self.events_data = event_data
+        # # Events data
+        # self.events_data = {
+        #     1: [
+        #         {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
+        #         {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
+        #     ],
+        #     5: [
+        #         {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
+        #     ],
+        #     17: [
+        #         {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
+        #         {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
+        #         {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
+        #         {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
+        #     ]
+        # }
 
     # -------------------------------------------------------------------------------------------------------------------------- #
     # DIARY CARD #
@@ -120,20 +121,29 @@ class DiaryCard:
     # -------------------------------------------------------------------------------------------------------------------------- #
     # EVENTS METHODS #
 
+    # def get_events_for_day(self, day):
+    #     return self.events_data.get(day, [])
     def get_events_for_day(self, day):
-        return self.events_data.get(day, [])
+        date_key = self.format_date_title(day, self.calendar_state['month'], self.calendar_state['year'])
+        return self.events_data.get(date_key, [])
 
     def get_all_events_for_month(self):
         month_events = []
-        for day, events in self.events_data.items():
-            for event in events:
-                event_with_day = event.copy()
-                event_with_day['day'] = day
-                month_events.append(event_with_day)
+        for date_str, events in self.events_data.items():
+            try:
+                date_obj = datetime.strptime(date_str, '%d/%m/%Y')
+                if date_obj.month == self.calendar_state['month'] and date_obj.year == self.calendar_state['year']:
+                    for event in events:
+                        event_with_day = event.copy()
+                        event_with_day['day'] = date_obj.day
+                        event_with_day['date_str'] = date_str  # por si hace falta
+                        month_events.append(event_with_day)
+            except Exception as e:
+                print(f"Error con fecha {date_str}: {e}")
         return sorted(month_events, key=lambda x: (x['day'], x['start_date']))
 
     def format_date_title(self, day, month, year):
-        return f"{day:02d}-{month:02d}-{year}"
+        return f"{day:02d}/{month:02d}/{year}"
 
     def update_events_panel(self):
         """ Updates the events panel """
@@ -231,39 +241,45 @@ class DiaryCard:
 
         # Hanlding the save event
         def handle_save(new_event):
-            """ Manages the save event """
-            
+            """Manages the save event"""
+
             day = event_data['day']
-            
+            date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
+
             # Create event
             if action == 'create':
-                if day not in self.events_data:
-                    self.events_data[day] = []
-                self.events_data[day].append(new_event)
+                if date_key not in self.events_data:
+                    self.events_data[date_key] = []
+                self.events_data[date_key].append(new_event)
                 ui.notify(f'Evento "{new_event["titulo"]}" creado correctamente', type='positive')
-            
+
             # Edit event
-            else: 
-                idx = next((i for i, e in enumerate(self.events_data[day]) if e['titulo'] == event['titulo']), None)
+            else:
+                idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['titulo'] == event['titulo']), None)
                 if idx is not None:
-                    self.events_data[day][idx] = new_event
+                    self.events_data[date_key][idx] = new_event
                     ui.notify(f'Evento "{new_event["titulo"]}" actualizado correctamente', type='positive')
-            
+
             # Updates UI
             self.update_diary()
             self.update_events_panel()
 
         # Handling the delete event
         def handle_delete(event_to_delete):
-            """ Manages the delete event """
-            
+            """Manages the delete event"""
+
             day = event_data['day']
-            self.events_data[day] = [e for e in self.events_data[day] if e['titulo'] != event_to_delete['titulo']]
-            
-            if not self.events_data[day]:
-                del self.events_data[day]
+            date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
+
+            self.events_data[date_key] = [
+                e for e in self.events_data[date_key] if e['titulo'] != event_to_delete['titulo']
+            ]
+
+            if not self.events_data[date_key]:
+                del self.events_data[date_key]
+
             ui.notify(f'Evento "{event_to_delete["titulo"]}" eliminado correctamente', type='warning')
-            
+
             # Updates UI
             self.update_diary()
             self.update_events_panel()

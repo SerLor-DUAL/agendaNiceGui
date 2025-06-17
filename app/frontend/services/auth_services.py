@@ -274,7 +274,6 @@ class AuthService:
     # FIRST INIT. It will be used as a decorator.
     async def first_init(self) -> None:
         """During the first INIT we will try to set up the user."""
-        print(app.storage.user.get('session_initialized', True))
         if not app.storage.user.get('session_initialized', False):
             await self.load_user_session()
         app.storage.user['session_initialized'] = True
