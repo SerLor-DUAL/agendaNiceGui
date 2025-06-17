@@ -256,14 +256,14 @@ class DiaryCard:
                 if date_key not in self.events_data:
                     self.events_data[date_key] = []
                 self.events_data[date_key].append(new_event)
-                ui.notify(f'Evento "{new_event["titulo"]}" creado correctamente', type='positive')
+                ui.notify(f'Evento "{new_event["title"]}" creado correctamente', type='positive')
 
             # Edit event
             else:
-                idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['titulo'] == event['titulo']), None)
+                idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['title'] == event['title']), None)
                 if idx is not None:
                     self.events_data[date_key][idx] = new_event
-                    ui.notify(f'Evento "{new_event["titulo"]}" actualizado correctamente', type='positive')
+                    ui.notify(f'Evento "{new_event["title"]}" actualizado correctamente', type='positive')
 
             # Updates UI
             self.update_diary()

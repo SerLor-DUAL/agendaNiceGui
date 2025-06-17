@@ -31,7 +31,7 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
         for day in days_of_week_Responsive:
             ui.label(day).classes('text-center font-medium text-gray-500 text-sm md:hidden')
 
-   # Display the calendar days in a grid
+    # Display the calendar days in a grid
     with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
         for i in range(6):
             week = month_days[i] if i < len(month_days) else [0]*7

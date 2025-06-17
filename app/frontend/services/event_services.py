@@ -37,7 +37,7 @@ class EventService:
         try:
             # Execute the JS, wait for the response, and parse the JSON
             events = await ui.run_javascript(js_code, timeout=5)
-
+            print(events)
             if isinstance(events, dict) and events.get('error'):
                 ui.notify(f"Error obteniendo los eventos: {events['error']}", color='negative')
                 return None
