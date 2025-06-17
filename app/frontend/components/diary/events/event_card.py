@@ -1,6 +1,7 @@
 # frontend/components/diary/events/event_card.py
 
 # Import necessary modules
+from datetime import datetime
 from nicegui import ui        # Import the ui module
 
 def event_card(event, on_edit=None, on_delete=None, is_monthly=False):
@@ -21,11 +22,11 @@ def event_card(event, on_edit=None, on_delete=None, is_monthly=False):
             with ui.column().classes('flex-1 gap-1'):
                 
                 # Title
-                ui.label(event['titulo']).classes('text-sm font-semibold text-gray-800' if is_monthly else 'text-base font-semibold text-gray-800')
+                ui.label(event['title']).classes('text-sm font-semibold text-gray-800' if is_monthly else 'text-base font-semibold text-gray-800')
                 
                 # Description
-                if event.get('descripcion'):
-                    ui.label(event['descripcion']).classes('text-xs text-gray-600' if is_monthly else 'text-sm text-gray-600')
+                if event.get('description'):
+                    ui.label(event['description']).classes('text-xs text-gray-600' if is_monthly else 'text-sm text-gray-600')
                     
                 # Time range
                 ui.label(format_time_range(event['start_date'], event['end_date'])) \
@@ -56,11 +57,13 @@ def event_card(event, on_edit=None, on_delete=None, is_monthly=False):
 
 def format_time_range(start_date, end_date):
     """Formats time range for display in the card"""
-    
+    start_date = datetime.fromisoformat(start_date)
+    end_date = datetime.fromisoformat(end_date)
+
     # Formats the time range to show it in a readable way
     try:
-        start_time = start_date.split(' ')[1]
-        end_time = end_date.split(' ')[1]
-        return f"{start_time} - {end_time}"
+        return f"{start_date.hour:02d}:{start_date.minute:02d} - {end_date.hour:02d}:{end_date.minute:02d}"
+
+    
     except:
         return "Todo el día"
