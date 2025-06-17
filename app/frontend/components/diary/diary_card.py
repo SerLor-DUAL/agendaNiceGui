@@ -56,7 +56,7 @@ class DiaryCard:
         """ Creates the diary card """
         
         # Creating the diary card
-        with ui.row().classes('h-fit w-full justify-center p-4'):
+        with ui.row().classes('h-fit w-full justify-center md:p-4 p-0'):
             
             # Diary card
             with ui.card().classes('w-full max-w-7xl bg-white rounded-xl shadow-lg overflow-hidden'):
@@ -107,7 +107,7 @@ class DiaryCard:
     def _create_calendar_section(self):
         """ Creates the calendar section """
         
-        with ui.column().classes('flex-1 p-6'):
+        with ui.column().classes('flex-1 md:p-6 py-6 px-1'):
             self.calendar_container = ui.column().classes('w-full')
 
     def _create_events_section(self):

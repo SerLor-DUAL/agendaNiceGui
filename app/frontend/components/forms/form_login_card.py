@@ -37,7 +37,7 @@ def login_card():
             password_input.value = ''
             
             # Redirects the user to the calendar page
-            frh.go_to('/calendar')
+            frh.go_to('/diary')
             
         else:
             feedback_label.text = result.get('message', 'Error logging in')
