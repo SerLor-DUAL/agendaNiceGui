@@ -69,8 +69,6 @@ async def navbar():
                             # Links
                             with ui.column().classes('space-y-1 ml-4'):
                                 await mobile_nav_links(current_user)
-                                
-                            # ui.separator().classes('border-gray-700')
                             
                             # Buttons
                             with ui.column().classes('space-y-2 flex-1 items-center self-center'):

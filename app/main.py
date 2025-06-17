@@ -8,7 +8,7 @@ from backend.utils.cors import setup_cors
 from backend.api.routes import events, events_admin, users_admin, auth
 
 # Import routes (pages)
-from frontend.routes import home, login, register, calendar, event_page
+from frontend.routes import home, login, register, diary
 
 # Import database initializer
 from backend.db.db_handler import init_db
@@ -28,7 +28,6 @@ from frontend.components.utils import navbar
 
 from frontend.services.auth_services import front_auth_service, with_first_init
 
-   
 # ============================================================================================================================= #
 #                                           FastAPI and NiceGUI initial integration                                             #
 # ============================================================================================================================= #
@@ -102,16 +101,10 @@ async def page_register():
 # =====================#
 
 # Set calendar page
-@ui.page('/calendar')  
-async def page_calendar():
+@ui.page('/diary')  
+async def page_diary():
     await navbar()
-    await calendar.create_calendar_page()
-
-# Set events page
-@ui.page('/events')
-async def page_events():
-    await navbar()
-    await event_page.create_events_page()
+    await diary.create_diary_page()
 
 # ============================================================================================================================= #
 #                                           Database and app initialization                                                     #

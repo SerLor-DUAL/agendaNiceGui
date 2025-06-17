@@ -1,423 +1,332 @@
 # frontend/components/diary/diary_card.py
 
-# Import necessary modules
-import calendar
-from nicegui import ui
-from datetime import datetime
-from frontend.components.diary.diary_day_card import create_diary_day_card
-import locale
+# Importing necessary modules
+import calendar                                                                         # Importing for calendar operations
+import locale                                                                           # Importing for locale operations
+from nicegui import ui                                                                  # Importing for GUI operations
+from datetime import datetime                                                           # Importing for date and time operations
+from frontend.components.diary.calendar.calendar_mode import calendar_mode              # Importing for calendar mode
+from frontend.components.diary.calendar.monthly_mode import monthly_mode                # Importing for monthly mode
+from frontend.components.diary.events.events_list import events_list                    # Importing for events list
+from frontend.components.diary.events.events_list import event_card                     # Importing for event card
+from frontend.components.diary.events.event_dialog import show_event_dialog             # Importing for event dialog
 
+# Setting the locale to Spanish
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
-# Global calendar state
-calendar_state = {
-    'year': datetime.now().year,
-    'month': datetime.now().month,
-    'selected_day': datetime.now().day,
-    'view_mode': 'calendar'                 # 'calendar' or 'monthly'
-}
+class DiaryCard:
+    
+    def __init__(self):
+        
+        # Calendar state
+        self.calendar_state = {
+                                'year': datetime.now().year,
+                                'month': datetime.now().month,
+                                'selected_day': datetime.now().day,
+                                'view_mode': 'calendar'
+                            }
+        
+        # UI elements
+        self.date_label = None
+        self.calendar_container = None
+        self.events_container = None
+        self.view_button = None
+        
+        # Events data
+        self.events_data = {
+            1: [
+                {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
+                {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
+            ],
+            5: [
+                {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
+            ],
+            17: [
+                {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
+                {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
+                {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
+                {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
+            ]
+        }
 
-# Mock events data - replace with your actual data source
-events_data = {
-    1: [
-        {
-            "titulo": "Reunión de trabajo",
-            "descripcion": "Reunión semanal del equipo de desarrollo",
-            "start_date": "01/06/2025 09:00",
-            "end_date": "01/06/2025 10:30"
-        },
-        {
-            "titulo": "Cita médica",
-            "descripcion": "Revisión médica anual",
-            "start_date": "01/06/2025 15:00",
-            "end_date": "01/06/2025 16:00"
-        }
-    ],
-    5: [
-        {
-            "titulo": "Cumpleaños de María",
-            "descripcion": "Celebración en el restaurante italiano",
-            "start_date": "05/06/2025 20:00",
-            "end_date": "05/06/2025 23:30"
-        }
-    ],
-    17: [
-        {
-            "titulo": "Dentista",
-            "descripcion": "Limpieza dental rutinaria",
-            "start_date": "17/06/2025 10:00",
-            "end_date": "17/06/2025 11:00"
-        },
-        {
-            "titulo": "Compras",
-            "descripcion": "Compras semanales en el supermercado",
-            "start_date": "17/06/2025 16:00",
-            "end_date": "17/06/2025 17:30"
-        },
-        {
-            "titulo": "Gimnasio",
-            "descripcion": "Entrenamiento de piernas",
-            "start_date": "17/06/2025 18:00",
-            "end_date": "17/06/2025 19:30"
-        },
-        {
-            "titulo": "Cena con amigos",
-            "descripcion": "Cena en el nuevo restaurante asiático",
-            "start_date": "17/06/2025 21:00",
-            "end_date": "17/06/2025 23:00"
-        }
-    ]
-}
+    # -------------------------------------------------------------------------------------------------------------------------- #
+    # DIARY CARD #
 
-# Function to create a calendar card
-def diary_card():
-    # ----------------------------------------------------------------------------------------------------------------------------------------- #
-    # METHODS #
-    
-        # ----------------------------------------------------------------------------------------------------------------------------------------- #
-        # FORMAT #
-    
-    def get_events_for_day(day):
-        """Get events for a specific day"""
-        return events_data.get(day, [])
-    
-    def get_all_events_for_month():
-        """Get all events for the current month"""
+    def create_diary_card(self):
+        """ Creates the diary card """
+        
+        # Creating the diary card
+        with ui.row().classes('h-fit w-full justify-center p-4'):
+            
+            # Diary card
+            with ui.card().classes('w-full max-w-7xl bg-white rounded-xl shadow-lg overflow-hidden'):
+                
+                # Diary controls
+                self._create_controls()
+                
+                # Diary sections
+                with ui.row().classes('w-full').style('height: 600px'):
+                    
+                    # Calendar section
+                    self._create_calendar_section()
+                    
+                    # Events section
+                    self._create_events_section()
+                    
+                # Updates the diary component
+                self.update_diary()
+                self.update_events_panel()
+
+    # -------------------------------------------------------------------------------------------------------------------------- #
+    # DIARY METHODS #
+
+    def _create_controls(self):
+        """ Creates the diary controllers """
+        
+        # Calendar controls
+        with ui.row().classes('w-full items-center justify-between px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b'):
+            
+            # Navigation
+            with ui.row().classes('items-center gap-3'):
+                ui.button(icon='chevron_left', on_click=lambda: self.change_month(-1)) \
+                    .props('dense round') \
+                    .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
+                self.date_label = ui.label().classes('text-2xl font-bold text-gray-800 min-w-[200px] text-center')
+                ui.button(icon='chevron_right', on_click=lambda: self.change_month(1)) \
+                    .props('dense round') \
+                    .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
+                    
+            # Buttons
+            with ui.row().classes('gap-3'):
+                ui.button('Hoy', icon='today', on_click=self.go_to_today) \
+                    .classes('bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 shadow-sm')
+                self.view_button = ui.button('Vista mensual', icon='calendar_view_month', on_click=self.toggle_view_mode) \
+                    .props('outline') \
+                    .classes('text-blue-600 border-blue-600 hover:bg-blue-50 px-4 py-2')
+
+    def _create_calendar_section(self):
+        """ Creates the calendar section """
+        
+        with ui.column().classes('flex-1 p-6'):
+            self.calendar_container = ui.column().classes('w-full')
+
+    def _create_events_section(self):
+        """ Creates the events section """
+        
+        with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
+            self.events_container = ui.column().classes('w-full h-full')
+
+
+    # -------------------------------------------------------------------------------------------------------------------------- #
+    # EVENTS METHODS #
+
+    def get_events_for_day(self, day):
+        return self.events_data.get(day, [])
+
+    def get_all_events_for_month(self):
         month_events = []
-        for day, events in events_data.items():
+        for day, events in self.events_data.items():
             for event in events:
                 event_with_day = event.copy()
                 event_with_day['day'] = day
                 month_events.append(event_with_day)
         return sorted(month_events, key=lambda x: (x['day'], x['start_date']))
-    
-    def format_time_range(start_date, end_date):
-        """Format time range for display"""
-        try:
-            start_time = start_date.split(' ')[1]
-            end_time = end_date.split(' ')[1]
-            return f"{start_time} - {end_time}"
-        except:
-            return "Todo el día"
-    
-    def format_date_title(day, month, year):
-        """Format date for title display"""
+
+    def format_date_title(self, day, month, year):
         return f"{day:02d}-{month:02d}-{year}"
 
-        # ----------------------------------------------------------------------------------------------------------------------------------------- #
-        # INTERACTION #
-
-    def update_events_panel(events_container):
-        """Update the events panel for the selected day or month view"""
-        events_container.clear()
+    def update_events_panel(self):
+        """ Updates the events panel """
         
-        # Events container
-        with events_container:
+        # Clearing the events container
+        self.events_container.clear()
+        
+        # Events panel
+        with self.events_container:
             
-            # Mode calendar
-            if calendar_state['view_mode'] == 'calendar':
+            # Calendar mode
+            if self.calendar_state['view_mode'] == 'calendar':
                 
-                selected_day = calendar_state['selected_day']
-                events = get_events_for_day(selected_day)
+                # Creating the events list with the selected day data
+                selected_day = self.calendar_state['selected_day']
+                events = self.get_events_for_day(selected_day)
+                date_title = self.format_date_title(selected_day, self.calendar_state['month'], self.calendar_state['year'])
                 
-                # Events header
-                date_title = format_date_title(selected_day, calendar_state['month'], calendar_state['year'])
-                with ui.row().classes('w-full items-center justify-between mb-4'):
-                    ui.label(f'Eventos de {date_title}').classes('text-lg font-bold text-gray-800')
-                    ui.button(icon='add', color='green', on_click=lambda: show_event_dialog('create', selected_day)) \
-                        .props('dense round') \
-                        .classes('bg-green-500 hover:bg-green-600') \
-                        .tooltip('Agregar evento')
+                events_list(
+                    events=events,
+                    date_title=date_title,
+                    on_add=lambda: self.show_event_dialog('create', selected_day),
+                    on_edit=lambda event: self.show_event_dialog('edit', selected_day, event),
+                    on_delete=lambda event: self.show_event_dialog('delete', selected_day, event)
+                )
                 
-                # Scrollable events container
-                with ui.scroll_area().classes('h-[600px] w-full hide-scroll'):
-                    ui.run_javascript("""
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__thumb').forEach(el => {
-                            el.style.width = '0px';
-                            el.style.height = '0px';
-                            el.style.opacity = '0';
-                            el.style.pointerEvents = 'none';
-                        });
-                    """)
-
-                    # Events list
-                    if events:
-                        for i, event in enumerate(events):
-                            with ui.card().classes('w-full mb-3 p-4 bg-blue-50 border-l-4 border-blue-500 hover:bg-blue-100 transition-colors'):
-                                with ui.row().classes('w-full items-start justify-between'):
-                                    with ui.column().classes('flex-1 gap-1'):
-                                        ui.label(event['titulo']).classes('text-base font-semibold text-gray-800')
-                                        if event.get('descripcion'):
-                                            ui.label(event['descripcion']).classes('text-sm text-gray-600')
-                                        ui.label(format_time_range(event['start_date'], event['end_date'])).classes('text-xs text-blue-600 font-medium')
-                                    
-                                    with ui.row().classes('gap-1 ml-2'):
-                                        ui.button(icon='edit', on_click=lambda idx=i: show_event_dialog('edit', selected_day, idx)) \
-                                            .props('dense round flat') \
-                                            .classes('text-blue-600 hover:bg-blue-200') \
-                                            .tooltip('Editar evento')
-                                        ui.button(icon='delete', on_click=lambda idx=i: show_event_dialog('delete', selected_day, idx)) \
-                                            .props('dense round flat') \
-                                            .classes('text-red-600 hover:bg-red-200') \
-                                            .tooltip('Eliminar evento')
-                    
-                    # No events message
-                    else:
-                        with ui.column().classes('w-full items-center py-8 text-center'):
-                            ui.icon('event_busy', size='48px').classes('text-gray-300 mb-2')
-                            ui.label('No hay eventos programados').classes('text-gray-500 font-medium')
-                            ui.label('Haz clic en "+" para agregar uno').classes('text-gray-400 text-sm')
-            
-            # TODO: Mode monthly events (IMPROVE VISUALIZATION)
+            # Monthly mode    
             else:
                 
-                month_events = get_all_events_for_month()
-                month_name = calendar.month_name[calendar_state['month']].capitalize()
-                year = calendar_state['year']
-                
-                # Monthly events header
+                # Creating the events list with the selected month data
+                month_events = self.get_all_events_for_month()
+                month_name = calendar.month_name[self.calendar_state['month']].capitalize()
+                year = self.calendar_state['year']
+                    
+                # Title
                 ui.label(f'Eventos de {month_name} {year}').classes('text-lg font-bold text-gray-800 mb-4')
                 
-                # TODO: Scrollable monthly events container / CHANGE FOR A CONTAINER
-                with ui.scroll_area().classes('h-[600px] w-full'):
-                    if month_events:
-                        current_day = None
-                        for event in month_events:
-                            # Day separator
-                            if current_day != event['day']:
-                                current_day = event['day']
-                                if current_day != month_events[0]['day']:  # Add spacing except for first day
-                                    ui.separator().classes('my-3')
-                                ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
-                            
-                            # Event card
-                            with ui.card().classes('w-full mb-2 p-3 bg-indigo-50 border-l-4 border-indigo-500 hover:bg-indigo-100 transition-colors'):
-                                with ui.row().classes('w-full items-start justify-between'):
-                                    with ui.column().classes('flex-1 gap-1'):
-                                        ui.label(event['titulo']).classes('text-sm font-semibold text-gray-800')
-                                        if event.get('descripcion'):
-                                            ui.label(event['descripcion']).classes('text-xs text-gray-600')
-                                        ui.label(format_time_range(event['start_date'], event['end_date'])).classes('text-xs text-indigo-600 font-medium')
-                                    
-                                    with ui.row().classes('gap-1 ml-2'):
-                                        ui.button(icon='edit', on_click=lambda day=event['day']: select_day_and_edit(day)) \
-                                            .props('dense round flat size=xs') \
-                                            .classes('text-indigo-600 hover:bg-indigo-200') \
-                                            .tooltip('Editar evento')
-                    else:
-                        # No events message
-                        with ui.column().classes('w-full items-center py-8 text-center'):
-                            ui.icon('event_busy', size='48px').classes('text-gray-300 mb-2')
-                            ui.label('No hay eventos este mes').classes('text-gray-500 font-medium')
+                # For each event in the month it creates an event card
+                if month_events:
+                    current_day = None
+                    for event in month_events:
+                        if current_day != event['day']:
+                            current_day = event['day']
+                            if current_day != month_events[0]['day']:
+                                ui.separator().classes('my-3')
+                            ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
+                        
+                        event_card(
+                            event, 
+                            on_edit=lambda e: self.select_day_and_edit(event['day'], event),
+                            is_monthly=True
+                        )
+                        
+                # No events message
+                else:
+                    with ui.column().classes('w-full items-center py-8 text-center'):
+                        ui.icon('event_busy', size='48px').classes('text-gray-300 mb-2')
+                        ui.label('No hay eventos este mes').classes('text-gray-500 font-medium')
 
-    def select_day_and_edit(day):
-        """Switch to calendar view and select specific day"""
-        
-        calendar_state['selected_day'] = day
-        calendar_state['view_mode'] = 'calendar'
-        update_diary(calendar_container, date_label)
-        update_events_panel(events_container)
-        update_view_button(view_button)
 
-    def show_event_dialog(action, day, event_index=None):
-        """Show dialog for event management"""
+    # -------------------------------------------------------------------------------------------------------------------------- #
+    # EVENT CARD METHODS #
+    
+    def select_day_and_edit(self, day, event=None):
+        """ Selects the day and edits the event """
         
-        # Get events for selected day
-        events = get_events_for_day(day)
+        # Changes the state and updates the UI
+        self.calendar_state['selected_day'] = day
+        self.calendar_state['view_mode'] = 'calendar'
+        self.update_diary()
+        self.update_events_panel()
+        self.update_view_button()
         
-        # Create
+        # Opens the event dialog
+        if event:
+            self.show_event_dialog('edit', day, event)
+
+    def show_event_dialog(self, action, day, event=None):
+        """ Shows the event dialog """
+        
+        # If the action is create, the event data is initialized
         if action == 'create':
-            title = f'Agregar evento - Día {day}'
-            button_text = 'Crear evento'
-            button_color = 'green'
             event_data = {
-                'titulo': '',
-                'descripcion': '',
-                'start_date': f'{day:02d}/{calendar_state["month"]:02d}/{calendar_state["year"]} 09:00',
-                'end_date': f'{day:02d}/{calendar_state["month"]:02d}/{calendar_state["year"]} 10:00'
-            }
-        
-        # Update   
-        elif action == 'edit':
-            title = f'Editar evento - Día {day}'
-            button_text = 'Guardar cambios'
-            button_color = 'blue'
-            event_data = events[event_index] if event_index < len(events) else {}
-        
-        # Delete    
+                            'day': day,
+                            'titulo': '',
+                            'descripcion': '',
+                            'start_date': f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]} 09:00',
+                            'end_date': f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]} 10:00'
+                        }
+            
+        # If the action is edit, the event data is updated
         else:
-            title = f'Eliminar evento - Día {day}'
-            button_text = 'Eliminar'
-            button_color = 'red'
-            event_data = events[event_index] if event_index < len(events) else {}
+            event_data = event.copy()
+            event_data['day'] = day
 
-        # Modal dialog for actions related to an event
-        with ui.dialog() as dialog, ui.card().classes('w-[500px] p-6'):
+        # Hanlding the save event
+        def handle_save(new_event):
+            """ Manages the save event """
             
-            # Modal title
-            ui.label(title).classes('text-xl font-bold mb-6 text-gray-800')
+            day = event_data['day']
             
-            # Delete confirmation
-            if action == 'delete':
-                
-                # Description
-                ui.label('¿Estás seguro de que quieres eliminar este evento?').classes('text-gray-700 mb-3')
-                with ui.card().classes('bg-red-50 border-l-4 border-red-400 p-4 mb-4'):
-                    ui.label(event_data.get('titulo', '')).classes('font-semibold text-red-800')
-                    ui.label(event_data.get('descripcion', '')).classes('text-sm text-red-700')
-                    ui.label(format_time_range(event_data.get('start_date', ''), event_data.get('end_date', ''))).classes('text-xs text-red-600')
-            else:
-                # Form fields
-                titulo_input = ui.input('Título del evento', value=event_data.get('titulo', '')) \
-                    .classes('w-full mb-4').props('outlined')
-                
-                descripcion_input = ui.textarea('Descripción', value=event_data.get('descripcion', '')) \
-                    .classes('w-full mb-4').props('outlined')
-                
-                # Date and time inputs
-                with ui.row().classes('w-full gap-4 mb-4'):
-                    with ui.column().classes('flex-1'):
-                        ui.label('Fecha y hora de inicio').classes('text-sm font-medium text-gray-700 mb-2')
-                        start_date_input = ui.input('Fecha inicio', value=event_data.get('start_date', '').split(' ')[0] if event_data.get('start_date') else '') \
-                            .classes('w-full mb-2').props('outlined').tooltip('Formato: dd/mm/aaaa')
-                        start_time_input = ui.input('Hora inicio', value=event_data.get('start_date', '').split(' ')[1] if event_data.get('start_date') else '') \
-                            .classes('w-full').props('outlined').tooltip('Formato: hh:mm')
-                    
-                    with ui.column().classes('flex-1'):
-                        ui.label('Fecha y hora de fin').classes('text-sm font-medium text-gray-700 mb-2')
-                        end_date_input = ui.input('Fecha fin', value=event_data.get('end_date', '').split(' ')[0] if event_data.get('end_date') else '') \
-                            .classes('w-full mb-2').props('outlined').tooltip('Formato: dd/mm/aaaa')
-                        end_time_input = ui.input('Hora fin', value=event_data.get('end_date', '').split(' ')[1] if event_data.get('end_date') else '') \
-                            .classes('w-full').props('outlined').tooltip('Formato: hh:mm')
+            # Create event
+            if action == 'create':
+                if day not in self.events_data:
+                    self.events_data[day] = []
+                self.events_data[day].append(new_event)
+                ui.notify(f'Evento "{new_event["titulo"]}" creado correctamente', type='positive')
             
-            with ui.row().classes('w-full justify-end gap-3 mt-6'):
-                ui.button('Cancelar', on_click=dialog.close).props('flat').classes('text-gray-600 px-4')
-                
-                def handle_action():
-                    try:
-                        if action == 'create':
-                            new_event = {
-                                'titulo': titulo_input.value,
-                                'descripcion': descripcion_input.value,
-                                'start_date': f'{start_date_input.value} {start_time_input.value}',
-                                'end_date': f'{end_date_input.value} {end_time_input.value}'
-                            }
-                            if day not in events_data:
-                                events_data[day] = []
-                            events_data[day].append(new_event)
-                            ui.notify(f'Evento "{new_event["titulo"]}" creado correctamente', type='positive')
-                            
-                        elif action == 'edit':
-                            updated_event = {
-                                'titulo': titulo_input.value,
-                                'descripcion': descripcion_input.value,
-                                'start_date': f'{start_date_input.value} {start_time_input.value}',
-                                'end_date': f'{end_date_input.value} {end_time_input.value}'
-                            }
-                            events_data[day][event_index] = updated_event
-                            ui.notify(f'Evento "{updated_event["titulo"]}" actualizado correctamente', type='positive')
-                            
-                        else:  # delete
-                            deleted_title = events_data[day][event_index]['titulo']
-                            events_data[day].pop(event_index)
-                            if not events_data[day]:
-                                del events_data[day]
-                            ui.notify(f'Evento "{deleted_title}" eliminado correctamente', type='warning')
-                        
-                        dialog.close()
-                        update_diary(calendar_container, date_label)
-                        update_events_panel(events_container)
-                        
-                    except Exception as e:
-                        ui.notify(f'Error al procesar el evento: {str(e)}', type='negative')
-                
-                ui.button(button_text, on_click=handle_action) \
-                    .classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')
+            # Edit event
+            else: 
+                idx = next((i for i, e in enumerate(self.events_data[day]) if e['titulo'] == event['titulo']), None)
+                if idx is not None:
+                    self.events_data[day][idx] = new_event
+                    ui.notify(f'Evento "{new_event["titulo"]}" actualizado correctamente', type='positive')
+            
+            # Updates UI
+            self.update_diary()
+            self.update_events_panel()
+
+        # Handling the delete event
+        def handle_delete(event_to_delete):
+            """ Manages the delete event """
+            
+            day = event_data['day']
+            self.events_data[day] = [e for e in self.events_data[day] if e['titulo'] != event_to_delete['titulo']]
+            
+            if not self.events_data[day]:
+                del self.events_data[day]
+            ui.notify(f'Evento "{event_to_delete["titulo"]}" eliminado correctamente', type='warning')
+            
+            # Updates UI
+            self.update_diary()
+            self.update_events_panel()
+
         
+        # Opens the dialog with the event data and the handlers
+        dialog = show_event_dialog(
+                                        action=action,
+                                        event_data=event_data,
+                                        on_save=handle_save,
+                                        on_delete=handle_delete if action == 'delete' else None
+                                    )
         dialog.open()
 
-    def update_diary(container, date_label):
-        """ Updates the calendar """
+    # -------------------------------------------------------------------------------------------------------------------------- #
+    # UPDATE METHODS #
+    
+    def update_diary(self):
+        """ Updates the UI of the diary"""
         
-        # Clear the container
-        container.clear()
+        # Clears the calendar container
+        self.calendar_container.clear()
         
-        # Get the current month and year from the calendar state
-        year = calendar_state['year']
-        month = calendar_state['month']
+        # Gets the calendar state
+        year = self.calendar_state['year']
+        month = self.calendar_state['month']
+        selected_day = self.calendar_state['selected_day']
         
-        # Get the selected day from the calendar state
-        selected_day = calendar_state['selected_day']
-        
-        # Create a calendar object
-        cal = calendar.Calendar(firstweekday=0)
-        
-        # Get the days of the month
-        month_days = cal.monthdayscalendar(year, month)
-        
-        # Assign the weekdays naming
-        days_of_week = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-        
-        # Get the current date
-        today = datetime.today()
-        
-        # When a day is selected    
-        def on_select(day):
-            
-            # Update the calendar state
-            calendar_state['selected_day'] = day
-            if calendar_state['view_mode'] == 'monthly':
-                calendar_state['view_mode'] = 'calendar'
-                
-                # Update the view mode of the view button
-                update_view_button(view_button)
-                
-            # Updates the diary and events panel
-            update_diary(container, date_label)
-            update_events_panel(events_container)
-        
-        # Calendar container
-        with container:
-            
-            # In calendar mode
-            if calendar_state['view_mode'] == 'calendar':
-                
-                # Creates the weekdays header
-                with ui.grid().classes('w-full px-2').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
-                    for day in days_of_week:
-                        ui.label(day).classes('text-center font-medium text-gray-500 text-lg')
-
-                # Creates the grid for days
-                with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
-                    for i in range(6):
-                        week = month_days[i] if i < len(month_days) else [0]*7
-                        for day in week:
-                            is_today = (day == today.day and month == today.month and year == today.year)
-                            is_selected = (day == selected_day)
-                            
-                            # If the day is 0, it is a placeholder
-                            if day == 0:
-                                ui.element('div').classes('bg-gray-100 shadow-lg rounded-lg')
-                                
-                            # If not then, creates a day card
-                            else:
-                                event_count = len(get_events_for_day(day))
-                                create_diary_day_card(day, event_count, is_today, is_selected, on_select)
-            
-            # In monthly mode
+        # Updates the UI
+        with self.calendar_container:
+            if self.calendar_state['view_mode'] == 'calendar':
+                calendar_mode(
+                                year=year,
+                                month=month,
+                                selected_day=selected_day,
+                                events_data=self.events_data,
+                                on_select=self.on_day_select
+                            )
             else:
-                with ui.column().classes('w-full'):
-                    ui.label('Vista de lista mensual').classes('text-center text-gray-500 text-lg font-medium mb-4')
-                    ui.label('Los eventos se muestran en el panel lateral →').classes('text-center text-gray-400 text-sm')
+                monthly_mode()
         
-        date_label.set_text(f"{calendar.month_name[month].capitalize()} {year}")
+        month_name = calendar.month_name[month].capitalize()
+        self.date_label.set_text(f"{month_name} {year}")
 
-    def change_month(offset: int, container, date_label):
-        """ Changes the month and updates the calendar """
+
+
+    def on_day_select(self, day):
+        """ Handles the day select event """
         
-        #Calculate month and year
-        m = calendar_state['month'] + offset
-        y = calendar_state['year']
+        # Changes the state
+        self.calendar_state['selected_day'] = day
+        self.calendar_state['view_mode'] = 'calendar'
+        
+        # Updates the UI
+        self.update_diary()
+        self.update_events_panel()
+        self.update_view_button()
+
+    def change_month(self, offset):
+        
+        # Sets the month and year values
+        m = self.calendar_state['month'] + offset
+        y = self.calendar_state['year']
         
         if m > 12:
             m = 1
@@ -426,95 +335,48 @@ def diary_card():
             m = 12
             y -= 1
         
-        # Change state
-        calendar_state['month'] = m
-        calendar_state['year'] = y
+        # Changes the state 
+        self.calendar_state['month'] = m
+        self.calendar_state['year'] = y
         
-        # Updates UI
-        update_diary(container, date_label)
-        update_events_panel(events_container)
-        
-    def go_to_today(container, date_label):
-        """ Jumps to the current month/year """
-        
-        # Change state and sets to today
-        today = datetime.today()
-        calendar_state['year'] = today.year
-        calendar_state['month'] = today.month
-        calendar_state['selected_day'] = today.day
-        
-        # Updates UI
-        update_diary(container, date_label)
-        update_events_panel(events_container)
-    
-    def toggle_view_mode(container, date_label, button):
-        """ Toggle between calendar and monthly view """
-        
-        # Change state
-        if calendar_state['view_mode'] == 'calendar':
-            calendar_state['view_mode'] = 'monthly'
-        else:
-            calendar_state['view_mode'] = 'calendar'
-        
-        # Updates UI
-        update_diary(container, date_label)
-        update_events_panel(events_container)
-        update_view_button(button)
-    
-    def update_view_button(button):
-        """ Update view button text and icon """
-        
-        # Change state
-        if calendar_state['view_mode'] == 'calendar':
-            button.set_text('Vista mensual')
-            button.props('icon=calendar_view_month')
-        else:
-            button.set_text('Vista calendario')
-            button.props('icon=calendar_view_day')
+        # Updates the UI
+        self.update_diary()
+        self.update_events_panel()
 
-    # ----------------------------------------------------------------------------------------------------------------------------------------- #
-    # UI #
-    
-    # Principal Container
-    with ui.row().classes('h-fit w-full justify-center p-4'):
+    def go_to_today(self):
+        """ Handles the go to today event """
         
-        # Main card
-        with ui.card().classes('w-full max-w-7xl bg-white rounded-xl shadow-lg overflow-hidden'):
-            
-            # Calendar controls
-            with ui.row().classes('w-full items-center justify-between px-6 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b'):
-                
-                # Month navigation
-                with ui.row().classes('items-center gap-3'):
-                    ui.button(icon='chevron_left', on_click=lambda: change_month(-1, calendar_container, date_label)) \
-                        .props('dense round') \
-                        .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
-                    
-                    date_label = ui.label().classes('text-2xl font-bold text-gray-800 min-w-[200px] text-center')
-                    
-                    ui.button(icon='chevron_right', on_click=lambda: change_month(1, calendar_container, date_label)) \
-                        .props('dense round') \
-                        .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
-                
-                # Action buttons
-                with ui.row().classes('gap-3'):
-                    ui.button('Hoy', icon='today', on_click=lambda: go_to_today(calendar_container, date_label)) \
-                        .classes('bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 shadow-sm')
-                    view_button = ui.button('Vista mensual', icon='calendar_view_month', on_click=lambda: toggle_view_mode(calendar_container, date_label, view_button)) \
-                        .props('outline') \
-                        .classes('text-blue-600 border-blue-600 hover:bg-blue-50 px-4 py-2')
-            
-            # Content area with calendar and events panel
-            with ui.row().classes('w-full').style('height: 600px'):
-                
-                # Calendar section (left side)
-                with ui.column().classes('flex-1 p-6'):
-                    calendar_container = ui.column().classes('w-full')
-                
-                # Events panel (right side)
-                with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
-                    events_container = ui.column().classes('w-full h-full')
-                    
-            # Initialize
-            update_diary(calendar_container, date_label)
-            update_events_panel(events_container)
+        # Changes the state
+        today = datetime.today()
+        self.calendar_state['year'] = today.year
+        self.calendar_state['month'] = today.month
+        self.calendar_state['selected_day'] = today.day
+        self.calendar_state['view_mode'] = 'calendar'
+        
+        # Updates the UI
+        self.update_diary()
+        self.update_events_panel()
+        self.update_view_button()
+
+    def toggle_view_mode(self):
+        """ Handles the toggle view mode event """
+        
+        if self.calendar_state['view_mode'] == 'calendar':
+            self.calendar_state['view_mode'] = 'monthly'
+        else:
+            self.calendar_state['view_mode'] = 'calendar'
+        
+        # Updates the UI
+        self.update_diary()
+        self.update_events_panel()
+        self.update_view_button()
+
+    def update_view_button(self):
+        """ Updates the view button """
+        
+        if self.calendar_state['view_mode'] == 'calendar':
+            self.view_button.set_text('Vista mensual')
+            self.view_button.props('icon=calendar_view_month')
+        else:
+            self.view_button.set_text('Vista calendario')
+            self.view_button.props('icon=calendar_view_day')

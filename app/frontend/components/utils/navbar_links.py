@@ -31,11 +31,10 @@ async def navbar_links(current_user):
 
     ui.link('Inicio', '/').classes(desktop_link_classes)
 
-    #If user is logged in show calendar and events links
+    #If user is logged in show diary and events links
     # if logged:
     if current_user:
-        ui.link('Calendario', '/calendar').classes(desktop_link_classes)
-        ui.link('Eventos', '/events').classes(desktop_link_classes)
+        ui.link('Diario', '/diary').classes(desktop_link_classes)
 
 # NOTE: Function to add the navbar links component for mobile
 async def mobile_nav_links(current_user):
@@ -47,7 +46,5 @@ async def mobile_nav_links(current_user):
     #If user is logged in show calendar and events links
     # if logged:
     if current_user:
-        # ui.button('Calendario', on_click=lambda: frh.go_to('/calendar')).classes(mobile_link_classes)
-        # ui.button('Eventos', on_click=lambda: frh.go_to('/events')).classes(mobile_link_classes)
-        ui.link('Calendario', '/calendar').classes(mobile_link_classes)
-        ui.link('Eventos', '/events').classes(mobile_link_classes)
+
+        ui.link('Diario', '/diary').classes(mobile_link_classes)
