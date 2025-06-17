@@ -19,7 +19,30 @@ def header_links():
                             }
                         </script>
                     ''')
-                            
+
+    ui.add_head_html("""
+                        <style>
+                                .hide-scroll .q-scrollarea__container {
+                                    scrollbar-width: none !important;       /* Firefox */
+                                    -ms-overflow-style: none !important;    /* IE 10+ */
+                                    overflow-y: scroll !important;
+                                }
+
+                                .hide-scroll .q-scrollarea__container::-webkit-scrollbar {
+                                    width: 0px !important;
+                                    height: 0px !important;
+                                    display: none !important;
+                                }
+
+                                .hide-scroll .q-scrollarea__thumb {
+                                    display: none !important;
+                                    opacity: 0 !important;
+                                    width: 0px !important;
+                                    height: 0px !important;
+                                }
+                        </style>
+                        """)
+
     # Add customs CSS
     ui.add_head_html('<link rel="stylesheet" href="/static/css/styleColores.css">')
     
