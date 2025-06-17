@@ -27,8 +27,8 @@ class RouteHandler:
         ui.navigate.to('/logout')
     
     @staticmethod    
-    def go_calendar():
-        ui.navigate.to('/calendar')
+    def go_diary():
+        ui.navigate.to('/diary')
     
     @staticmethod
     def go_events():
@@ -69,7 +69,7 @@ class RouteHandler:
             '/login': RouteHandler.go_login,
             '/register': RouteHandler.go_register,
             '/logout': RouteHandler.go_logout,
-            '/calendar': RouteHandler.go_calendar,
+            '/diary': RouteHandler.go_diary,
             '/events': RouteHandler.go_events,
         }
         
