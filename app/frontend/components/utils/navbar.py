@@ -1,7 +1,7 @@
 # frontend/components/navbar.py
 
 # Import necesary modules
-from nicegui import ui                                                                      # Import the ui module
+from nicegui import ui, app                                                                     # Import the ui module
 from frontend.components.utils.navbar_buttons import navbar_buttons, mobile_nav_buttons     # Importing the navbar_buttons component
 from frontend.components.utils.navbar_links import navbar_links, mobile_nav_links           # Importing the navbar_links component
 from frontend.utils.routing import front_router_handler as frh                              # Importing the RouteHandler
@@ -10,7 +10,7 @@ from frontend.utils.routing import front_router_handler as frh                  
 
 # NOTE: Function to add the navbar component
 async def navbar():
-    
+    current_user =  app.storage.user.get('user_id', None)
     # Header
     with ui.header().classes('bg-gray-900 text-white shadow-md'):
         
@@ -23,18 +23,18 @@ async def navbar():
                     img.on('click', lambda: frh.go_to('/'))
 
                 # Links (CENTER)
-                with ui.row().classes('items-center justify-center space-x-8 flex-1 max-md:hidden'):
+                with ui.row().classes('items-center justify-center space-x-8 flex-1 max-lg:hidden'):
                     with ui.row().classes('space-x-6 text-lg font-medium'):
-                        await navbar_links()
+                        await navbar_links(current_user)
 
                 # Botones (RIGHT)
-                with ui.row().classes('items-center justify-end space-x-4 flex-1 max-md:hidden'):
-                    await navbar_buttons()
+                with ui.row().classes('items-center justify-end space-x-4 flex-1 max-lg:hidden'):
+                    await navbar_buttons(current_user)
                 
                 # ----------------------------------------------------------------------------------------------------------------------------------------- #
                 # Mobile
                 
-                with ui.element('div').classes('md:hidden relative'):
+                with ui.element('div').classes('lg:hidden relative'):
                     
                     # Menu button
                     menu_button = ui.button().classes('text-white bg-transparent hover:bg-gray-700 p-2 rounded-md transition-colors duration-200')
@@ -44,7 +44,7 @@ async def navbar():
                         ui.label('☰').classes('text-white text-3xl leading-none select-none')
 
                     # Overlay of menu
-                    mobile_overlay = ui.element('div').classes('fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden')
+                    mobile_overlay = ui.element('div').classes('fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden')
 
                     # Sliding mobile menu
                     mobile_menu = ui.element('div').classes(
@@ -67,14 +67,14 @@ async def navbar():
                         with ui.column().classes('p-4 space-y-4 flex-1'):
                             
                             # Links
-                            with ui.column().classes('space-y-1'):
-                                await mobile_nav_links()
+                            with ui.column().classes('space-y-1 ml-4'):
+                                await mobile_nav_links(current_user)
                                 
-                            ui.separator().classes('my-4 border-gray-700')
+                            # ui.separator().classes('border-gray-700')
                             
                             # Buttons
-                            with ui.column().classes('space-y-2'):
-                                await mobile_nav_buttons()
+                            with ui.column().classes('space-y-2 flex-1 items-center self-center'):
+                                await mobile_nav_buttons(current_user)
 
                     # State to open/close menu
                     is_menu_open = False

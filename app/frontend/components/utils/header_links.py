@@ -14,7 +14,18 @@ def header_links():
                         <script>
                             tailwind.config = {
                                 theme: {
-                                    extend: {}
+                                    extend: {
+                                        colors: {
+                                            'logo': '#349CD7',
+                                            'secondary': '#2C82C9',
+                                            'lightBlue': '#8ED6F8',
+                                            'darkGray': '#1F2937',
+                                            'midGray': '#4B5563',
+                                            'lightGray': '#F3F4F6',
+                                            'AccentOrange': '#FFFFFF',
+                                            'AccentGreen': '#10B981'
+                                            }
+                                    }
                                 }
                             }
                         </script>
@@ -44,6 +55,7 @@ def header_links():
                         """)
 
     # Add customs CSS
+    # Comentar este link si el tailwind.config de arriba funciona (Por el momento no funciona ninguno de los dos ??)
     ui.add_head_html('<link rel="stylesheet" href="/static/css/styleColores.css">')
     
     # Add customs CSS for animation.
