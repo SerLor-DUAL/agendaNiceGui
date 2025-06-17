@@ -17,14 +17,19 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
     
     # Assign the weekdays naming
     days_of_week = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+
+    # Responsive Weekdays naming
+    days_of_week_Responsive = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
     
     # Get the current date
     today = datetime.today()
     
     # Display the calendar weekdays in a grid
-    with ui.grid().classes('w-full px-2').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
+    with ui.grid().classes('w-full md:px-2 px-0').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
         for day in days_of_week:
-            ui.label(day).classes('text-center font-medium text-gray-500 text-lg')
+            ui.label(day).classes('text-center font-medium text-gray-500 text-lg opacity-0 md:opacity-100')
+        for day in days_of_week_Responsive:
+            ui.label(day).classes('text-center font-medium text-gray-500 text-sm md:invisible')
 
     # Display the calendar days in a grid
     with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
