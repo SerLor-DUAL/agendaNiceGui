@@ -4,6 +4,9 @@ from dotenv import load_dotenv      # Importing load_dotenv for loading environm
 import os                           # Importing os for environment variable handling                           
 from nicegui import ui              # Importing ui from nicegui
 
+from collections import defaultdict
+from datetime import datetime
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -38,8 +41,8 @@ class EventService:
             if isinstance(events, dict) and events.get('error'):
                 ui.notify(f"Error obteniendo los eventos: {events['error']}", color='negative')
                 return None
-
-            return events  # List of event JSON
+            group_events = self.group_events_by_date(events)
+            return group_events
 
         except Exception as e:
                 ui.notify(f"Error ejecutando el fetch: {str(e)}", color='negative')
@@ -52,7 +55,21 @@ class EventService:
 
     async def delete_event(self, event_id):
         """ Delete an event by ID """
+    
+    @staticmethod
+    def group_events_by_date(events: list) -> dict:
+        event_group = defaultdict(list)
+        for event in events:
+            try:
+                date = datetime.fromisoformat(event['start_date']).strftime('%d/%m/%Y')
+                event_group[date].append(event)
+            except Exception as e:
+                print(f"Error procesando evento: {event}, {e}")
+        print(event_group)
+        return dict(event_group)
         
+
+
 
 # Create an instance of the EventService
 front_event_service = EventService()  # Create an instance of the EventService

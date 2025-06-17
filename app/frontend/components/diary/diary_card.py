@@ -16,7 +16,7 @@ locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
 class DiaryCard:
     
-    def __init__(self):
+    def  __init__(self, event_data: dict):
         
         # Calendar state
         self.calendar_state = {
@@ -32,22 +32,23 @@ class DiaryCard:
         self.events_container = None
         self.view_button = None
         
-        # Events data
-        self.events_data = {
-            1: [
-                {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
-                {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
-            ],
-            5: [
-                {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
-            ],
-            17: [
-                {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
-                {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
-                {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
-                {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
-            ]
-        }
+        self.events_data = event_data
+        # # Events data
+        # self.events_data = {
+        #     1: [
+        #         {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
+        #         {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
+        #     ],
+        #     5: [
+        #         {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
+        #     ],
+        #     17: [
+        #         {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
+        #         {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
+        #         {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
+        #         {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
+        #     ]
+        # }
 
     # -------------------------------------------------------------------------------------------------------------------------- #
     # DIARY CARD #
