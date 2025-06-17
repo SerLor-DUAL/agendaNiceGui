@@ -27,9 +27,9 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
     # Display the calendar weekdays in a grid
     with ui.grid().classes('w-full md:px-2 px-0').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
         for day in days_of_week:
-            ui.label(day).classes('text-center font-medium text-gray-500 text-lg opacity-0 md:opacity-100')
+            ui.label(day).classes('text-center font-medium text-gray-500 text-lg opacity-0 md:opacity-100 md:h-auto h-0')
         for day in days_of_week_Responsive:
-            ui.label(day).classes('text-center font-medium text-gray-500 text-sm md:invisible')
+            ui.label(day).classes('text-center font-medium text-gray-500 text-sm md:hidden')
 
    # Display the calendar days in a grid
     with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
