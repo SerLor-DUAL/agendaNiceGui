@@ -79,9 +79,8 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
 
             if action == 'delete':
                 ui.button(button_text, on_click=lambda: handle_delete(on_delete,event_data)).classes('bg-red-500 text-white hover:bg-red-600 px-6')
-                print("ACA")
             else:
-                async def handle_action():
+                async def handle_action(oldEvent = None):
                     new_event = {
                         'title': title_input.value,
                         'description': description_input.value,
@@ -89,11 +88,16 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
                         'end_date': datetime.strptime(f'{end_date_input.value} {end_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
                     }
                     on_save(new_event)
-                    event_service = EventService()
-                    await event_service.create_event(new_event)
+                    if action == 'create':
+                        event_service = EventService()
+                        await event_service.create_event(new_event)
+                    else:
+                        event_service = EventService()
+                        event_id = oldEvent['id']
+                        await event_service.update_event(event_id, new_event)
                     dialog.close()
 
-                ui.button(button_text, on_click=handle_action).classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')
+                ui.button(button_text, on_click=lambda: handle_action(event_data if action != 'create' else None)).classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')
 
     return dialog
 
