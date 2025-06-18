@@ -17,24 +17,25 @@ def events_list(events, date_title=None, on_add=None, on_edit=None, on_delete=No
                     .tooltip('Agregar evento')
 
         # Scrollable events list
-        with ui.scroll_area().classes('h-[600px] w-full hide-scroll'):
+        with ui.scroll_area().classes('h-full w-full hide-scroll'):
             
-            # Invisible scrollbar script
-            ui.run_javascript("""
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__container').forEach(el => {
-                            el.style.scrollbarWidth = 'none';  // Firefox
-                            el.style.msOverflowStyle = 'none'; // IE 10+
-                        });
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__container::-webkit-scrollbar').forEach(el => {
-                            el.style.display = 'none';         // Chrome, Safari y Opera
-                        });
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__thumb').forEach(el => {
-                            el.style.display = 'none';
-                            el.style.opacity = '0';
-                            el.style.width = '0';
-                            el.style.height = '0';
-                        });
-                    """)
+            # Comented out the invisible scrollbar script for now
+            # # Invisible scrollbar script
+            # ui.run_javascript("""
+            #             document.querySelectorAll('.hide-scroll .q-scrollarea__container').forEach(el => {
+            #                 el.style.scrollbarWidth = 'none';  // Firefox
+            #                 el.style.msOverflowStyle = 'none'; // IE 10+
+            #             });
+            #             document.querySelectorAll('.hide-scroll .q-scrollarea__container::-webkit-scrollbar').forEach(el => {
+            #                 el.style.display = 'none';         // Chrome, Safari y Opera
+            #             });
+            #             document.querySelectorAll('.hide-scroll .q-scrollarea__thumb').forEach(el => {
+            #                 el.style.display = 'none';
+            #                 el.style.opacity = '0';
+            #                 el.style.width = '0';
+            #                 el.style.height = '0';
+            #             });
+            #         """)
                                 
             # Create the events list for the selected day
             if events:

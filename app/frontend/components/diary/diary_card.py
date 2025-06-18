@@ -263,6 +263,7 @@ class DiaryCard:
 
             # Edit event
             else:
+                # Esto no es correcto, ya que no se está usando un identificador único
                 idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['title'] == event['title']), None)
                 if idx is not None:
                     self.events_data[date_key][idx] = new_event
@@ -280,6 +281,14 @@ class DiaryCard:
             day = event_data['day']
             date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
 
+            for e in self.events_data[date_key]:
+                print('Evento:', e, '| id:', e.get('id'))
+                # Esto mostrará si falta la clave 'id'
+
+            # Necesita que el DTO del Create (o el base) tenga un identificador único para eliminarlo correctamente
+            # self.events_data[date_key] = [
+            #     e for e in self.events_data[date_key] if e['id'] != event_to_delete['id']
+            # ]
             self.events_data[date_key] = [
                 e for e in self.events_data[date_key] if e['title'] != event_to_delete['title']
             ]
