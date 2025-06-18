@@ -88,7 +88,10 @@ class AuthService:
 
         # Runs the JavaScript code
         result = await ui.run_javascript(js_code, timeout=5.0)
-        
+
+        # After geting a result we load the session again. With these, every component that used
+        # the app.storage.user will have it reloaded to use it.
+        await self.load_user_session()
         # Returns a response from the fetched JavaScript code
         return result
 

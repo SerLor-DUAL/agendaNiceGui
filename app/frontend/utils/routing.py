@@ -52,7 +52,8 @@ class RouteHandler:
     
     @staticmethod    
     def go_calendar2():
-        return RedirectResponse(url='/calendar')
+        
+        return RedirectResponse(url='/diary')
     
     @staticmethod
     def go_events2():

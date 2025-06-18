@@ -39,6 +39,7 @@ def login_card():
             # Redirects the user to the calendar page
             frh.go_to('/diary')
             
+            
         else:
             feedback_label.text = result.get('message', 'Error logging in')
             feedback_label.style('color: red')
