@@ -245,6 +245,7 @@ class DiaryCard:
 
 
         # Hanlding the save event
+        # TODO this could be modularized into the dialog function.
         def handle_save(new_event):
             """Manages the save event"""
 
@@ -278,13 +279,13 @@ class DiaryCard:
             date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
 
             self.events_data[date_key] = [
-                e for e in self.events_data[date_key] if e['titulo'] != event_to_delete['titulo']
+                e for e in self.events_data[date_key] if e['title'] != event_to_delete['title']
             ]
 
             if not self.events_data[date_key]:
                 del self.events_data[date_key]
 
-            ui.notify(f'Evento "{event_to_delete["titulo"]}" eliminado correctamente', type='warning')
+            ui.notify(f'Evento "{event_to_delete["title"]}" eliminado correctamente', type='warning')
 
             # Updates UI
             self.update_diary()

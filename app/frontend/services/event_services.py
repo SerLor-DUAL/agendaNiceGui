@@ -21,6 +21,9 @@ class EventService:
     def __init__(self):
         self.client = httpx.AsyncClient(base_url=BASE_URL)  # Initialize the HTTP client with the base URL
 
+# -------------------------------------------------------------------------------------------------------------------------------------
+# CRUD CALLS TO THE API
+# READ
     async def get_events(self):
         """ Get all events """
         js_code = f'''
@@ -48,13 +51,92 @@ class EventService:
                 ui.notify(f"Error ejecutando el fetch: {str(e)}", color='negative')
                 return None
 
+# -------------------------------------------------------------------------------------------------------------------------------------
+# CREATE
+    async def create_event(self, event_data: dict):
+        """ Create a new event by sending a POST request via browser fetch """
+        js_code = f'''
+        fetch('{BASE_URL}/api/events', {{
+            method: 'POST',
+            headers: {{
+                'Content-Type': 'application/json'
+            }},
+            credentials: 'include',
+            body: JSON.stringify({{
+                "title": "{event_data['title']}",
+                "description": "{event_data['description']}",
+                "start_date": "{event_data['start_date']}",
+                "end_date": "{event_data['end_date']}"
+            }})
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+        '''
 
-    async def create_event(self, event_data):
-        """ Create a new event """
+        try:
+            result = await ui.run_javascript(js_code, timeout=5)
+            print('Evento creado:', result)
+            ui.notify('Evento creado con éxito', color='positive')
+            return result
+        except Exception as e:
+            print('Error al crear evento:', e)
+            ui.notify(f'Error creando evento: {str(e)}', color='negative')
+            return None
         
+# -------------------------------------------------------------------------------------------------------------------------------------
+# DELETE
+    async def delete_event(self, event_id: int):
+        """ Delete an event by ID using a browser-side fetch call """
+        js_code = f'''
+        fetch('{BASE_URL}/api/events/{event_id}', {{
+            method: 'DELETE',
+            credentials: 'include'
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+        '''
 
-    async def delete_event(self, event_id):
-        """ Delete an event by ID """
+        try:
+            result = await ui.run_javascript(js_code, timeout=5)
+            print('Evento eliminado:', result)
+            return True
+        except Exception as e:
+            print('Error al eliminar evento:', e)
+            return False
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+# UPDATE
+    async def update_event(self, event_id: int, updated_data: dict):
+        """ Update an event by ID using a browser-side fetch call """
+        js_code = f'''
+        fetch('{BASE_URL}/api/events/{event_id}', {{
+            method: 'PUT',
+            credentials: 'include',
+            headers: {{
+                'Content-Type': 'application/json'
+            }},
+            body: JSON.stringify({updated_data})
+        }})
+        .then(response => {{
+            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
+            return response.json();
+        }})
+        '''
+
+        try:
+            result = await ui.run_javascript(js_code, timeout=5)
+            print('Evento actualizado:', result)
+            ui.notify('Evento actualizado correctamente', color='positive')
+            return result
+        except Exception as e:
+            print('Error al actualizar evento:', e)
+            ui.notify(f'Error actualizando evento: {str(e)}', color='negative')
+            return None
+
     
     @staticmethod
     def group_events_by_date(events: list) -> dict:
@@ -67,8 +149,6 @@ class EventService:
                 print(f"Error procesando evento: {event}, {e}")
         return dict(event_group)
         
-
-
 
 # Create an instance of the EventService
 front_event_service = EventService()  # Create an instance of the EventService
