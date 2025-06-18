@@ -114,8 +114,8 @@ class DiaryCard:
     def _create_events_section(self):
         """ Creates the events section """
         
-        with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
-            self.events_container = ui.column().classes('w-full h-full gap-0')
+        # with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
+        self.events_container = ui.column().classes('w-80 bg-gray-50 border-l p-6 h-full gap-0').style('height: 600px; overflow: hidden;')
 
 
     # -------------------------------------------------------------------------------------------------------------------------- #
@@ -159,7 +159,8 @@ class DiaryCard:
             
             # Calendar mode
             if self.calendar_state['view_mode'] == 'calendar':
-                
+                # Cambia el ancho según el modo
+                self.events_container.props('class="w-80 bg-gray-50 border-l p-6 h-full gap-0"')
                 # Creating the events list with the selected day data
                 selected_day = self.calendar_state['selected_day']
                 events = self.get_events_for_day(selected_day)
@@ -175,7 +176,8 @@ class DiaryCard:
                 
             # Monthly mode    
             else:
-                
+                # Cambia el ancho según el modo
+                self.events_container.props('class="w-full bg-gray-50 border-l p-6 h-full gap-0"')
                 # Creating the events list with the selected month data
                 month_events = self.get_all_events_for_month()
                 month_name = calendar.month_name[self.calendar_state['month']].capitalize()
@@ -318,6 +320,7 @@ class DiaryCard:
         # Updates the UI
         with self.calendar_container:
             if self.calendar_state['view_mode'] == 'calendar':
+                self.calendar_container.props('class="w-full"')
                 calendar_mode(
                                 year=year,
                                 month=month,
@@ -326,6 +329,7 @@ class DiaryCard:
                                 on_select=self.on_day_select
                             )
             else:
+                self.calendar_container.props('class="hidden p-0"')
                 monthly_mode()
         
         month_name = calendar.month_name[month].capitalize()
