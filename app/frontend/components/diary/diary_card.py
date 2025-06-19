@@ -10,6 +10,7 @@ from frontend.components.diary.calendar.monthly_mode import monthly_mode        
 from frontend.components.diary.events.events_list import events_list                    # Importing for events list
 from frontend.components.diary.events.events_list import event_card                     # Importing for event card
 from frontend.components.diary.events.event_dialog import show_event_dialog             # Importing for event dialog
+from frontend.services.event_services import front_event_service as es                  # Importing the event service
 
 # Setting the locale to Spanish
 locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
@@ -32,23 +33,9 @@ class DiaryCard:
         self.events_container = None
         self.view_button = None
         
-        self.events_data = event_data
-        # # Events data
-        # self.events_data = {
-        #     1: [
-        #         {"titulo": "Reunión de trabajo", "descripcion": "Reunión semanal del equipo de desarrollo", "start_date": "01/06/2025 09:00", "end_date": "01/06/2025 10:30"},
-        #         {"titulo": "Cita médica", "descripcion": "Revisión médica anual", "start_date": "01/06/2025 15:00", "end_date": "01/06/2025 16:00"}
-        #     ],
-        #     5: [
-        #         {"titulo": "Cumpleaños de María", "descripcion": "Celebración en el restaurante italiano", "start_date": "05/06/2025 20:00", "end_date": "05/06/2025 23:30"}
-        #     ],
-        #     17: [
-        #         {"titulo": "Dentista", "descripcion": "Limpieza dental rutinaria", "start_date": "17/06/2025 10:00", "end_date": "17/06/2025 11:00"},
-        #         {"titulo": "Compras", "descripcion": "Compras semanales en el supermercado", "start_date": "17/06/2025 16:00", "end_date": "17/06/2025 17:30"},
-        #         {"titulo": "Gimnasio", "descripcion": "Entrenamiento de piernas", "start_date": "17/06/2025 18:00", "end_date": "17/06/2025 19:30"},
-        #         {"titulo": "Cena con amigos", "descripcion": "Cena en el nuevo restaurante asiático", "start_date": "17/06/2025 21:00", "end_date": "17/06/2025 23:00"}
-        #     ]
-        # }
+        # Data
+        self.events_data = event_data if event_data is not None else {}
+
 
     # -------------------------------------------------------------------------------------------------------------------------- #
     # DIARY CARD #
@@ -74,12 +61,12 @@ class DiaryCard:
                     # Events section
                     self._create_events_section()
                     
-                # Updates the diary component
-                self.update_diary()
-                self.update_events_panel()
+                # Updates the diary components
+                self.render_calendar()
+                self.render_events()
 
     # -------------------------------------------------------------------------------------------------------------------------- #
-    # DIARY METHODS #
+    # DIARY CARD ADDONS #
 
     def _create_controls(self):
         """ Creates the diary controllers """
@@ -89,15 +76,19 @@ class DiaryCard:
             
             # Navigation
             with ui.row().classes('items-center gap-3'):
-                ui.button(icon='chevron_left', on_click=lambda: self.change_month(-1)) \
-                    .props('dense round') \
+                
+                # Previous month button
+                ui.button(icon='chevron_left', on_click=lambda: self.change_month(-1)).props('dense round') \
                     .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
+                
+                # Date label    
                 self.date_label = ui.label().classes('text-2xl font-bold text-gray-800 min-w-[200px] text-center')
-                ui.button(icon='chevron_right', on_click=lambda: self.change_month(1)) \
-                    .props('dense round') \
+                
+                #  Next month button
+                ui.button(icon='chevron_right', on_click=lambda: self.change_month(1)).props('dense round') \
                     .classes('bg-blue text-blue-600 hover:bg-blue-50 shadow-sm border')
                     
-            # Buttons
+            # Action buttons
             with ui.row().classes('gap-3'):
                 ui.button('Hoy', icon='today', on_click=self.go_to_today) \
                     .classes('bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 shadow-sm')
@@ -114,42 +105,58 @@ class DiaryCard:
     def _create_events_section(self):
         """ Creates the events section """
         
-        # with ui.column().classes('w-80 bg-gray-50 border-l p-6').style('height: 600px; overflow: hidden;'):
         self.events_container = ui.column().classes('w-80 bg-gray-50 border-l p-6 h-full gap-0').style('height: 600px; overflow: hidden;')
 
 
     # -------------------------------------------------------------------------------------------------------------------------- #
-    # EVENTS METHODS #
+    # EVENTS GENERAL METHODS #
 
-    # def get_events_for_day(self, day):
-    #     return self.events_data.get(day, [])
     def get_events_for_day(self, day):
+        """ Returns the events for a specific day """
+        
+        # It gets the events for the specified day formatting the date key to a displayable format
         date_key = self.format_date_title(day, self.calendar_state['month'], self.calendar_state['year'])
+        
+        # Returns the events for the specified date key, or an empty list if there are no events
         return self.events_data.get(date_key, [])
 
 
     def get_all_events_for_month(self):
+        """ Returns all events for the current month """
+        
         month_events = []
+        
+        # Iterates through the events data and filters the events for the current month
         for date_str, events in self.events_data.items():
+            
+            # Parses the date string to a datetime object and checks if the month and year match the current calendar state
             try:
                 date_obj = datetime.strptime(date_str, '%d/%m/%Y')
                 if date_obj.month == self.calendar_state['month'] and date_obj.year == self.calendar_state['year']:
+                    
+                    # If it matches, it adds the events to the month_events list with the day and date_str
                     for event in events:
                         event_with_day = event.copy()
-                        event_with_day['day'] = date_obj.day
-                        event_with_day['date_str'] = date_str  # por si hace falta
-                        month_events.append(event_with_day)
+                        event_with_day['day'] = date_obj.day    # Adding the day of the month
+                        event_with_day['date_str'] = date_str   # Adding the original date string for reference
+                        month_events.append(event_with_day)     # Adding the event to the month list
+            
+            # If there's an error parsing the date, it prints the error and continues
             except Exception as e:
                 print(f"Error con fecha {date_str}: {e}")
+                
+        # Sorts the month events by day and start date
         return sorted(month_events, key=lambda x: (x['day'], x['start_date']))
 
 
     def format_date_title(self, day, month, year):
+        """ Formats the date title for display """
+    
         return f"{day:02d}/{month:02d}/{year}"
 
-
-    def update_events_panel(self):
-        """ Updates the events panel """
+    @ui.refreshable
+    def render_events(self):
+        """ Renders and refreshes the events panel """
         
         # Clearing the events container
         self.events_container.clear()
@@ -159,48 +166,66 @@ class DiaryCard:
             
             # Calendar mode
             if self.calendar_state['view_mode'] == 'calendar':
-                # Cambia el ancho según el modo
+                
+                # Change the width according to the mode
                 self.events_container.props('class="w-80 bg-gray-50 border-l p-6 h-full gap-0"')
-                # Creating the events list with the selected day data
+                
+                # Creates the events list with the selected day data
                 selected_day = self.calendar_state['selected_day']
+                
+                # Retrieves the events for the selected day
                 events = self.get_events_for_day(selected_day)
+                
+                # Formats the date title for display of the selected day
                 date_title = self.format_date_title(selected_day, self.calendar_state['month'], self.calendar_state['year'])
                 
+                # Creates the list of events for the selected day
                 events_list(
-                    events=events,
-                    date_title=date_title,
-                    on_add=lambda: self.show_event_dialog('create', selected_day),
-                    on_edit=lambda event: self.show_event_dialog('edit', selected_day, event),
-                    on_delete=lambda event: self.show_event_dialog('delete', selected_day, event)
-                )
+                            events=events,                                                                          # Events for the selected day
+                            date_title=date_title,                                                                  # Date of the selected day                                                     
+                            on_add=lambda: self.show_event_dialog('create', selected_day),                          # Function to add a new event    
+                            on_edit=lambda event: self.show_event_dialog('edit', selected_day, event),              # Function to edit an existing event
+                            on_delete=lambda event: self.show_event_dialog('delete', selected_day, event)           # Function to delete an existing event
+                        )
                 
             # Monthly mode    
             else:
-                # Cambia el ancho según el modo
+                # Change the width according to the mode
                 self.events_container.props('class="w-full bg-gray-50 border-l p-6 h-full gap-0"')
-                # Creating the events list with the selected month data
+
+                # Creates the events list with the selected month data
                 month_events = self.get_all_events_for_month()
+                
+                # Formats the month name and year for the title
                 month_name = calendar.month_name[self.calendar_state['month']].capitalize()
+                
+                # If the year is not set, it uses the current year
                 year = self.calendar_state['year']
                     
-                # Title
+                # Title for the events list of the month
                 ui.label(f'Eventos de {month_name} {year}').classes('text-lg font-bold text-gray-800 mb-4')
                 
                 # For each event in the month it creates an event card
                 if month_events:
+
                     current_day = None
+                    
+                    # Iterates through the month events and creates an event card for each one separated by day
                     for event in month_events:
                         if current_day != event['day']:
                             current_day = event['day']
+                            
+                            # If the day has changed, it adds a separator and a label for the day
                             if current_day != month_events[0]['day']:
                                 ui.separator().classes('my-3')
                             ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
                         
+                        # Creates the event card for the event
                         event_card(
-                            event, 
-                            on_edit=lambda e: self.select_day_and_edit(event['day'], event),
-                            is_monthly=True
-                        )
+                                        event,                                                                  # The event data
+                                        on_edit=lambda e: self.select_day_and_edit(event['day'], event),        # Function to edit the event
+                                        is_monthly=True                                                         # Indicates that it is a monthly event card     
+                                    )
                         
                 # No events message
                 else:
@@ -210,16 +235,18 @@ class DiaryCard:
 
 
     # -------------------------------------------------------------------------------------------------------------------------- #
-    # EVENT CARD METHODS #
+    # EVENT CARD SPECIFIC METHODS #
     
     def select_day_and_edit(self, day, event=None):
-        """ Selects the day and edits the event """
+        """ Selects the day and edits the event from the event card """
         
         # Changes the state and updates the UI
         self.calendar_state['selected_day'] = day
         self.calendar_state['view_mode'] = 'calendar'
-        self.update_diary()
-        self.update_events_panel()
+        
+        # Updates the diary and events panel
+        self.render_calendar()
+        self.render_events()
         self.update_view_button()
         
         # Opens the event dialog
@@ -227,82 +254,129 @@ class DiaryCard:
             self.show_event_dialog('edit', day, event)
 
 
-    def show_event_dialog(self, action, day, event=None):
-        """ Shows the event dialog """
+    async def show_event_dialog(self, action, day, event=None):
+        """ Show an event dialog to create, edit or delete an event in the current list of events for the selected day """
         
         # If the action is create, the event data is initialized
         if action == 'create':
             event_data = {
                             'day': day,
-                            'titulo': '',
-                            'descripcion': '',
+                            'title': '',
+                            'description': '',
                             'start_date': f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]} 09:00',
                             'end_date': f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]} 10:00'
                         }
             
-        # If the action is edit, the event data is updated
+        # If the action is edit or delete, the event data is updated copying the existing event data
         else:
             event_data = event.copy()
             event_data['day'] = day
 
-
+        # Variable to store dialog reference
+        dialog = None
+        
         # Hanlding the save event
-        # TODO this could be modularized into the dialog function.
-        def handle_save(new_event):
-            """Manages the save event"""
+        async def handle_save(new_event):
+            """Manages the save event from the dialog"""
 
-            day = event_data['day']
-            date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
+            try:
+                # Extracts the actual day and formats the date key
+                day = event_data['day']
+                date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
 
-            # Create event
-            if action == 'create':
-                if date_key not in self.events_data:
-                    self.events_data[date_key] = []
-                self.events_data[date_key].append(new_event)
-                ui.notify(f'Evento "{new_event["title"]}" creado correctamente', type='positive')
+                # Creates a new event
+                if action == 'create':
+                    
+                    if new_event:
+                        # Add the event with the ID created by the backend
+                        if date_key not in self.events_data:
+                            self.events_data[date_key] = []
+                        
+                        # Use the complete event returned by the backend (which includes the ID)
+                        self.events_data[date_key].append(new_event)
+                        
+                        # Notify the user that the event was created successfully
+                        ui.notify(f'Evento "{new_event["title"]}" creado correctamente', type='positive')
+                        
+                    # If the event creation fails, notify the user
+                    else:
+                        print('Error al crear el evento', type='negative')
+                        return
 
-            # Edit event
-            else:
-                # Esto no es correcto, ya que no se está usando un identificador único
-                idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['title'] == event['title']), None)
-                if idx is not None:
-                    self.events_data[date_key][idx] = new_event
-                    ui.notify(f'Evento "{new_event["title"]}" actualizado correctamente', type='positive')
+                # Edit event
+                else:
 
-            # Updates UI
-            self.update_diary()
-            self.update_events_panel()
+                    if new_event:
+                        # Updates the local events data with the updated event
+                        if date_key in self.events_data:
+                            idx = next((i for i, e in enumerate(self.events_data[date_key]) if e['id'] == event['id']), None)
+                            
+                            if idx is not None:
+                                self.events_data[date_key][idx] = new_event
+                                
+                        # Notify the user that the event was updated successfully
+                        ui.notify(f'Evento "{new_event["title"]}" actualizado correctamente', type='positive')
+                            
+                    # If the event update fails, notify the user
+                    else:
+                        print('Error al actualizar el evento', type='negative')
+                        return
+
+                # Update UI immediately after successful operation
+                await self.refresh_events_from_backend()
+                
+                # Close the dialog
+                if dialog:
+                    dialog.close()
+                    
+            except Exception as e:
+                print(f"Error in handle_save: {e}")
+                ui.notify('Error inesperado al guardar el evento', type='negative')
 
 
         # Handling the delete event
-        def handle_delete(event_to_delete):
+        async def handle_delete(event_to_delete):
             """Manages the delete event"""
 
-            day = event_data['day']
-            date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
+            try:
 
-            for e in self.events_data[date_key]:
-                print('Evento:', e, '| id:', e.get('id'))
-                # Esto mostrará si falta la clave 'id'
+                # Checks if the event to delete has ID
+                if 'id' not in event_to_delete:
+                    print('El evento no tiene un identificador único para eliminarlo', type='negative')
+                    return
+                
+                if event_to_delete:
 
-            # Necesita que el DTO del Create (o el base) tenga un identificador único para eliminarlo correctamente
-            # self.events_data[date_key] = [
-            #     e for e in self.events_data[date_key] if e['id'] != event_to_delete['id']
-            # ]
-            self.events_data[date_key] = [
-                e for e in self.events_data[date_key] if e['title'] != event_to_delete['title']
-            ]
+                    day = event_data['day']
+                    date_key = f'{day:02d}/{self.calendar_state["month"]:02d}/{self.calendar_state["year"]}'
 
-            if not self.events_data[date_key]:
-                del self.events_data[date_key]
-
-            ui.notify(f'Evento "{event_to_delete["title"]}" eliminado correctamente', type='warning')
-
-            # Updates UI
-            self.update_diary()
-            self.update_events_panel()
-
-        
+                    # Deletes the event from the local events data
+                    if date_key in self.events_data:
+                        self.events_data[date_key] = [e for e in self.events_data[date_key] if e['id'] != event_to_delete['id']]
+                        
+                        # If there are no more events for that date, it removes the date key from the events data
+                        if not self.events_data[date_key]:
+                            del self.events_data[date_key]
+                    
+                    # Notify the user that the event was deleted successfully
+                    ui.notify(f'Evento "{event_to_delete["title"]}" eliminado correctamente', type='warning')
+                    
+                    # Update UI immediately after successful operation
+                    await self.refresh_events_from_backend()
+                    
+                    # Close the dialog
+                    if dialog:
+                        dialog.close()
+                    
+                # If the event deletion fails, notify the user
+                else:
+                    print('Error al eliminar el evento', type='negative')
+                    return
+                    
+            except Exception as e:
+                print(f"Error in handle_delete: {e}")
+                ui.notify('Error inesperado al eliminar el evento', type='negative')
+            
         # Opens the dialog with the event data and the handlers
         dialog = show_event_dialog(
                                         action=action,
@@ -312,11 +386,49 @@ class DiaryCard:
                                     )
         dialog.open()
 
+        
+    def convert_date_to_backend_format(self, date_str):
+        """Converts a date string from the frontend format to the backend format"""
+        try:
+            dt = datetime.strptime(date_str, '%d/%m/%Y %H:%M')
+            return dt.strftime('%Y-%m-%dT%H:%M:%S')
+        except Exception as e:
+            print(f"Error convirtiendo fecha {date_str}: {e}")
+            return date_str
+
+    async def refresh_events_from_backend(self):
+        """Refreshes the events from the backend"""
+        try:
+            # Obtain the updated events from the event service that calls the backend
+            updated_events = await es.get_events()
+            
+            # Update the events data
+            if updated_events:
+                self.events_data = updated_events
+
+            # Update the UI
+            ui.timer(0.0001, lambda: self._refresh_ui(), once=True)
+
+        except Exception as e:
+            print(f"Error refreshing events: {e}")
+            ui.notify('Error al actualizar eventos', type='negative')
+
+    def _refresh_ui(self):
+        """ Refreshes the UI components """
+        
+        # Refreshes the calendar and events
+        self.render_calendar()
+        self.render_events()
+        
+        # Updates the view button
+        self.update_view_button()
+    
     # -------------------------------------------------------------------------------------------------------------------------- #
     # UPDATE METHODS #
     
-    def update_diary(self):
-        """ Updates the UI of the diary"""
+    @ui.refreshable
+    def render_calendar(self):
+        """ Renders and refreshes the UI of the calendar"""
         
         # Clears the calendar container
         self.calendar_container.clear()
@@ -353,8 +465,8 @@ class DiaryCard:
         self.calendar_state['view_mode'] = 'calendar'
         
         # Updates the UI
-        self.update_diary()
-        self.update_events_panel()
+        self.render_calendar()
+        self.render_events()
         self.update_view_button()
 
 
@@ -376,8 +488,8 @@ class DiaryCard:
         self.calendar_state['year'] = y
         
         # Updates the UI
-        self.update_diary()
-        self.update_events_panel()
+        self.render_calendar()
+        self.render_events()
 
 
     def go_to_today(self):
@@ -391,8 +503,8 @@ class DiaryCard:
         self.calendar_state['view_mode'] = 'calendar'
         
         # Updates the UI
-        self.update_diary()
-        self.update_events_panel()
+        self.render_calendar()
+        self.render_events()
         self.update_view_button()
 
 
@@ -405,8 +517,8 @@ class DiaryCard:
             self.calendar_state['view_mode'] = 'calendar'
         
         # Updates the UI
-        self.update_diary()
-        self.update_events_panel()
+        self.render_calendar()
+        self.render_events()
         self.update_view_button()
 
 

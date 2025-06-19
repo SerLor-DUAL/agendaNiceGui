@@ -19,17 +19,17 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
     days_of_week = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
     # Responsive Weekdays naming
-    days_of_week_Responsive = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+    days_of_week_responsive = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
     
     # Get the current date
     today = datetime.today()
     
     # Display the calendar weekdays in a grid
-    with ui.grid().classes('w-full md:px-2 px-0').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
+    with ui.grid().classes('w-full gap-y-0 px-2').style('grid-template-columns:repeat(7, minmax(0, 1fr));'):
         for day in days_of_week:
-            ui.label(day).classes('text-center font-medium text-gray-500 text-lg opacity-0 md:opacity-100 md:h-auto h-0')
-        for day in days_of_week_Responsive:
-            ui.label(day).classes('text-center font-medium text-gray-500 text-sm md:hidden')
+            ui.label(day).classes('text-center font-medium text-gray-500 text-lg opacity-0 lg:opacity-100 lg:h-auto h-0 pb-0 lg:pb-3 pt-0 lg:pt-1')
+        for day in days_of_week_responsive:
+            ui.label(day).classes('text-center font-medium text-gray-500 text-md h-auto lg:hidden lg:h-0 pt-2 lg:pt-0 pb-3 lg:pb-0')
 
     # Display the calendar days in a grid
     with ui.grid().classes('w-full p-2 gap-3').style('grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 75px;'):
@@ -44,7 +44,7 @@ def calendar_mode(year, month, selected_day, events_data, on_select):
                 # Create a day card
                 else:
                     date_key = f'{day:02d}/{month:02d}/{year}'
-                    event_count = len(events_data.get(date_key, []))
+                    event_count = len(events_data.get(date_key, []) if events_data is not None else [])
                     is_today = (day == today.day and month == today.month and year == today.year)
                     is_selected = (day == selected_day)
                     create_diary_day_card(day, event_count, is_today, is_selected, lambda d=day: on_select(d))

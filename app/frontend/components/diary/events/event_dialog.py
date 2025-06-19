@@ -1,15 +1,9 @@
 # frontend/components/diary/events/event_dialog.py
 
-# Import necessary modules
-from nicegui import ui      # Import the ui module from nicegui
-
-# frontend/components/diary/events/event_dialog.py
-
 from nicegui import ui
 from datetime import datetime
-from frontend.services.event_services import EventService
-
-
+from frontend.services.event_services import front_event_service as es
+import asyncio   
 
 def show_event_dialog(action, event_data, on_save, on_delete=None):
     title = {
@@ -77,35 +71,60 @@ def show_event_dialog(action, event_data, on_save, on_delete=None):
         with ui.row().classes('w-full justify-end gap-3 mt-6'):
             ui.button('Cancelar', on_click=dialog.close).props('flat').classes('text-gray-600 px-4')
 
+            # Handling different actions of the dialog
+        
+            # If the action is 'delete', we define a delete handler
             if action == 'delete':
-                ui.button(button_text, on_click=lambda: handle_delete(on_delete,event_data)).classes('bg-red-500 text-white hover:bg-red-600 px-6')
-            else:
-                async def handle_action(oldEvent = None):
-                    new_event = {
-                        'title': title_input.value,
-                        'description': description_input.value,
-                        'start_date': datetime.strptime(f'{start_date_input.value} {start_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
-                        'end_date': datetime.strptime(f'{end_date_input.value} {end_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
-                    }
-                    on_save(new_event)
-                    if action == 'create':
-                        event_service = EventService()
-                        await event_service.create_event(new_event)
+                
+                # Define the delete handler
+                async def handle_delete():
+                    """Handles the action of deleting an event"""
+                    
+                    await es.delete_event(event_data["id"])
+                    
+                    if asyncio.iscoroutinefunction(on_delete):
+                        await on_delete(event_data)
                     else:
-                        event_service = EventService()
-                        event_id = oldEvent['id']
-                        await event_service.update_event(event_id, new_event)
+                        on_delete(event_data)
+                        
                     dialog.close()
 
-                ui.button(button_text, on_click=lambda: handle_action(event_data if action != 'create' else None)).classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')
+                # Create the delete button with the handler
+                # The button will be red and will call the handle_delete function when clicked
+                ui.button(button_text, on_click=handle_delete).classes('bg-red-500 text-white hover:bg-red-600 px-6')
+
+            # If the action is 'create' or 'edit', we define a create/edit handler
+            else:
+                
+                # Define the action handler for create/edit
+                async def handle_action():
+                    """Handles the action of creating or editing an event"""
+                    
+                    # Validate inputs
+                    new_event = {
+                                    'title': title_input.value,
+                                    'description': description_input.value,
+                                    'start_date': datetime.strptime(f'{start_date_input.value} {start_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
+                                    'end_date': datetime.strptime(f'{end_date_input.value} {end_time_input.value}', '%d/%m/%Y %H:%M').isoformat(),
+                                }
+                                
+                    # TO CREATE OR UPDATE EVENT
+                    if action == 'create':
+                        created_event = await es.create_event(new_event)
+                        await on_save(created_event)
+                    else:
+                        event_id = event_data['id']
+                        updated_event = await es.update_event(event_id, new_event)
+                        updated_event['id'] = event_id
+                        await on_save(updated_event)
+
+                    dialog.close()
+                    
+                # Create the button with the handler
+                # The button will be colored according to the action and will call the handle_action function when clicked
+                ui.button(button_text, on_click=handle_action).classes(f'bg-{button_color}-500 text-white hover:bg-{button_color}-600 px-6')
 
     return dialog
-
-# TODO this will need refactor, but it's just a test by now.
-async def handle_delete(function, event_data):
-    function(event_data)
-    event_service = EventService()
-    await event_service.delete_event(event_data["id"])
 
 def format_time_range(start_date, end_date):
     """Formats time range for display"""
