@@ -26,4 +26,4 @@ async def create_diary_page():
     dc = DiaryCard(events)
     
     # Add the diary card to the UI
-    dc.create_diary_card()
+    dc.create()

@@ -1,55 +1,53 @@
 # frontend/components/diary/events/events_list.py
 
-# Import necessary modules
-from nicegui import ui                      # Import NiceGUI
-from .event_card import event_card          # Import the event_card function
+# Importing necessary modules
+from nicegui import ui
+from .event_card import event_card
 
-def events_list(events, date_title=None, on_add=None, on_edit=None, on_delete=None, is_monthly=False):
+def events_list(events: list, date_title: str = None, on_add: callable = None, on_edit: callable = None, on_delete: callable = None, is_monthly: bool = False) -> None:
+    """Display list of events for the given date or month"""
     
-    # Create a row for the events list container
     if date_title:
-        with ui.row().classes('w-full items-center justify-between mb-4'):
-            ui.label(f'Eventos de {date_title}').classes('text-lg font-bold text-gray-800')
-            if on_add:
-                ui.button(icon='add', color='green', on_click=on_add) \
-                    .props('dense round') \
-                    .classes('bg-green-500 hover:bg-green-600') \
-                    .tooltip('Agregar evento')
+        _render_header(date_title, on_add)
+    
+    with ui.scroll_area().classes('h-full w-full pb-4 hide-scrollbar'):
+        _render_events_content(events, on_edit, on_delete, is_monthly)
 
-        # Scrollable events list
-        with ui.scroll_area().classes('h-full w-full hide-scroll pb-4'):
 
-            # Invisible scrollbar script
-            ui.run_javascript("""
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__container').forEach(el => {
-                            el.style.scrollbarWidth = 'none';  // Firefox
-                            el.style.msOverflowStyle = 'none'; // IE 10+
-                        });
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__container::-webkit-scrollbar').forEach(el => {
-                            el.style.display = 'none';         // Chrome, Safari y Opera
-                        });
-                        document.querySelectorAll('.hide-scroll .q-scrollarea__thumb').forEach(el => {
-                            el.style.display = 'none';
-                            el.style.opacity = '0';
-                            el.style.width = '0';
-                            el.style.height = '0';
-                        });
-                    """)
-                                
-            # Create the events list for the selected day
-            if events:
-                for event in events:
-                    event_card(event, 
-                                on_edit=lambda e, ev=event: on_edit(ev) if on_edit else None,
-                                on_delete=lambda e, ev=event: on_delete(ev) if on_delete else None,
-                                is_monthly=is_monthly)
-            
-            # Show a message if there are no events
-            else:
-                
-                # Create a column for the no events message
-                with ui.column().classes('w-full items-center py-8 text-center'):
-                    ui.icon('event_busy', size='48px').classes('text-gray-300 mb-2')
-                    ui.label('No hay eventos programados' if not is_monthly else 'No hay eventos este mes').classes('text-gray-500 font-medium')
-                    if on_add and not is_monthly:
-                        ui.label('Haz clic en "+" para agregar uno').classes('text-gray-400 text-sm')
+def _render_header(date_title: str, on_add: callable) -> None:
+    """Render events list header with title and add button"""
+    
+    with ui.row().classes('w-full items-center justify-between mb-4'):
+        
+        ui.label(f'Eventos de {date_title}').classes('text-lg font-bold text-gray-800')
+
+        # Add button
+        if on_add:
+            ui.button(icon='add', color='green', on_click=on_add) \
+                .classes('bg-green-500 hover:bg-green-600') \
+                .props('dense round') \
+                .tooltip('Agregar evento')
+
+
+def _render_events_content(events: list, on_edit: callable, on_delete: callable, is_monthly: bool) -> None:
+    """Render events content area"""
+    if events:
+        for event in events:
+            event_card(
+                event, 
+                on_edit=lambda e, ev=event: on_edit(ev) if on_edit else None,
+                on_delete=lambda e, ev=event: on_delete(ev) if on_delete else None,
+                is_monthly=is_monthly
+            )
+    else:
+        _render_empty_state(is_monthly)
+
+def _render_empty_state(is_monthly: bool) -> None:
+    """Render empty events state"""
+    
+    # Message for no events
+    message = 'No hay eventos este mes' if is_monthly else 'No hay eventos programados'
+    
+    with ui.column().classes('w-full items-center py-8 text-center'):
+        ui.icon('event_busy', size='48px').classes('text-gray-300 mb-2')
+        ui.label(message).classes('text-gray-500 font-medium')
