@@ -91,8 +91,9 @@ class DiaryCard:
     def _create_calendar_section(self) -> None:
         """Create calendar display area"""
         
-        with ui.column().classes('flex-1 p-4'):
-            self.ui_elements['calendar_container'] = ui.column().classes('w-full')
+        # Column inside a column no longer needed, just a single column
+        with ui.column().classes('flex-1'):
+            self.ui_elements['calendar_container'] = ui.column().classes('w-full p-4')
 
     def _create_events_section(self) -> None:
         """Create events display area"""
@@ -160,6 +161,7 @@ class DiaryCard:
         self.ui_elements['calendar_container'].clear()
         with self.ui_elements['calendar_container']:
             if self.state['view'] == 'calendar':
+                self.ui_elements['calendar_container'].props('class="nicegui-column w-full p-4"')
                 calendar_mode(
                                 year=self.state['year'],
                                 month=self.state['month'],
@@ -167,6 +169,8 @@ class DiaryCard:
                                 events_data=self.events_data,
                                 on_select=self._select_day
                             )
+            else:
+                self.ui_elements['calendar_container'].props('class="nicegui-column w-full p-0 hidden"')
 
     @ui.refreshable
     def _render_events(self) -> None:
@@ -175,8 +179,10 @@ class DiaryCard:
         self.ui_elements['events_container'].clear()
         with self.ui_elements['events_container']:
             if self.state['view'] == 'calendar':
+                self.ui_elements['events_container'].props('class="nicegui-column w-80 bg-gray-50 border-l p-4 h-full overflow-hidden"')
                 self._render_daily_events()
             else:
+                self.ui_elements['events_container'].props('class="nicegui-column w-full bg-gray-50 border-l p-4 h-[90%] overflow-hidden"')
                 self._render_monthly_events()
 
 
@@ -202,24 +208,27 @@ class DiaryCard:
         month_name = calendar.month_name[self.state['month']].capitalize()
         
         ui.label(f'Eventos de {month_name} {self.state["year"]}').classes('text-lg font-bold text-gray-800 mb-4')
-        
+        # with ui.scroll_area().classes('h-full w-[50%] pb-4 hide-scrollbar'):    
         if not month_events:
             self._render_empty_month()
             return
-        
-        current_day = None
-        for event in month_events:
-            if current_day != event['day']:
-                current_day = event['day']
-                if current_day != month_events[0]['day']:
-                    ui.separator().classes('my-3')
-                ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
-            
-            event_card(
-                        event,
-                        on_edit=lambda e: self._select_day_and_edit(e),
-                        is_monthly=True
-                    )
+        with ui.row().classes('w-full h-full overflow-y-hidden overflow-x-auto flex-nowrap gap-4'):
+            # with ui.scroll_area().classes('h-full w-full pb-4 horizontal-scrollbar'):
+            #     with ui.row().classes('gap-4 w-full h-max overflow-x-scroll flex-nowrap'):
+            current_day = None
+            for event in month_events:
+                if current_day != event['day']:
+                    current_day = event['day']
+                    with ui.column().classes('w-1/4 h-full flex-shrink-0 items-center overflow-y-auto bg-gray-100 p-3'): 
+                        ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
+                        for event in month_events:
+                            if event['day'] == current_day:
+                                # Render event card for the specific day
+                                event_card(
+                                            event,
+                                            on_edit=lambda e: self._select_day_and_edit(e),
+                                            is_monthly=True
+                                        )
 
 
     def _render_empty_month(self) -> None:
