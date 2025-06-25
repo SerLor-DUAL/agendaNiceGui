@@ -70,7 +70,7 @@ class DiaryCard:
         with ui.row().classes('w-full items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b'):
             
             # Navigation
-            with ui.row().classes('items-center gap-3'):
+            with ui.row().classes('items-center gap-3 mx-auto'):
                 ui.button(icon='chevron_left', on_click=lambda: self._change_month(-1)) \
                     .classes('text-blue-600 border shadow-sm hover:bg-blue-50')
                 
@@ -161,7 +161,7 @@ class DiaryCard:
         self.ui_elements['calendar_container'].clear()
         with self.ui_elements['calendar_container']:
             if self.state['view'] == 'calendar':
-                self.ui_elements['calendar_container'].props('class="nicegui-column w-full p-4"')
+                self.ui_elements['calendar_container'].props('class="nicegui-column w-full md:p-4 py-4 px-0"')
                 calendar_mode(
                                 year=self.state['year'],
                                 month=self.state['month'],
@@ -212,23 +212,25 @@ class DiaryCard:
         if not month_events:
             self._render_empty_month()
             return
-        with ui.row().classes('w-full h-full overflow-y-hidden overflow-x-auto flex-nowrap gap-4'):
+        with ui.row().classes('w-full h-full overflow-y-hidden overflow-x-auto transition flex-nowrap gap-4'):
             # with ui.scroll_area().classes('h-full w-full pb-4 horizontal-scrollbar'):
             #     with ui.row().classes('gap-4 w-full h-max overflow-x-scroll flex-nowrap'):
             current_day = None
             for event in month_events:
                 if current_day != event['day']:
                     current_day = event['day']
-                    with ui.column().classes('w-1/4 h-full flex-shrink-0 items-center overflow-y-auto bg-gray-100 p-3'): 
+                    with ui.column().classes('md:w-1/4 w-full h-full flex-shrink-0 items-center overflow-y-hidden bg-gray-100 pb-12'): 
                         ui.label(f'Día {current_day:02d}').classes('text-sm font-bold text-gray-700 mb-2 mt-3')
-                        for event in month_events:
-                            if event['day'] == current_day:
-                                # Render event card for the specific day
-                                event_card(
-                                            event,
-                                            on_edit=lambda e: self._select_day_and_edit(e),
-                                            is_monthly=True
-                                        )
+                        with ui.column().classes('w-full h-full flex-shrink-0 items-center overflow-y-auto bg-gray-100 p-3'):
+                            for event in month_events:
+                                if event['day'] == current_day:
+                                    # Render event card for the specific day
+                                    event_card(
+                                                event,
+                                                on_edit=lambda e: self._select_day_and_edit(e),
+                                                is_monthly=True
+                                            )
+                                
 
 
     def _render_empty_month(self) -> None:

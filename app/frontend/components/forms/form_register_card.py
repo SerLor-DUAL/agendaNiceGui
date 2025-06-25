@@ -21,12 +21,12 @@ def register_card():
         confirm_password_value = confirm_password_input.value
 
         if not username_value or not password_value or not confirm_password_value:
-            feedback_label.text = "Fill all fields"
+            feedback_label.text = "Rellene todos los campos"
             feedback_label.style('color: red')
             return
         
         if password_value != confirm_password_value:
-            feedback_label.text = "Passwords do not match"
+            feedback_label.text = "Las contraseñas no coinciden"
             feedback_label.style('color: red')
             return
         
@@ -34,15 +34,15 @@ def register_card():
 
         # Updates the feedback label based on the result
         if result.get('status') == 'success':
-            feedback_label.text = result.get('message', 'Login successful')
+            feedback_label.text = result.get('message', 'Inicio de sesión con éxito')
             feedback_label.style('color: green')
             username_input.value = ''
             password_input.value = ''
             
-            frh.go_to('/calendar')
+            frh.go_to('/diary')
             
         else:
-            feedback_label.text = result.get('message', 'Error logging in')
+            feedback_label.text = result.get('message', 'Error al registrarse')
             feedback_label.style('color: red')
 
     # ----------------------------------------------------------------------------------------------------------------------------------------- #
@@ -71,7 +71,26 @@ def register_card():
                                                                 'px-4 py-2 '                
                                                                 'rounded focus:outline-none '        
                                                                 'focus:ring-2 focus:ring-[#349CD7]'  
-                                                            )
+                                                            ).props('autofocus id="username" maxlength="100"')  # Autofocus on username input
+            
+            # Add JavaScript to change focus when pressing Enter
+            ui.run_javascript("""
+                document.querySelector('input[id="username"]').addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        document.querySelector('input[id="password"]').focus();
+                    }
+                });
+                document.querySelector('input[id="password"]').addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        document.querySelector('input[id="confirm-password"]').focus();
+                    }
+                });
+                document.querySelector('input[id="confirm-password"]').addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        document.querySelector('button[id="register-button"]').focus();
+                    }
+                });
+                              """)
             
             # Password input
             password_input = ui.input('Contraseña', password=True).classes(
@@ -81,7 +100,35 @@ def register_card():
                                                                             'px-4 py-2 '
                                                                             'rounded focus:outline-none '
                                                                             'focus:ring-2 focus:ring-[#349CD7]'
-                                                                        )
+                                                                        ).props('id="password" maxlength="100"')  # Password input with max length
+            # Codigo mejorable para el botón de ojo de contraseña (refactorizar)
+            with password_input:
+                password_visible = ui.switch(value=False).props('dense').style('display:none')  # Estado oculto
+                eye_button = ui.button(icon='visibility_off', on_click=lambda: toggle_password()).props('flat').classes('p-2 m-0 h-fit self-center rounded-lg').props('id="eye-button"')
+
+            def toggle_password():
+                password_visible.value = not password_visible.value
+                if password_visible.value:
+                    password_input.type = 'text'
+                else:
+                    password_input.type = 'password'
+                eye_button.icon = 'visibility' if password_visible.value else 'visibility_off'
+
+            # Add JavaScript to toggle password visibility
+            ui.run_javascript("""
+                // Espera a que el DOM esté listo
+                setTimeout(function() {
+                    const pwInput = document.querySelector('input[id="password"]');
+                    const eyeBtn = document.querySelector('#eye-button');
+                              
+                    let visible = false;
+                    eyeBtn.addEventListener('click', function() {
+                        visible = !visible;
+                        pwInput.type = visible ? 'text' : 'password';
+                    });
+                }, 500);
+            """)
+
             # Confirm password input
             confirm_password_input = ui.input('Confirmar Contraseña', password=True).classes(
                                                                                             'w-full mb-6 '
@@ -90,9 +137,35 @@ def register_card():
                                                                                             'px-4 py-2 '
                                                                                             'rounded focus:outline-none '
                                                                                             'focus:ring-2 focus:ring-[#349CD7]'
-                                                                                        )
+                                                                                        ).props('id="confirm-password" maxlength="100"')  # Confirm password input with max length
 
-            
+            # Codigo mejorable para el botón de ojo de confirmación (refactorizar)
+            with confirm_password_input:
+                confirm_password_visible = ui.switch(value=False).props('dense').style('display:none')  # Estado oculto
+                confirm_eye_button = ui.button(icon='visibility_off', on_click=lambda: confirm_toggle_password()).props('flat').classes('p-2 m-0 h-fit self-center rounded-lg').props('id="confirm-eye-button"')
+
+            def confirm_toggle_password():
+                confirm_password_visible.value = not confirm_password_visible.value
+                if confirm_password_visible.value:
+                    confirm_password_input.type = 'text'
+                else:
+                    confirm_password_input.type = 'password'
+                confirm_eye_button.icon = 'visibility' if confirm_password_visible.value else 'visibility_off'
+
+            # Add JavaScript to toggle password visibility
+            ui.run_javascript("""
+                // Espera a que el DOM esté listo
+                setTimeout(function() {
+                    const pwInput = document.querySelector('input[id="confirm-password"]');
+                    const eyeBtn = document.querySelector('#confirm-eye-button');
+                              
+                    let visible = false;
+                    eyeBtn.addEventListener('click', function() {
+                        visible = !visible;
+                        pwInput.type = visible ? 'text' : 'password';
+                    });
+                }, 500);
+            """)
 
             # Register button
             ui.button('Registrarse', on_click=submit_register).classes(
@@ -104,7 +177,7 @@ def register_card():
                                                                         'rounded-lg '                     
                                                                         'focus:outline-none '             
                                                                         'focus:ring-2 focus:ring-[#2C82C9]'  
-                                                                    )
+                                                                    ).props('id="register-button"')
             # Feedback label
             feedback_label = ui.label().classes('text-sm mb-4')
 

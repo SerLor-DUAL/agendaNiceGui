@@ -16,7 +16,7 @@ def create_diary_day_card(day: int, event_count: int, is_today: bool, is_selecte
             # Solo mostrar badge si hay eventos
             if event_count > 0:
                 ui.badge(str(event_count)).classes(
-                    'text-xs font-bold bg-blue-500 text-white px-1.5 py-0.5 shadow-sm min-w-[24px]'
+                    'text-xs font-bold bg-blue-500 text-white px-1.5 py-0.5 md:self-start self-center shadow-sm'
                 ).style('opacity: 0.9;')
 
 

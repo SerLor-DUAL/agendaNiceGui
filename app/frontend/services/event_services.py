@@ -34,6 +34,9 @@ class EventService:
                             credentials: 'include'
                         }})
                         .then(response => {{
+                            if (response.status === 404) {{
+                                return {{notFound: true}};
+                            }}
                             if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
                             return response.json();
                         }})
@@ -46,6 +49,12 @@ class EventService:
             
             # Print the events for debugging
             print(events)
+
+            # Si la respuesta es notFound, muestra aviso y retorna un dict vacío
+            if isinstance(events, dict) and events.get('notFound'):
+                # Por el momento no se muestra un aviso, pero podriamos descomentar si se desea
+                # ui.notify("No se encontraron eventos", color='warning')
+                return {}
             
             # Check if the response is an error
             if isinstance(events, dict) and events.get('error'):

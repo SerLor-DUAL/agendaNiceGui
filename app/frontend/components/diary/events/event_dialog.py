@@ -12,7 +12,7 @@ def show_event_dialog(action: str, event_data: dict, on_save: callable, on_delet
     dialog = ui.dialog()
     title, button_text, button_color = _get_dialog_config(action)
     
-    with dialog, ui.card().classes('w-[500px] p-6'):
+    with dialog, ui.card().classes('w-[500px] p-6 flex flex-row'):
         ui.label(f'{title} - Día {event_data["day"]}').classes('text-xl font-bold mb-6')
         
         # Render content based on action type
@@ -41,9 +41,16 @@ def _render_delete_confirmation(event_data: dict) -> None:
     """Render delete confirmation content"""
     
     ui.label('¿Estás seguro de que quieres eliminar este evento?').classes('text-gray-700 mb-3')
-    with ui.card().classes('bg-red-50 border-l-4 border-red-400 p-4 mb-4'):
-        ui.label(event_data.get('title', '')).classes('font-semibold text-red-800')
-        ui.label(event_data.get('description', '')).classes('text-sm text-red-700')
+    with ui.card().classes('bg-red-50 border-l-4 border-red-400 p-4 mb-4 min-w-[75%] self-center'):
+        title = event_data.get('title', 'Evento sin título')[:50]  # Truncate title to 50 characters
+        if len(title) == 50:
+            title += '...'
+        ui.label(title).classes('font-semibold text-red-800')
+        description = event_data.get('description')[:120]  # Truncate title to 120 characters
+        if len(description) == 120:
+            description += '...'
+        if description:
+            ui.label(description).classes('text-sm text-red-700')
 
         # Formatted time range display
         ui.label(_format_time_range(event_data.get('start_date', ''), event_data.get('end_date', ''))).classes('text-xs text-red-600')
@@ -56,24 +63,15 @@ def _render_event_form(event_data: dict) -> dict:
     
     # Initialize input fields with existing event data or defaults
     inputs = {
-        'title': ui.input('Título', value=event_data.get('title', '')).classes('w-full mb-4').props('outlined'),
-        'description': ui.textarea('Descripción', value=event_data.get('description', '')).classes('w-full mb-4').props('outlined'),
-        'start_date': ui.input('Fecha inicio', value=start_date).classes('w-full mb-2').props('outlined'),
-        'start_time': ui.input('Hora inicio', value=start_time).classes('w-full').props('outlined'),
-        'end_date': ui.input('Fecha fin', value=end_date).classes('w-full mb-2').props('outlined'),
-        'end_time': ui.input('Hora fin', value=end_time).classes('w-full').props('outlined'),
+        'title': ui.input('Título', value=event_data.get('title', '')).classes('w-full mb-4').props('outlined').props('maxlength=100'),
+        'description': ui.textarea('Descripción', value=event_data.get('description', '')).classes('w-full mb-4').props('outlined').props('maxlength=500'),
+        'start_date_title': ui.label('Fecha y hora de inicio').classes('text-sm font-medium text-gray-700 w-[48%] text-center'),
+        'end_date_title': ui.label('Fecha y hora de fin').classes('text-sm font-medium text-gray-700 w-[48%] text-center'),
+        'start_date': ui.input('Fecha inicio', value=start_date).classes('w-[48%] mb-2').props('outlined'),
+        'end_date': ui.input('Fecha fin', value=end_date).classes('w-[48%]').props('outlined'),
+        'start_time': ui.input('Hora inicio', value=start_time).classes('w-[48%] mb-2').props('outlined'),
+        'end_time': ui.input('Hora fin', value=end_time).classes('w-[48%]').props('outlined'),
     }
-    
-    # Render date and time inputs in a row
-    with ui.row().classes('w-full gap-4 mb-4'):
-        with ui.column().classes('flex-1'):
-            ui.label('Fecha y hora de inicio').classes('text-sm font-medium text-gray-700 mb-2')
-            inputs['start_date']
-            inputs['start_time']
-        with ui.column().classes('flex-1'):
-            ui.label('Fecha y hora de fin').classes('text-sm font-medium text-gray-700 mb-2')
-            inputs['end_date']
-            inputs['end_time']
     
     return inputs
 

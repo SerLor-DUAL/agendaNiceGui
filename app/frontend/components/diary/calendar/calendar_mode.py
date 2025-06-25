@@ -17,7 +17,7 @@ def calendar_mode(year: int, month: int, selected_day: int, events_data: dict, o
     _render_weekday_headers()
     
     # Calendar grid
-    with ui.grid().classes('w-full p-2 gap-3 grid grid-cols-7 auto-rows-[75px]'):
+    with ui.grid().classes('w-full md:p-2 py-2 px-0 gap-3 grid grid-cols-7 auto-rows-[75px]'):
         for week in month_days:
             for day in week:
                 _render_day_cell(day, month, year, today, selected_day, events_data, on_select)

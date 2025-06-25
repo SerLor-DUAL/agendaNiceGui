@@ -50,7 +50,7 @@ class AuthService:
         return result
 
 
-    async def login(self, nickname: str, password: str, success_message: str = "Successful login") -> dict:
+    async def login(self, nickname: str, password: str, success_message: str = "Inicio de sesión con exito") -> dict:
         """ Login method that sends a POST request to the backend to login the user. It obtains cookies for the browser using a JavaScript fetch. """
         
         # JavaScript code to send the login request
@@ -200,9 +200,9 @@ class AuthService:
                     login_result = await self.login(nickname, password, success_message="Successful registration")
                     return login_result
                 else:
-                    return {"success": False, "message": f"Registry error: {response.text}"}
+                    return {"success": False, "message": f"Error de registro: {response.text}"}
             except Exception as e:
-                return {"success": False, "message": f"Connection error: {e}"}
+                return {"success": False, "message": f"Error de conexión: {e}"}
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
     

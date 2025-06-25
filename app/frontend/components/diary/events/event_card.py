@@ -10,9 +10,13 @@ def event_card(event: dict, on_edit: callable = None, on_delete: callable = None
     card_classes = _get_card_classes(is_monthly)
     
     with ui.card().classes(card_classes):
-        with ui.row().classes('w-full items-start justify-between'):
-            _render_event_info(event, is_monthly)
-            _render_event_actions(event, on_edit, on_delete, is_monthly)
+        with ui.column().classes('w-full items-start justify-between'):
+            # Ver con Sergio y Santiago si lo dejamos de esta forma o si lo dejamos como estaba antes
+            # _render_event_info(event, is_monthly)
+            _render_event_info_test1(event, on_edit, on_delete, is_monthly)
+            # _render_event_actions(event, on_edit, on_delete, is_monthly)
+            _render_event_info_test2(event, is_monthly)
+
 
 
 def _get_card_classes(is_monthly: bool) -> str:
@@ -31,17 +35,64 @@ def _render_event_info(event: dict, is_monthly: bool) -> None:
     
     with ui.column().classes('flex-1 gap-1'):
         title_size = 'text-sm' if is_monthly else 'text-base'
-        ui.label(event['title']).classes(f'{title_size} font-semibold text-gray-800')
-        
+        title = event['title'][0:30]  # Truncate title to 30 characters
+        if len(title) == 30:
+            title += '...'
+        ui.label(title).classes(f'{title_size} font-semibold text-gray-800')
         if event.get('description'):
+            description = event['description'][0:70]  # Truncate title to 70 characters
+            if len(description) == 70:
+                description += '...'
             desc_size = 'text-xs' if is_monthly else 'text-sm'
-            ui.label(event['description']).classes(f'{desc_size} text-gray-600')
-        
+            ui.label(description).classes(f'{desc_size} text-gray-600')
         time_color = 'text-indigo-600' if is_monthly else 'text-blue-600'
         
         ui.label(_format_time_range(event['start_date'], event['end_date'])) \
             .classes(f'text-xs font-medium {time_color}')
 
+def _render_event_info_test1(event: dict, on_edit: callable, on_delete: callable, is_monthly: bool) -> None:
+    """Render event information section"""
+    
+    with ui.row().classes('flex-1 gap-1 flex-nowrap justify-between items-center w-full'):
+        title_size = 'text-sm' if is_monthly else 'text-base'
+        title = event['title'][0:30]  # Truncate title to 30 characters
+        if len(title) == 30:
+            title += '...'
+        ui.label(title).classes(f'{title_size} font-semibold text-gray-800')
+        """Render event action buttons"""
+    
+        if not (on_edit or on_delete):
+            return
+        
+        with ui.row().classes('gap-1 ml-2 items-center flex-nowrap justify-end relative'):
+            
+            # Edit
+            if on_edit:
+                btn_classes = 'text-indigo-600 hover:bg-indigo-200' if is_monthly else 'text-blue-600 hover:bg-blue-200'
+                ui.button(icon='edit', on_click=lambda: on_edit(event)) \
+                    .props('dense round flat size=xs' if is_monthly else 'dense round flat') \
+                    .classes(btn_classes) \
+                    .tooltip('Editar evento')
+            
+            # Delete        
+            if on_delete:
+                ui.button(icon='delete', on_click=lambda: on_delete(event)) \
+                    .props('dense round flat size=xs' if is_monthly else 'dense round flat') \
+                    .classes('text-red-600 hover:bg-red-200') \
+                    .tooltip('Eliminar evento')
+
+def _render_event_info_test2(event: dict, is_monthly: bool) -> None:
+    with ui.column().classes('flex-1 gap-1'):
+        if event.get('description'):
+            description = event['description'][0:70]  # Truncate title to 70 characters
+            if len(description) == 70:
+                description += '...'
+            desc_size = 'text-xs' if is_monthly else 'text-sm'
+            ui.label(description).classes(f'{desc_size} text-gray-600')
+        time_color = 'text-indigo-600' if is_monthly else 'text-blue-600'
+        
+        ui.label(_format_time_range(event['start_date'], event['end_date'])) \
+            .classes(f'text-xs font-medium {time_color}')
 
 def _render_event_actions(event: dict, on_edit: callable, on_delete: callable, is_monthly: bool) -> None:
     """Render event action buttons"""
@@ -49,7 +100,7 @@ def _render_event_actions(event: dict, on_edit: callable, on_delete: callable, i
     if not (on_edit or on_delete):
         return
         
-    with ui.row().classes('gap-1 ml-2'):
+    with ui.row().classes('gap-1 ml-2 relative justify-end items-center'):
         
         # Edit
         if on_edit:
