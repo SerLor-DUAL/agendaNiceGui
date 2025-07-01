@@ -46,7 +46,7 @@ fastapi_app.include_router(events_admin.event_admin_router)     # Administration
 
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)
-
+app.storage.max_tab_storage_age = 1
 # ============================================================================================================================= #
 #                                           Directory configuration                                                             #
 # ============================================================================================================================= #

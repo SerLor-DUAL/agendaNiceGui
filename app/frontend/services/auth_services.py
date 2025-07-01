@@ -1,6 +1,7 @@
 # app/frontend/services/auth_services.py
 
 # Import necessary modules
+import time                                                                 # Importing time to caculate localstorage purge
 import httpx                                                                # Importing for making HTTP requests
 from dotenv import load_dotenv                                              # Importing load_dotenv for loading environment variables                              
 import os                                                                   # Importing os for accessing environment variables  
@@ -211,7 +212,7 @@ class AuthService:
         """ Function to be used as a decorator or as a boolean checker to check if the user is logged in """
 
         async def check_auth():
-            
+             
             #  First check local cache
             if 'user_id' in app.storage.user:
                 return True
@@ -259,7 +260,6 @@ class AuthService:
     async def load_user_session(self) -> bool:
         """ Loads the user session from the backend cookies and stores the user data in app.storage.user, 
             returns True if the session is valid, False if not. """
-
         # Checks if the user is logged in
         result = await self.get_me()
         
@@ -269,14 +269,17 @@ class AuthService:
             # Save the user data in app.storage.user
             app.storage.user['user_id'] = user_data.get('id')
             app.storage.user['nickname'] = user_data.get('nickname')
+            # Add timestamp to know when to delete the session
+            app.storage.user['ts'] = time.time()
             return True
         else:
-            app.storage.user.clear()
             return False
 # ----------------------------------------------------------------------------------------------------------------------------------------------------    
     # FIRST INIT. It will be used as a decorator.
     async def first_init(self) -> None:
         """During the first INIT we will try to set up the user."""
+        # Validate the session: if no tokens are present and the session has expired, clear the local storage.
+        is_session_valid(max_age=5)
         if not app.storage.user.get('session_initialized', False):
             await self.load_user_session()
         app.storage.user['session_initialized'] = True
@@ -300,3 +303,15 @@ def with_first_init(auth_service_instance):
             return await view_function(*args, **kwargs)
         return wrapper
     return decorator
+
+# SESSION VALID
+@staticmethod
+def is_session_valid(max_age: int = 86400) -> bool:
+    ts = app.storage.user.get('ts')
+    if not ts:
+        return False
+    if time.time() - ts > max_age:
+        app.storage.user.clear()
+        return False
+    return True
+
