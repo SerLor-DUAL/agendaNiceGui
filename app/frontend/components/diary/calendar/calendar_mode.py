@@ -22,17 +22,45 @@ def calendar_mode(year: int, month: int, selected_day: int, events_data: dict, o
             for day in week:
                 _render_day_cell(day, month, year, today, selected_day, events_data, on_select)
 
+
 def _render_weekday_headers() -> None:
-    """Render weekday header labels"""
+    """Renders an adaptative weekday headers for the calendar view."""
     
+    # Weekday names
     days_full = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
     days_short = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    
+    days_mini = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+
+    # We add this CSS here because if it's in the global header or external file, it doesn't work properly due to style loading order and dynamic content.
+    # Injecting it here ensures the styles apply correctly when the labels are created.
+    ui.add_head_html("""
+        <style>
+            .weekday-label {
+                display: block;
+            }
+            
+            .weekday-label::before {
+                content: attr(data-mini);
+            }
+            
+            @media (min-width: 425px) and (max-width: 1023px) {
+                                            .weekday-label::before {
+                                                                        content: attr(data-short);
+                                                                    }
+                                        }
+                                        
+            @media (min-width: 1024px) {
+                                            .weekday-label::before {
+                                                content: attr(data-full);
+                                            }
+                                        }
+        </style>
+    """)
+
     with ui.grid().classes('w-full gap-y-0 px-2 grid-cols-7'):
-        for day in days_full:
-            ui.label(day).classes('hidden md:block text-center font-medium text-gray-500 text-lg')
-        for day in days_short:
-            ui.label(day).classes('md:hidden text-center font-medium text-gray-500 text-md py-2')
+        for full, short, mini in zip(days_full, days_short, days_mini):
+            ui.label("").classes('weekday-label text-center font-medium text-gray-500 text-lg md:text-lg text-md md:text-md py-2 md:py-0') \
+            .props(f'data-full="{full}" data-short="{short}" data-mini="{mini}" ')
 
 def _render_day_cell(day: int, month: int, year: int, today: datetime, selected_day: int, events_data: dict, on_select: callable) -> None:
     """Render individual day cell in calendar"""
@@ -43,7 +71,7 @@ def _render_day_cell(day: int, month: int, year: int, today: datetime, selected_
 
     date_key = f'{day:02d}/{month:02d}/{year}'
     
-    # Manejar caso cuando events_data es None o no tiene la clave
+    # Handle case when events_data is None or does not have the key
     event_count = 0
     if events_data and date_key in events_data:
         event_count = len(events_data[date_key])
@@ -52,9 +80,9 @@ def _render_day_cell(day: int, month: int, year: int, today: datetime, selected_
     is_selected = (day == selected_day)
     
     create_diary_day_card(
-        day=day,
-        event_count=event_count,
-        is_today=is_today,
-        is_selected=is_selected,
-        on_select=lambda d=day: on_select(d)
-    )
+                            day=day,
+                            event_count=event_count,
+                            is_today=is_today,
+                            is_selected=is_selected,
+                            on_select=lambda d=day: on_select(d)
+                        )

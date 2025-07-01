@@ -70,7 +70,7 @@ class DiaryCard:
         with ui.row().classes('w-full items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b'):
             
             # Navigation
-            with ui.row().classes('items-center gap-3 mx-auto'):
+            with ui.row().classes('items-center gap-3 mr-auto'):
                 ui.button(icon='chevron_left', on_click=lambda: self._change_month(-1)) \
                     .classes('text-blue-600 border shadow-sm hover:bg-blue-50')
                 
@@ -230,7 +230,6 @@ class DiaryCard:
                                                 on_edit=lambda e: self._select_day_and_edit(e),
                                                 is_monthly=True
                                             )
-                                
 
 
     def _render_empty_month(self) -> None:
@@ -243,7 +242,6 @@ class DiaryCard:
 
     def _update_view_button(self) -> None:
         """Update view toggle button text/icon"""
-        
         
         if self.state['view'] == 'calendar':
             self.ui_elements['view_button'].set_text('Vista mensual')
@@ -278,11 +276,22 @@ class DiaryCard:
         
         self.state['month'] = month
         self.state['year'] = year
+        
+        # Gets today date
+        today = datetime.now()
+        
+        # Resets to first day of the month or the actual day if the month is the same
+        if month == today.month and year == today.year:
+            self.state['day'] = today.day
+        else:
+            self.state['day'] = 1
+        
         self._refresh_ui()
 
 
     def _go_to_today(self) -> None:
         """Navigate to current date"""
+        
         today = datetime.today()
         self.state.update({
             'year': today.year,
@@ -295,12 +304,14 @@ class DiaryCard:
 
     def _toggle_view(self) -> None:
         """Toggle between calendar and monthly views"""
+        
         self.state['view'] = 'monthly' if self.state['view'] == 'calendar' else 'calendar'
         self._refresh_ui()
 
     # TODO Sergio doesnt like names :(
     def _select_day_and_edit(self, event: dict) -> None:
         """Select day and open event editor"""
+        
         self.state['day'] = event['day']
         self.state['view'] = 'calendar'
         self._refresh_ui()
@@ -337,17 +348,25 @@ class DiaryCard:
         """Handle event save from dialog"""
         
         try:
+            
+            # Get the date key
             date_key = self._format_date(self.state['day'])
             
+            # Check the action type
             if action == 'create':
+                
+                # If is a new event, add it to the events data
                 self.events_data.setdefault(date_key, []).append(new_event)
                 ui.notify(f'Evento "{new_event["title"]}" creado', type='positive')
             else:
+                
+                # If is an update, updates the event data
                 events = self.events_data[date_key]
                 index = next(i for i, e in enumerate(events) if e['id'] == new_event['id'])
                 events[index] = new_event
                 ui.notify(f'Evento "{new_event["title"]}" actualizado', type='positive')
             
+            # Refresh events
             await self._refresh_events()
             
         except Exception as e:
@@ -361,28 +380,27 @@ class DiaryCard:
                 if 'id' not in event:
                     raise ValueError("ID de evento no encontrado")
                 
-                # Obtener la clave de fecha
+                # Get the date key
                 date_key = self._format_date(self.state['day'])
                 
-                # Verificar si la fecha existe en los eventos
+                # Check if the date exists
                 if date_key not in self.events_data:
                     ui.notify('El evento ya ha sido eliminado', type='warning')
                     return
                     
-                # Filtrar el evento a eliminar
+                # Filter the event to delete
                 initial_events = self.events_data[date_key]
                 updated_events = [e for e in initial_events if e['id'] != event['id']]
                 
-                # Actualizar o eliminar la fecha según si quedan eventos
+                # Update or delete the date depending on whether there are remaining events
                 if updated_events:
                     self.events_data[date_key] = updated_events
                 else:
-                    # Eliminar la fecha completamente si no quedan eventos
                     del self.events_data[date_key]
                 
                 ui.notify(f'Evento "{event["title"]}" eliminado exitosamente!', type='positive')
                 
-                # Actualizar solo los componentes afectados
+                # Updates UI
                 self._render_events.refresh()
                 self._render_calendar.refresh()
                 
@@ -396,19 +414,19 @@ class DiaryCard:
         import asyncio
         
         try:
-            # Usar un indicador de carga más confiable
+            # Use a loading indicator
             loading = ui.linear_progress().classes('w-full absolute top-0')
             ui.update(loading)
             
-            # Obtener eventos con manejo de timeout
+            # Get events with timeout
             try:
                 self.events_data = await asyncio.wait_for(es.get_events(), timeout=8.0)
             except asyncio.TimeoutError:
                 ui.notify('El servidor está tardando en responder', type='warning')
-                # Intentar nuevamente con un timeout más corto
+                # Trying again with a shorter timeout
                 self.events_data = await asyncio.wait_for(es.get_events(), timeout=4.0)
             
-            # Actualizar UI
+            # Updates UI
             self._render_events.refresh()
             self._render_calendar.refresh()
             
