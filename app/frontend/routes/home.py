@@ -26,7 +26,7 @@ async def create_home_page():
         with ui.element('div').classes(
             'flex justify-center w-full h-full items-start order-1 md:order-2 md:pt-8'
         ):
-            with ui.element('div').classes('w-full self-start'):
+            with ui.element('div').classes('w-full self-start 2xl:self-end'):
                 ui.image('/static/img/hero.png').classes(
-                    'w-full h-auto max-h-[40vh] md:max-h-[52vh] lg:max-h-[72vh] object-contain rounded-xl'
+                    'w-full h-auto max-w-[800px] max-h-[70vh] object-contain rounded-2xl mx-auto'
                 )
