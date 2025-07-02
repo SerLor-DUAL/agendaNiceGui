@@ -11,7 +11,7 @@ async def create_home_page():
         
         # Text left column
         with ui.element('div').classes(
-            'flex flex-col h-full justify-start items-center md:items-start text-center md:text-left order-2 md:order-1 md:pt-8'
+            'flex flex-col h-full justify-center items-center text-center md:text-left order-2 md:order-1 md:pt-8'
         ):
             ui.label('AgendaNiceGUI').classes(
                 'text-2xl sm:text-3xl md:text-5xl font-bold text-gray-900 mb-6 slide-in-left'

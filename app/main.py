@@ -123,6 +123,5 @@ if __name__ in {"__main__", "__mp_main__"}:
     
     # Get JWT secret key from environment variable
     secret_key = os.getenv("SECRET_STORAGE")
-    
     # Runs app
     ui.run(port=selected_port, reload=True, show=True, storage_secret=secret_key, tailwind=True)
