@@ -15,11 +15,11 @@ async def create_home_page():
         ):
             
             ui.label('AgendaNiceGUI').classes(
-                'text-5xl md:text-7xl font-bold text-gray-900 mb-6 slide-in-left'
+                'text-4xl md:text-7xl font-bold text-gray-900 mb-6 slide-in-left'
             ).style('animation-delay: 0.1s;')
 
             ui.label('Esta agenda es nuestra brújula.🧭').classes(
-                'text-2xl md:text-3xl text-gray-700 slide-in-left'
+                'text-xl md:text-3xl text-gray-700 slide-in-left'
             ).style('animation-delay: 0.1s;')
 
         # Image right column
