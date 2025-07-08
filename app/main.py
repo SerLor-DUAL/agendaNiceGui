@@ -46,7 +46,7 @@ fastapi_app.include_router(events_admin.event_admin_router)     # Administration
 
 # Include FastAPI into NiceGUI
 app.mount("/api", fastapi_app)
-
+app.storage.max_tab_storage_age = 1
 # ============================================================================================================================= #
 #                                           Directory configuration                                                             #
 # ============================================================================================================================= #
@@ -123,6 +123,5 @@ if __name__ in {"__main__", "__mp_main__"}:
     
     # Get JWT secret key from environment variable
     secret_key = os.getenv("SECRET_STORAGE")
-    
     # Runs app
     ui.run(port=selected_port, reload=True, show=True, storage_secret=secret_key, tailwind=True)

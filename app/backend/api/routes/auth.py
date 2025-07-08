@@ -29,7 +29,7 @@ async def api_auth_login_OAuth(form_data: OAuth2PasswordRequestForm = Depends(),
 
     # If token is None, raise an error
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidos")
 
     # Returns the access token and the refresh token and token type (bearer)
     return {
@@ -50,7 +50,7 @@ async def api_auth_login_JSON(data: UserLogin, response: Response, session: Asyn
 
     # If token is None, raise an error
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales invalidos")
     
     # Clear cookies to avoid security issues
     ach.clear_auth_cookies(response)
