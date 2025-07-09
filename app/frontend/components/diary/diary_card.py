@@ -367,7 +367,6 @@ class DiaryCard:
                         ui.icon('schedule', size='sm').classes('text-gray-500')
                         start_time = event['start_date'].split(' ')[1] if ' ' in event['start_date'] else event['start_date']
                         end_time = event['end_date'].split(' ')[1] if ' ' in event['end_date'] else event['end_date']
-                        # 2025-07-09 Santi
                         ui.label(f'{self._format_iso_to_hour(start_time)} - {self._format_iso_to_hour(end_time)}').classes('text-sm text-gray-600')
                 
                 # Action buttons
