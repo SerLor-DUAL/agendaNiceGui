@@ -367,7 +367,8 @@ class DiaryCard:
                         ui.icon('schedule', size='sm').classes('text-gray-500')
                         start_time = event['start_date'].split(' ')[1] if ' ' in event['start_date'] else event['start_date']
                         end_time = event['end_date'].split(' ')[1] if ' ' in event['end_date'] else event['end_date']
-                        ui.label(f'{start_time} - {end_time}').classes('text-sm text-gray-600')
+                        # 2025-07-09 Santi
+                        ui.label(f'{self._format_iso_to_date(start_time)} - {self._format_iso_to_date(end_time)}').classes('text-sm text-gray-600')
                 
                 # Action buttons
                 with ui.row().classes('gap-2'):
@@ -409,6 +410,9 @@ class DiaryCard:
 
     def _format_date(self, day: int) -> str:
         return f"{day:02d}/{self.state['month']:02d}/{self.state['year']}"
+    def _format_iso_to_hour(self, datetime_str: str) -> str:
+        dt = datetime.fromisoformat(datetime_str)
+        return dt.strftime("%H:%M")
 
     # ====================================================================================== #
     # EVENT HANDLING
