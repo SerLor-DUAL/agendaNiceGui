@@ -382,7 +382,7 @@ class DiaryCard:
             ui.label('No hay eventos este mes').classes('text-xl font-semibold text-gray-600 mb-2')
             ui.label('Los eventos que agregues aparecerán aquí organizados por días') \
                 .classes('text-sm text-gray-400 text-center max-w-md')
-            ui.button('+ Agregar Primer Evento', icon='add', 
+            ui.button('Agregar Primer Evento', icon='add', 
                      on_click=lambda: self._show_event_dialog('create')) \
                 .classes('bg-blue-600 text-white px-6 py-3 mt-4')
 
