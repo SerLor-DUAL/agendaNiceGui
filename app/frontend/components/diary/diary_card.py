@@ -378,7 +378,7 @@ class DiaryCard:
 
     def _render_empty_month(self) -> None:
         with ui.column().classes('w-full h-96 justify-center items-center fade-in'):
-            ui.icon('event_busy', size='4xl').classes('text-gray-300 mb-4')
+            ui.icon('event_busy').classes('text-gray-300 mb-4').style('font-size: 80px')
             ui.label('No hay eventos este mes').classes('text-xl font-semibold text-gray-600 mb-2')
             ui.label('Los eventos que agregues aparecerán aquí organizados por días') \
                 .classes('text-sm text-gray-400 text-center max-w-md')
