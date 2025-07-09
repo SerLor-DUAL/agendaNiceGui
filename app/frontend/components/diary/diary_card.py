@@ -325,7 +325,7 @@ class DiaryCard:
         events = self._get_events_for_day(selected_day)
         date_str = self._format_date(selected_day)
         
-        with ui.column().classes('w-full monthly-container fade-in max-h-[200px]'):
+        with ui.column().classes('w-full monthly-container gap-1 fade-in max-h-[200px]'):
 
             # Day header
             with ui.row().classes('w-full monthly-header items-center'):
@@ -340,9 +340,13 @@ class DiaryCard:
 
             # Day events
             if events:
-                with ui.column().classes('w-full gap-4'):
-                    for event in events:
-                        self._render_day_event_card(event)
+                # with ui.column().classes('w-full gap-4'):
+                #     for event in events:
+                #         self._render_day_event_card(event)
+                with ui.scroll_area().classes('h-80 custom-scroll'):
+                    with ui.column().classes('w-full gap-3 p-3'):
+                        for event in events:
+                            self._render_day_event_card(event)
             else:
                 with ui.column().classes('w-full h-60 justify-center items-center'):
                     ui.icon('event_available', size='4xl').classes('text-gray-300 mb-4')
@@ -351,7 +355,8 @@ class DiaryCard:
                         .classes('bg-blue-600 text-white px-4 py-2 mt-4')
 
     def _render_day_event_card(self, event: dict) -> None:
-        with ui.card().classes('day-event-card w-full p-0'):
+        # with ui.card().classes('day-event-card w-full p-0'):
+        with ui.card().classes('day-event-card w-full p-2'):
             with ui.row().classes('w-full items-start justify-between p-4'):
                 # Event info
                 with ui.column().classes('flex-1 gap-2'):
