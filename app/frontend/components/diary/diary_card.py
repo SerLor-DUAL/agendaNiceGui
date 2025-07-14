@@ -438,9 +438,9 @@ class DiaryCard:
         try:
             if action == 'create':
                 await es.create_event(new_event)
-                ui.notify(f'Evento "{new_event["title"]}" creado', type='positive')
+                ui.notify(f'Evento "{new_event["id"], new_event["title"]}" creado', type='positive')
             else:
-                await es.update_event(new_event)
+                await es.update_event(new_event["id"], new_event)
                 ui.notify(f'Evento "{new_event["title"]}" actualizado', type='positive')
             
             await self._refresh_events()
@@ -534,9 +534,11 @@ class DiaryCard:
         self.state['day'] = day
         self._show_event_dialog('create')
 
-    def _edit_monthly_event(self, event: dict) -> None:
+    async def _edit_monthly_event(self, event: dict) -> None:
         self.state['day'] = event['day']
-        self._show_event_dialog('edit', event)
+        print(f"Editing event for day: {self.state['day']}")
+        print(f"Event details: {event}")
+        await self._show_event_dialog('edit', event)
 
     def _delete_monthly_event(self, event: dict) -> None:
         self.state['day'] = event['day']

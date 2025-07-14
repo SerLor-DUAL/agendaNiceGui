@@ -120,6 +120,7 @@ async def _handle_form_action(action: str, inputs: dict, event_data: dict, on_sa
                 raise ValueError("El evento no se creó correctamente")
         else:
             event_id = event_data['id']
+            print("Updating event with ID:", new_event)
             result = await es.update_event(event_id, new_event)
             if not result:
                 raise ValueError("El evento no se actualizó correctamente")
