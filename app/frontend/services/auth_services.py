@@ -279,7 +279,7 @@ class AuthService:
     async def first_init(self) -> None:
         """During the first INIT we will try to set up the user."""
         # Validate the session: if no tokens are present and the session has expired, clear the local storage.
-        is_session_valid(max_age=5)
+        is_session_valid()
         if not app.storage.user.get('session_initialized', False):
             await self.load_user_session()
         app.storage.user['session_initialized'] = True
