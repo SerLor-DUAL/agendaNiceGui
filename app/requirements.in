@@ -9,3 +9,4 @@ pydantic
 email_validator
 passlib
 python-jose[cryptography]
+babel
