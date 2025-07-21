@@ -17,6 +17,7 @@ def events_list(events: list, date_title: str = None, on_add: callable = None, o
                                 scrollbar-width: none !important;       /* Firefox */
                                 -ms-overflow-style: none !important;    /* IE 10+ */
                                 overflow-y: scroll !important;
+                                height: 94% !important;
                             }
 
                             .hide-scroll .q-scrollarea__container::-webkit-scrollbar {
@@ -27,6 +28,12 @@ def events_list(events: list, date_title: str = None, on_add: callable = None, o
                             
                             .hide-scroll .q-scrollarea__content {
                                 padding: 0rem !important;
+                                width: 0px !important;
+                            }
+                            
+                            .hide-scroll .q-scrollarea__content.absolute {
+                                padding: 0rem !important;
+                                width: 0px !important;
                             }
 
                             .hide-scroll .q-scrollarea__thumb {

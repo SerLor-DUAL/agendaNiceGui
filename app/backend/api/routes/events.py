@@ -127,7 +127,7 @@ async def api_delete_event_by_id(event_id: int, session: AsyncSession = Depends(
         This endpoint requires an user session and cookies with a validated token."""
 
     # Calls the EventService function to delete the event
-    was_deleted = await es.delete_user_event(event_id, current_user, session)
+    await es.delete_user_event(event_id, current_user, session)
     
     # Commits the changes to the database
     await session.commit()

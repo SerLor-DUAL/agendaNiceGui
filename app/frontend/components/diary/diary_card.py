@@ -107,6 +107,38 @@ MONTHLY_VIEW_CSS = """
             display: none;
             width: 0 !important;
         }
+        
+        .custom-scroll .q-scrollarea__container {
+            scrollbar-width: none !important;       /* Firefox */
+            -ms-overflow-style: none !important;    /* IE 10+ */
+            overflow-y: scroll !important;
+            height: 94% !important;
+        }
+
+        .custom-scroll .q-scrollarea__container::-webkit-scrollbar {
+            width: 0px !important;
+            height: 0px !important;
+            display: none !important;
+        }
+
+        .custom-scroll .q-scrollarea__content {
+            padding: 0rem !important;
+            width: 0px !important;
+        }
+
+        .custom-scroll .q-scrollarea__content.absolute {
+            padding: 0rem !important;
+            width: 0px !important;
+        }
+
+        .custom-scroll .q-scrollarea__thumb {
+            display: none !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            pointer-events: none !important;
+            transition: none !important;
+        }
     </style>
 """
 
@@ -355,22 +387,31 @@ class DiaryCard:
                         .classes('bg-blue-600 text-white px-4 py-2 mt-4')
 
     def _render_day_event_card(self, event: dict) -> None:
-        # with ui.card().classes('day-event-card w-full p-0'):
+        """Render a single event card for the monthly view."""
+
         with ui.card().classes('day-event-card w-full p-2'):
-            with ui.row().classes('w-full items-start justify-between p-4'):
-                # Event info
-                with ui.column().classes('flex-1 gap-2'):
-                    ui.label(event['title']).classes('text-lg font-bold text-gray-800')
+            with ui.row().classes('items-start justify-between w-full max-w-full p-4'):
+                # Columna izquierda: máximo 75% ancho
+                with ui.column().classes('flex-grow max-w-[75%] gap-2'):
+                    # Título con truncado y tooltip
+                    ui.label(event['title']) \
+                        .classes('text-lg font-bold text-gray-800 truncate') \
+                        .tooltip(event['title'])
+                    # Descripción con truncado y tooltip
                     if event.get('description'):
-                        ui.label(event['description']).classes('text-sm text-gray-600')
+                        ui.label(event['description']) \
+                            .classes('text-sm text-gray-600 truncate') \
+                            .tooltip(event['description'])
+                    # Fecha y hora
                     with ui.row().classes('items-center gap-2'):
                         ui.icon('schedule', size='sm').classes('text-gray-500')
                         start_time = event['start_date'].split(' ')[1] if ' ' in event['start_date'] else event['start_date']
                         end_time = event['end_date'].split(' ')[1] if ' ' in event['end_date'] else event['end_date']
-                        ui.label(f'{self._format_iso_to_hour(start_time)} - {self._format_iso_to_hour(end_time)}').classes('text-sm text-gray-600')
-                
-                # Action buttons
-                with ui.row().classes('gap-2'):
+                        ui.label(f'{self._format_iso_to_hour(start_time)} - {self._format_iso_to_hour(end_time)}') \
+                            .classes('text-sm text-gray-600')
+
+                # Columna derecha: botones de acción, alineados abajo y pegados a la derecha
+                with ui.column().classes('flex-shrink-0 items-end gap-2 min-w-[70px]'):
                     ui.button(icon='edit', on_click=lambda e=event: self._edit_monthly_event(e)) \
                         .classes('text-blue-600 bg-blue-50 hover:bg-blue-100')
                     ui.button(icon='delete', on_click=lambda e=event: self._delete_monthly_event(e)) \

@@ -18,8 +18,8 @@ def event_card(event: dict, on_edit: callable = None, on_delete: callable = None
 def _get_card_classes(is_monthly: bool) -> str:
     base = 'mb-3 p-4 border-l-4 transition-all duration-300 w-full'
     if is_monthly:
-        return f'{base} bg-white border-blue-400 hover:bg-blue-50 hover:border-blue-600 shadow-md hover:shadow-lg'
-    return f'{base} bg-blue-50 border-blue-500 hover:bg-blue-100 max-w-[250px]'
+        return f'{base} bg-white border-blue-400 hover:bg-blue-50 hover:border-blue-600 shadow-md hover:shadow-lg max-w-5xl'
+    return f'{base} bg-blue-50 border-blue-500 hover:bg-blue-100 max-w-xs'
 
 def _render_event_info(event: dict, on_edit: callable, on_delete: callable, is_monthly: bool) -> None:
     """ Adds event info to the card """
@@ -38,7 +38,7 @@ def _render_event_info(event: dict, on_edit: callable, on_delete: callable, is_m
                 'max-width: calc(100% - 7rem); '
                 'overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: normal;'
             ) \
-            .tooltip(event['title'])
+            .tooltip(event['title'][:20 if is_monthly else 30] + '...')
 
         # Buttons
         with ui.row().classes('gap-1 items-center').style('width: 6rem; flex-shrink: 0; justify-content: flex-end;'):
@@ -65,7 +65,7 @@ def _render_event_info(event: dict, on_edit: callable, on_delete: callable, is_m
                 'word-break: break-word; overflow-wrap: break-word; display: -webkit-box; '
                 '-webkit-line-clamp: 2; -webkit-box-orient: vertical;'
             ) \
-            .tooltip(event['description'])
+            .tooltip(event['description'][:40 if is_monthly else 50] + '...')
 
     # Row 3: Time
     ui.label(_format_time_range(event['start_date'], event['end_date'])) \
