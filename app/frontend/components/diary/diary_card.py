@@ -417,30 +417,31 @@ class DiaryCard:
     # EVENT HANDLING
     # ====================================================================================== #
     
-    async def _show_event_dialog(self, action: str, event: Optional[dict] = None) -> None:
+    def _show_event_dialog(self, action: str, event: Optional[dict] = None) -> None:
         event_data = event.copy() if event else {
-            'day': self.state['day'],
-            'title': '',
-            'description': '',
-            'start_date': f'{self._format_date(self.state["day"])} 09:00',
-            'end_date': f'{self._format_date(self.state["day"])} 10:00'
-        }
-        
+                                                    'day': self.state['day'],
+                                                    'title': '',
+                                                    'description': '',
+                                                    'start_date': f'{self._format_date(self.state["day"])} 09:00',
+                                                    'end_date': f'{self._format_date(self.state["day"])} 10:00'
+                                                }
+        if 'day' not in event_data:
+            event_data['day'] = self.state['day']
+
         dialog = show_event_dialog(
-                                    action=action,
-                                    event_data=event_data,
-                                    on_save=lambda e: self._handle_event_save(action, e),
-                                    on_delete=lambda e: self._handle_event_delete(e) if action == 'delete' else None
-                                )
+            action=action,
+            event_data=event_data,
+            on_save=lambda e: self._handle_event_save(action, e),
+            on_delete=lambda e: self._handle_event_delete(e) if action == 'delete' else None
+        )
         dialog.open()
 
     async def _handle_event_save(self, action: str, new_event: dict) -> None:
         try:
+            # Remove backend call here, only notify and refresh
             if action == 'create':
-                await es.create_event(new_event)
                 ui.notify(f'Evento "{new_event["title"]}" creado', type='positive')
             else:
-                await es.update_event(new_event["id"], new_event)
                 ui.notify(f'Evento "{new_event["title"]}" actualizado', type='positive')
             
             await self._refresh_events()
@@ -451,7 +452,10 @@ class DiaryCard:
         try:
             await es.delete_event(event['id'])
             ui.notify(f'Evento "{event["title"]}" eliminado', type='positive')
-            await self._refresh_events()
+            # Elimina el evento localmente para refresco instantáneo
+            for events in self.events_data.values():
+                events[:] = [e for e in events if e.get('id') != event['id']]
+            self._refresh_ui()  # Solo refresca la UI, no recarga del backend (así es más rápido)
         except Exception as e:
             ui.notify(f'Error al eliminar evento: {str(e)}', type='negative')
 
@@ -534,12 +538,16 @@ class DiaryCard:
         self.state['day'] = day
         self._show_event_dialog('create')
 
-    async def _edit_monthly_event(self, event: dict) -> None:
-        self.state['day'] = event['day']
-        print(f"Editing event for day: {self.state['day']}")
-        print(f"Event details: {event}")
-        await self._show_event_dialog('edit', event)
+    def _edit_monthly_event(self, event: dict) -> None:
+        day = event.get('day', self.state.get('day', self.monthly_view_state.get('selected_day')))
+        self.state['day'] = day
+        event_with_day = event.copy()
+        event_with_day['day'] = day
+        self._show_event_dialog('edit', event_with_day)
 
-    async def _delete_monthly_event(self, event: dict) -> None:
-        self.state['day'] = event['day']
-        await self._show_event_dialog('delete', event)
+    def _delete_monthly_event(self, event: dict) -> None:
+        day = event.get('day', self.state.get('day', self.monthly_view_state.get('selected_day')))
+        self.state['day'] = day
+        event_with_day = event.copy()
+        event_with_day['day'] = day
+        self._show_event_dialog('delete', event_with_day)
