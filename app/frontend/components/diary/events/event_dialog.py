@@ -42,15 +42,11 @@ def _render_delete_confirmation(event_data: dict) -> None:
     
     ui.label('¿Estás seguro de que quieres eliminar este evento?').classes('text-gray-700 mb-3')
     with ui.card().classes('bg-red-50 border-l-4 border-red-400 p-4 mb-4 min-w-[75%] self-center'):
-        title = event_data.get('title', 'Evento sin título')[:50]  # Truncate title to 50 characters
-        if len(title) == 50:
-            title += '...'
-        ui.label(title).classes('font-semibold text-red-800')
-        description = event_data.get('description')[:120]  # Truncate title to 120 characters
-        if len(description) == 120:
-            description += '...'
+        title = event_data.get('title', 'Evento sin título')
+        ui.label(title).classes('font-semibold text-red-800 truncate w-full') # Usamos Truncate de Tailwind para truncar el texto
+        description = event_data.get('description')
         if description:
-            ui.label(description).classes('text-sm text-red-700')
+            ui.label(description).classes('text-sm text-red-700 truncate w-full') # Usamos Truncate de Tailwind para truncar el texto
 
         # Formatted time range display
         ui.label(_format_time_range(event_data.get('start_date', ''), event_data.get('end_date', ''))).classes('text-xs text-red-600')

@@ -169,7 +169,7 @@ class DiaryCard:
         with ui.row().classes('w-full justify-center p-5'):                
             with ui.card().classes('w-full max-w-7xl bg-white rounded-2xl shadow-2xl p-6'):
                 self._create_controls()
-                with ui.row().classes('w-full h-[600px]'):
+                with ui.row().classes('w-full h-[600px] content-start'):
                     self._create_calendar_section()
                     self._create_daily_events_section()
                     self._create_monthly_section()
@@ -395,12 +395,12 @@ class DiaryCard:
                 with ui.column().classes('flex-grow max-w-[75%] gap-2'):
                     # Título con truncado y tooltip
                     ui.label(event['title']) \
-                        .classes('text-lg font-bold text-gray-800 truncate') \
+                        .classes('text-lg font-bold text-gray-800 truncate w-full') \
                         .tooltip(event['title'])
                     # Descripción con truncado y tooltip
                     if event.get('description'):
                         ui.label(event['description']) \
-                            .classes('text-sm text-gray-600 truncate') \
+                            .classes('text-sm text-gray-600 truncate w-full') \
                             .tooltip(event['description'])
                     # Fecha y hora
                     with ui.row().classes('items-center gap-2'):
