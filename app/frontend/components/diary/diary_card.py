@@ -524,6 +524,8 @@ class DiaryCard:
         else:
             self.monthly_view_state = {'mode': 'day', 'selected_day': day}
             self._render_monthly_view()
+        self._refresh_ui()
+
 
     def _change_month(self, delta: int) -> None:
         month = self.state['month'] + delta
