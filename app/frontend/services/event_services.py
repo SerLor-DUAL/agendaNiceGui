@@ -114,31 +114,21 @@ class EventService:
 
     async def delete_event(self, event_id: int):
         """ Delete an event by ID using a browser-side fetch call """
-        
-        # JavaScript code to delete an event using the fetch API
-        js_code = f'''
-                        fetch('{BASE_URL}/api/events/{event_id}', {{
-                            method: 'DELETE',
-                            credentials: 'include'
-                        }})
-                        .then(response => {{
-                            if (!response.ok) throw new Error(`Error ${{response.status}}: ${{response.statusText}}`);
-                            return response.json();
-                        }})
-                    '''
-
+        js_code = f"""
+            (async () => {{
+                const response = await fetch('{BASE_URL}/api/events/{event_id}', {{
+                    method: 'DELETE',
+                    credentials: 'include'
+                }});
+                return response.status === 200 || response.status === 204 || response.status === 404;
+            }})()
+        """
         try:
-            # Execute the JS code to delete the event
             result = await ui.run_javascript(js_code, timeout=5)
-            
-            # Print the result for debugging
             print('Deleted event:', 'Deleted' if result else 'Not Deleted')
             if result:
                 print('Deleted id:', event_id)
-                
-            return True
-        
-        # If there's an error executing the fetch, notify the user
+            return result
         except Exception as e:
             print('Error al eliminar evento:', e)
             return False

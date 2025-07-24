@@ -121,17 +121,13 @@ async def api_update_event_by_id(event_id: int, event_to_update: EventUpdate, se
 # ---------------------------------------------------------------------------------------------------------------------------------------------------- #
 # DELETE ENDPOINTS #
 
-@event_router.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+@event_router.delete("/events/{event_id}", status_code=status.HTTP_200_OK)
 async def api_delete_event_by_id(event_id: int, session: AsyncSession = Depends(get_session), current_user: User = Depends(api_auth_get_me_cookie)):
     """ API endpoint to delete an event by its ID from the database for the current user and returns a success message. 
         This endpoint requires an user session and cookies with a validated token."""
 
     # Calls the EventService function to delete the event
-    was_deleted = await es.delete_user_event(event_id, current_user, session)
-
-    # If event deletion failed, raise an error
-    if not was_deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found or deletion failed")
+    await es.delete_user_event(event_id, current_user, session)
     
     # Commits the changes to the database
     await session.commit()
