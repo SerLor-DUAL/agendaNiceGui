@@ -40,7 +40,7 @@ mi_proyecto/
 |   |   |   |         ├── update.py         # DTO para la modificación de usuarios, hereda del DTO base
 |   |   |   |         ├── read.py           # DTO para la lectura de usuarios, hereda del DTO base
 |   |   |   |         └── login.py          # DTO para el login de usuarios, hereda del DTO base
-│   │   │   └── event
+│   │   │   ├── event
 |   |   |   |     ├── model.py              # Modelo de evento según la BD
 |   |   |   |     └── DTOs                  # Carpeta para los DTOs del evento
 |   |   |   |         ├── base.py           # DTO base para el resto
