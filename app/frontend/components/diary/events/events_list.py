@@ -69,6 +69,9 @@ def _render_header(date_title: str, on_add: callable) -> None:
 
 def _render_events_content(events: list, on_edit: callable, on_delete: callable, is_monthly: bool) -> None:
     """Render events content area"""
+    
+    events = sorted(events, key=lambda e: e['start_date'])
+    
     if events:
         for event in events:
             event_card(
