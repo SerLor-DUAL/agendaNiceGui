@@ -80,7 +80,7 @@ mi_proyecto/
 |   |   |   |    ├── form_login_card.py     # Formulario de login
 |   |   |   |    └── form_register_card.py  # Fromulario de registro
 
-│   │   │   └── utils/
+│   │   │   ├── utils/
 |   |   |   |    ├── header_links.py        # CSS inyectado en la barra de navegación en el HEAD del HTML
 |   |   |   |    ├── navbar_buttons.py      # Butones de la barra de navegación
 |   |   |   |    ├── navbar_links.py        # Links de la barra de navegación
