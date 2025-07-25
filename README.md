@@ -20,48 +20,85 @@ mi_proyecto/
 │   │   ├── api/                            # Endpoints
 │   │   │   ├── routes/
 │   │   │   │   ├── users.py                # Rutas de usuarios
+│   │   │   │   ├── users_admin.py          # FEATURE TODO: Rutas de usuarios para el administrador
 │   │   │   │   ├── events.py               # Rutas de eventos
+│   │   │   │   ├── events_admin.py         # FEATURE TODO: Rutas de eventos para el administrador
 │   │   │   │   └── auth.py                 # Login, registro, autenticación
 │   │   │   └── dependencies/
-│   │   │       ├── auth_guard.py           # TODO: REVISAR SI SE BORRA POR NO USARLO
-│   │   │       └── auth_cookies.py         # Verificación JWT + COOKIES - Actua como Middleware
+│   │   │       ├── auth_guard.py           # FEATURE TODO: Añadir autenticación a través de terceros
+│   │   │       └── auth_cookies.py         # Verificación JWT + COOKIES - Actua como Middleware de cookies
 
 │   │   ├── db/                             # Conexión y consultas SQL a la base de datos
-│   │   │   └── db_handler.py               # Conexión y gestión de PostgreSQL
+│   │   │   └── db_handler.py               # Controlador de la conexión y gestión de PostgreSQL
 
 │   │   ├── models/                         # Modelos SQLModel para BD y validación
 │   │   │   ├── user
 |   |   |   |     ├── model.py              # Modelo de usuario según la BD
 |   |   |   |     └── DTOs                  # Carpeta para los DTOs del usuario
+|   |   |   |         ├── base.py           # DTO base para el resto
+|   |   |   |         ├── create.py         # DTO para la creación de usuarios, hereda del DTO base
+|   |   |   |         ├── update.py         # DTO para la modificación de usuarios, hereda del DTO base
+|   |   |   |         ├── read.py           # DTO para la lectura de usuarios, hereda del DTO base
+|   |   |   |         └── login.py          # DTO para el login de usuarios, hereda del DTO base
 │   │   │   └── event
-|   |   |         ├── model.py              # Modelo de evento según la BD
-|   |   |         └── DTOs                  # Carpeta para los DTOs del evento
+|   |   |   |     ├── model.py              # Modelo de evento según la BD
+|   |   |   |     └── DTOs                  # Carpeta para los DTOs del evento
+|   |   |   |         ├── base.py           # DTO base para el resto
+|   |   |   |         ├── create.py         # DTO para la creación de eventos, hereda del DTO base
+|   |   |   |         ├── update.py         # DTO para la modificación de eventos, hereda del DTO base
+|   |   |   |         └── read.py           # DTO para la lectura de eventos, hereda del DTO base
 
-│   │   ├── services/                       # Lógica de negocio (Es decir "controladores")
+│   │   ├── services/                       # Lógica de negocio separada de la API (Es decir "Controladores")
 │   │   │   ├── user_service.py             # CRUD y otros de usuarios
 │   │   │   └── event_Service.py            # CRUD y otros de eventos
 
 │   │   ├── utils/                          # Funciones auxiliares reutilizables
 │   │   │   ├── jwt.py                      # Crear y verificar tokens JWT
+│   │   │   ├── cors.py                     # Manjeo de peticiones seguras de origen cruzado y trasferencias de datos entre navegadores y servidores (Middleware)
 │   │   │   └── hashing.py                  # Hashing de contraseñas (bcrypt)
 
 │   │   └── config.py                       # Configuración de clases que usan información de .env
 
 │   ├── frontend/                           # Interfaz de usuario con NiceGUI
-│   │   ├── routes/                         # Páginas visibles
-│   │   │   ├── home.py
-│   │   │   ├── dashboard.py
-│   │   │   └── login.py
-│   │   ├── components/                     # Componentes visuales reutilizables
-│   │   │   ├── navbar.py
-│   │   │   ├── sidebar.py
-│   │   │   └── user_card.py
-│   │   ├── static/
-│   │   │   ├── img/
+│   │   ├── routes/                         
+│   │   │   ├── home.py                     # Página principal
+│   │   │   ├── diary.py                    # Diario con los eventos
+│   │   │   ├── register.py                 # Registro de los usuarios
+│   │   │   └── login.py                    # Inicio de los usuarios
 
-    ├── requirements.in                     # Lista las dependencias directas del proyecto, sin versiones estrictas.
-    ├── requirements.txt                    # Versión bloqueada con todas las dependencias y sub-dependencias.
-├── .env                                    # Variables secretas (BD, JWT_SECRET, etc.)
+│   │   ├── components/                     
+│   │   │   ├── diary/
+|   |   |   |    ├── calendar/              
+|   |   |   |    |    ├── calendar_mode.py  # Modo del calendario normal (Veremos los eventos en un calendario en grid)
+|   |   |   |    |    └── monthly_mode.py   # Modo del calendario de vista mensual (Veremos los eventos del mes en una lista)
+|   |   |   |    ├──  events/               
+|   |   |   |    |    ├── event_card.py     # Card del evento
+|   |   |   |    |    ├── event_dialog.py   # Modal de acciones del evento
+|   |   |   |    |    └── event_list.py     # Lista de eventos que contienen las cards de cada evento vinculado a esta
+
+│   │   │   ├── forms/
+|   |   |   |    ├── form_login_card.py     # Formulario de login
+|   |   |   |    └── form_register_card.py  # Fromulario de registro
+
+│   │   │   └── utils/
+|   |   |   |    ├── header_links.py        # CSS inyectado en la barra de navegación en el HEAD del HTML
+|   |   |   |    ├── navbar_buttons.py      # Butones de la barra de navegación
+|   |   |   |    ├── navbar_links.py        # Links de la barra de navegación
+|   |   |   |    └── navbar.py              # Barra de navegación principal
+
+│   │   │   ├── diary_card.py               # Componente principal del diario
+│   │   │   └── diary_day_card.py           # Cards del diario cuando el calendario tiene el modo normal (Es decir los días en el grid del calendario)
+
+│   │   ├── static/
+│   │   │   ├── img/                        # Componentes visuales reutilizables
+│   │   │   └── css/                        # CSS personalizado reutilizable
+
+│   │   └── utils/                          # Funciones que aportan utilidades y son reutilizables
+
+│   ├── requirements.in                     # Lista las dependencias directas del proyecto, sin versiones estrictas.
+│   └── requirements.txt                    # Versión bloqueada con todas las dependencias y sub-dependencias.
+
+└── .env                                    # Variables secretas (BD, JWT_SECRET, etc.)
 ```
 
 ---
