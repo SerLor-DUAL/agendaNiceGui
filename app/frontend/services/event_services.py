@@ -47,9 +47,6 @@ class EventService:
             # Execute the JS, wait for the response, and parse the JSON
             events = await ui.run_javascript(js_code, timeout=7)
             
-            # Print the events for debugging
-            print(events)
-
             # Si la respuesta es notFound, muestra aviso y retorna un dict vacío
             if isinstance(events, dict) and events.get('notFound'):
                 # Por el momento no se muestra un aviso, pero podriamos descomentar si se desea
